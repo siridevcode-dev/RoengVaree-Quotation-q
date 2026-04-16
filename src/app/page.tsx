@@ -1,65 +1,94 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import Sidebar from "@/components/Sidebar";
+import Header from "@/components/Header";
+import Dashboard from "@/components/Dashboard";
+import QuotationList from "@/components/QuotationList";
+import CustomerList from "@/components/CustomerList";
+import QuotationForm from "@/components/QuotationForm";
+import ProductList from "@/components/ProductList";
+import Reports from "@/components/Reports";
+import RepeatQueries from "@/components/RepeatQueries";
+import Settings from "@/components/Settings";
+import MemberManagement from "@/components/MemberManagement";
+import ProductSelector from "@/components/ProductSelector";
+import { Product } from "@/context/AppContext";
+
+import { useAppContext } from "@/context/AppContext";
+import Login from "@/components/Login";
 
 export default function Home() {
+  const { currentUser, isReady } = useAppContext();
+  const [activePage, setActivePage] = useState("Quotations");
+  const [activeQuotationId, setActiveQuotationId] = useState<string | undefined>(undefined);
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+
+  const handleNavigate = (page: string, quotationId?: string, items?: Product[]) => {
+    setActiveQuotationId(quotationId);
+    if (page !== "Quotation Form") {
+      setSelectedProducts([]);
+    } else if (items && items.length > 0) {
+      setSelectedProducts(items);
+    }
+    setActivePage(page);
+  };
+
+  // ฟังก์ชันสลับการแสดงผลตาม activePage
+  const renderActivePage = () => {
+    switch (activePage) {
+      case "Dashboard":
+        return <Dashboard />;
+      case "Quotations":
+        return <QuotationList onNavigate={handleNavigate} />;
+      case "Customers":
+        return <CustomerList />;
+      case "Quotation Form":
+        return <QuotationForm onNavigate={handleNavigate} quotationId={activeQuotationId} initialItems={selectedProducts} />;
+      case "Select Products":
+        return (
+          <ProductSelector 
+            onConfirm={(products) => {
+              setSelectedProducts(products);
+              handleNavigate("Quotation Form");
+            }}
+            onCancel={() => handleNavigate("Dashboard")}
+          />
+        );
+      case "Products":
+        return <ProductList />;
+      case "Reports":
+        return <Reports />;
+      case "Quotation Templates":
+        return <RepeatQueries onNavigate={handleNavigate} />;
+      case "Settings":
+        return <Settings />;
+      case "Members":
+        return <MemberManagement />;
+      default:
+        return <Dashboard />;
+    }
+  };
+
+  if (!isReady) return null;
+
+  if (!currentUser) {
+    return <Login />;
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="flex h-screen bg-[#f0f4f8] animate-in fade-in duration-700">
+      {/* Sidebar */}
+      <Sidebar activePage={activePage} onPageChange={(p) => handleNavigate(p)} />
+
+      {/* Main area */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Header */}
+        <Header activePage={activePage} onNavigate={handleNavigate} />
+
+        {/* Content */}
+        {renderActivePage()}
+      </div>
     </div>
   );
 }

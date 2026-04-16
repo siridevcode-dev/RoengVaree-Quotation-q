@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  roengvaree-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: roengvaree-quotation
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      # Map the NAS folder to the app data folder
+      # Ensure the local folder path exists on your Synology NAS
+      - ./data:/app/data
+      - ./public/uploads:/app/public/uploads
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET=roengvaree_secure_secret_2026
+      - PORT=3000
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
