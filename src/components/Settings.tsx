@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useAppContext, BoatSpecification } from "@/context/AppContext";
+import { api } from "@/lib/api-client";
 
 export default function Settings() {
   const { settings, updateSettings, resetAllData, currentUser, updateBoatSpecification } = useAppContext();
@@ -52,29 +53,31 @@ export default function Settings() {
 
   const handleSave = async () => {
     try {
+      const updates: any = {};
+
       if (activeTab === "profile") {
         if (profileData.password && profileData.password !== profileData.confirmPassword) {
           alert("รหัสผ่านไม่ตรงกัน");
           return;
         }
+        if (currentUser) {
+          updates.profile = {
+            ...profileData,
+            role: currentUser.role,
+            status: currentUser.status
+          };
+        }
+      } else if (activeTab === "company") {
+        updates.companySettings = companyData;
+      } else if (activeTab === "quotation") {
+        updates.quotationSettings = quotationData;
+      } else if (activeTab === "notifications") {
+        updates.notifications = notificationsData;
       }
 
-      const updates: any = {
-        companySettings: companyData,
-        quotationSettings: quotationData,
-        notifications: notificationsData,
-      };
-
-      if (activeTab === "profile" && currentUser) {
-        // We include EVERYTHING the API expects to avoid downgrading role/status
-        updates.profile = {
-          ...profileData,
-          role: currentUser.role,
-          status: currentUser.status
-        };
+      if (Object.keys(updates).length > 0) {
+        await updateSettings(updates);
       }
-
-      await updateSettings(updates);
       
       // Clear passwords after save
       if (activeTab === "profile") {
@@ -374,27 +377,34 @@ function BoatSpecificationTab() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRefUpload = useRef<HTMLInputElement>(null);
   const [uploadTarget, setUploadTarget] = useState<{ model: string, index: number } | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && uploadTarget) {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const imageUrl = event.target?.result as string;
+      try {
+        setIsUploading(true);
+        const res = await api.upload(file);
+        const imageUrl = res.url;
+        
         const currentSpec = boatSpecifications[uploadTarget.model] || {
           loa: "-", beam: "-", draft: "-", freshWaterCapacity: "-",
           gasTank: "-", height: "-", recEngine: "-", speedDesign: "-", passenger: "-", images: []
         };
         const currentImages = [...(currentSpec.images || [])];
+        // Pad array if needed
+        while (currentImages.length <= uploadTarget.index) currentImages.push("");
         currentImages[uploadTarget.index] = imageUrl;
         
         await updateBoatSpecification(uploadTarget.model, { ...currentSpec, images: currentImages });
-        
+      } catch (err) {
+        console.error("Upload failed:", err);
+        alert("อัปโหลดรูปภาพไม่สำเร็จ");
+      } finally {
+        setIsUploading(false);
         setUploadTarget(null);
-        // Clear input so same file can be selected again
         if (fileInputRefUpload.current) fileInputRefUpload.current.value = "";
-      };
-      reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -619,6 +629,11 @@ function BoatSpecificationTab() {
                                 : "border-gray-200 bg-gray-50/30 hover:bg-teal-50/50 hover:border-teal-300"
                             }`}
                           >
+                            {isUploading && uploadTarget?.index === i && (
+                              <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
+                                <div className="w-6 h-6 border-2 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
+                              </div>
+                            )}
                             {imageUrl ? (
                               <>
                                 <img src={imageUrl} alt={`เรือรุ่น ${model} รูปที่ ${i + 1}`} className="w-full h-full object-cover" />
@@ -643,7 +658,8 @@ function BoatSpecificationTab() {
                             ) : (
                               <button 
                                 onClick={() => triggerUpload(model, i)}
-                                className="w-full h-full flex flex-col items-center justify-center gap-2 text-gray-400 group-hover:text-teal-600 transition-colors"
+                                disabled={isUploading}
+                                className="w-full h-full flex flex-col items-center justify-center gap-2 text-gray-400 group-hover:text-teal-600 transition-colors disabled:opacity-50"
                               >
                                 <svg className="w-8 h-8 opacity-40 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
