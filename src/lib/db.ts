@@ -5,24 +5,18 @@ import { seedDatabase } from "./seed";
 const DB_URL = process.env.TURSO_DATABASE_URL;
 const DB_AUTH_TOKEN = process.env.TURSO_AUTH_TOKEN;
 
-if (!DB_URL) {
-  throw new Error("CRITICAL: TURSO_DATABASE_URL is missing from environment variables!");
-}
-
 // Singleton pattern for server-side DB connection
 let _db: Client | null = null;
 
 export function getDb(): Client {
+  if (!DB_URL) {
+    throw new Error("CRITICAL: TURSO_DATABASE_URL is missing from environment variables!");
+  }
   if (!_db) {
     _db = createClient({
       url: DB_URL,
       authToken: DB_AUTH_TOKEN,
     });
-
-    // In Next.js, we might want to handle initialization carefully
-    // Since we are switching to async, the initSchema and seedDatabase
-    // should probably be handled outside or checked differently.
-    // For now, we'll try to keep the logic similar but note it's async now.
   }
   return _db;
 }
@@ -30,8 +24,6 @@ export function getDb(): Client {
 export async function initDb() {
   const db = getDb();
   
-  // We'll execute the schema creation
-  // Note: initSchema and seedDatabase need to be converted to async
   await db.execute(`
     -- Users table
     CREATE TABLE IF NOT EXISTS users (
