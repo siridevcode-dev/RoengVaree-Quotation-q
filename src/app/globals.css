@@ -1,21 +1,38 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f0f4f8;
-  --foreground: #1e293b;
-  --teal-50: #eef2ff;
-  --teal-100: #e0e7ff;
-  --teal-200: #c7d2fe;
-  --teal-300: #a5b4fc;
-  --teal-400: #818cf8;
-  --teal-500: #6366f1;
-  --teal-600: #4f46e5;
-  --teal-700: #283583;
-  --teal-800: #3730a3;
-  --teal-900: #312e81;
+  /* Brand Colors */
+  --brand-primary: #283583;
+  --brand-primary-light: #3b4ba4;
+  --brand-primary-dark: #1e2a6e;
+
+  /* Accent - Indigo/Blue */
+  --accent-50: #eef2ff;
+  --accent-100: #e0e7ff;
+  --accent-200: #c7d2fe;
+  --accent-300: #a5b4fc;
+  --accent-400: #818cf8;
+  --accent-500: #6366f1;
+  --accent-600: #4f46e5;
+  --accent-700: #4338ca;
+
+  /* Teal (legacy compat) */
+  --teal-50: #f0fdf9;
+  --teal-100: #ccfbf1;
+  --teal-200: #99f6e4;
+  --teal-300: #5eead4;
+  --teal-400: #2dd4bf;
+  --teal-500: #14b8a6;
+  --teal-600: #0d9488;
+  --teal-700: #0f766e;
+  --teal-800: #115e59;
+  --teal-900: #134e4a;
+
+  /* Neutral */
   --white: #ffffff;
   --gray-50: #f8fafc;
   --gray-100: #f1f5f9;
+  --gray-150: #eaeff5;
   --gray-200: #e2e8f0;
   --gray-300: #cbd5e1;
   --gray-400: #94a3b8;
@@ -24,18 +41,38 @@
   --gray-700: #334155;
   --gray-800: #1e293b;
   --gray-900: #0f172a;
-  --red-500: #ef4444;
+
+  /* Status Colors */
+  --red-50: #fef2f2;
   --red-100: #fee2e2;
-  --emerald-50: #eef2ff;
-  --emerald-100: #e0e7ff;
-  --emerald-200: #c7d2fe;
-  --emerald-300: #a5b4fc;
-  --emerald-400: #818cf8;
-  --emerald-500: #6366f1;
-  --emerald-600: #4f46e5;
-  --emerald-700: #283583;
-  --emerald-800: #3730a3;
-  --emerald-900: #312e81;
+  --red-500: #ef4444;
+  --red-600: #dc2626;
+  --emerald-50: #ecfdf5;
+  --emerald-100: #d1fae5;
+  --emerald-500: #10b981;
+  --emerald-600: #059669;
+  --emerald-700: #047857;
+  --amber-50: #fffbeb;
+  --amber-100: #fef3c7;
+  --amber-500: #f59e0b;
+  --amber-700: #b45309;
+  --blue-50: #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-500: #3b82f6;
+  --blue-700: #1d4ed8;
+
+  /* Surface */
+  --background: #ffffff;
+  --surface: #f8fafc;
+  --surface-raised: #ffffff;
+  --foreground: #1e293b;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.06);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
 }
 
 @theme inline {
@@ -64,14 +101,17 @@
   --color-gray-900: var(--gray-900);
   --color-emerald-50: var(--emerald-50);
   --color-emerald-100: var(--emerald-100);
-  --color-emerald-200: var(--emerald-200);
-  --color-emerald-300: var(--emerald-300);
-  --color-emerald-400: var(--emerald-400);
   --color-emerald-500: var(--emerald-500);
   --color-emerald-600: var(--emerald-600);
   --color-emerald-700: var(--emerald-700);
-  --color-emerald-800: var(--emerald-800);
-  --color-emerald-900: var(--emerald-900);
+}
+
+/* ======================================================
+   BASE STYLES
+   ====================================================== */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -80,11 +120,32 @@ body {
   font-family: 'Inter', system-ui, sans-serif;
 }
 
+/* ======================================================
+   SCROLLBAR
+   ====================================================== */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--gray-300) transparent;
 }
 
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-400);
+}
+
+/* ======================================================
+   NUMBER INPUT
+   ====================================================== */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -94,3 +155,239 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
+/* ======================================================
+   ANIMATIONS
+   ====================================================== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes shine {
+  100% { left: 125%; }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(40, 53, 131, 0.15); }
+  50%       { box-shadow: 0 0 0 8px rgba(40, 53, 131, 0); }
+}
+
+.animate-fade-in    { animation: fadeIn 0.3s ease-out both; }
+.animate-slide-in-left { animation: slideInLeft 0.3s ease-out both; }
+.animate-scale-in   { animation: scaleIn 0.2s ease-out both; }
+.animate-shine      { animation: shine 0.75s; }
+.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+/* Staggered children */
+.stagger-children > *:nth-child(1)  { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2)  { animation-delay: 60ms; }
+.stagger-children > *:nth-child(3)  { animation-delay: 120ms; }
+.stagger-children > *:nth-child(4)  { animation-delay: 180ms; }
+
+/* ======================================================
+   CARD COMPONENT
+   ====================================================== */
+.card {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--gray-300);
+}
+.card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ======================================================
+   BUTTON VARIANTS
+   ====================================================== */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #283583 0%, #3b4ba4 100%);
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(40, 53, 131, 0.25);
+  transition: all 0.2s ease;
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #1e2a6e 0%, #283583 100%);
+  box-shadow: 0 6px 16px rgba(40, 53, 131, 0.35);
+  transform: translateY(-1px);
+}
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-700);
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-secondary:hover {
+  background: var(--gray-50);
+  border-color: var(--gray-300);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ======================================================
+   STAT CARD
+   ====================================================== */
+.stat-card {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #283583, #6366f1);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.stat-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+/* ======================================================
+   PAGE HEADER
+   ====================================================== */
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.page-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--gray-900);
+  letter-spacing: -0.4px;
+}
+.page-subtitle {
+  font-size: 13px;
+  color: var(--gray-500);
+}
+
+/* ======================================================
+   TABLE STYLES
+   ====================================================== */
+.data-table thead tr {
+  background: var(--gray-50);
+}
+.data-table thead th {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gray-500);
+  padding: 12px 16px;
+}
+.data-table tbody tr {
+  border-bottom: 1px solid var(--gray-100);
+  transition: background 0.15s;
+}
+.data-table tbody tr:last-child { border-bottom: none; }
+.data-table tbody tr:hover { background: #fafbff; }
+
+/* ======================================================
+   INPUT STYLES
+   ====================================================== */
+.input-modern {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--gray-900);
+  background: #ffffff;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-modern:focus {
+  border-color: #283583;
+  box-shadow: 0 0 0 3px rgba(40, 53, 131, 0.08);
+}
+.input-modern::placeholder {
+  color: var(--gray-400);
+}
+
+/* ======================================================
+   BADGE / STATUS PILL
+   ====================================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+/* ======================================================
+   EMPTY STATE
+   ====================================================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+  gap: 12px;
+}
+.empty-state-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-400);
+  margin-bottom: 4px;
+}
