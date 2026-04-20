@@ -10,7 +10,11 @@ let _db: Client | null = null;
 
 export function getDb(): Client {
   if (!DB_URL) {
-    throw new Error("CRITICAL: TURSO_DATABASE_URL is missing from environment variables!");
+    throw new Error("CRITICAL: TURSO_DATABASE_URL is missing!");
+  }
+  // Debug: Check if URL starts with libsql
+  if (!DB_URL.startsWith("libsql")) {
+    throw new Error(`CRITICAL: URL is invalid! It starts with: ${DB_URL.substring(0, 15)}...`);
   }
   if (!_db) {
     _db = createClient({
