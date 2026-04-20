@@ -255,7 +255,7 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
                     key={`${q.id}-${index}`}
                     onClick={(e) => {
                       if ((e.target as HTMLElement).tagName !== "INPUT" && !(e.target as HTMLElement).closest("button")) {
-                        onNavigate("Quotation Form", q.id);
+                        onNavigate("Quotation View", q.id);
                       }
                     }}
                     className="group cursor-pointer"

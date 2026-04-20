@@ -501,12 +501,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const generateNextId = useCallback((type: "Q") => {
     const prefix = settings?.quotationSettings?.prefix || "Q";
     const today = new Date();
-    const yy = String(today.getFullYear()).slice(-2);
+    const yyyy = String(today.getFullYear());
+    const yy = yyyy.slice(-2);
     const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dateStr = `${yy}${mm}`;
     
-    // Pattern to find the last index for the current PrefixYYMM
-    const pattern = new RegExp(`^${prefix}${dateStr}-(\\d{4})$`);
+    // If prefix already seems to contain a full year or month pattern,
+    // we might want to skip adding our own date string.
+    // However, to keep it consistent, we'll check if the prefix already includes the current year.
+    const hasYear = prefix.includes(yyyy) || prefix.includes(yy);
+    
+    let dateStr = "";
+    if (!hasYear) {
+      dateStr = `${yy}${mm}`;
+    }
+    
+    // Pattern to find the last index. 
+    // We try to match the prefix followed by the dateStr, then a dash or just the sequence.
+    const pattern = new RegExp(`^${prefix}${dateStr}-?(\\d{4})$`);
     let maxIndex = 0;
     
     quotations.forEach(q => {
@@ -518,7 +529,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
     
     const nextIndex = String(maxIndex + 1).padStart(4, '0');
-    return `${prefix}${dateStr}-${nextIndex}`;
+    
+    // Build the final ID. If prefix ends with a dash or numbers, be smart about separators.
+    const separator = (prefix.endsWith("-") || dateStr === "") ? "" : "-";
+    return `${prefix}${dateStr}${separator}${nextIndex}`;
   }, [settings, quotations]);
 
   // ----- Loading State -----

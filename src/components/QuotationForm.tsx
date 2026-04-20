@@ -733,12 +733,28 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
       <div className="max-w-[1400px] mx-auto p-6 space-y-6">
         {/* Form Header */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 print:mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{quotationId ? "Edit Quotation" : "Create New Quotation"}</h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Quotation number:{" "}
-              <span className="font-semibold text-teal-700">{currentId}</span>
-            </p>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => onNavigate && onNavigate(quotationId ? "Quotation View" : "Quotations", quotationId)}
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </button>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">{quotationId ? "Edit Quotation" : "Create New Quotation"}</h1>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-sm text-gray-500">Quotation number:</span>
+                <input
+                  type="text"
+                  value={currentId}
+                  onChange={(e) => setCurrentId(e.target.value)}
+                  className="font-semibold text-teal-700 bg-transparent border-b border-dashed border-teal-200 focus:border-teal-500 focus:outline-none px-1 py-0"
+                  title="คลิกเพื่อแก้ไขเลขที่ใบเสนอราคา"
+                />
+              </div>
+            </div>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex flex-col">

@@ -13,6 +13,7 @@ import RepeatQueries from "@/components/RepeatQueries";
 import Settings from "@/components/Settings";
 import MemberManagement from "@/components/MemberManagement";
 import ProductSelector from "@/components/ProductSelector";
+import QuotationView from "@/components/QuotationView";
 import { Product } from "@/context/AppContext";
 
 import { useAppContext } from "@/context/AppContext";
@@ -28,7 +29,7 @@ export default function Home() {
 
   const handleNavigate = (page: string, quotationId?: string, items?: Product[], customImages?: string[]) => {
     setActiveQuotationId(quotationId);
-    if (page !== "Quotation Form") {
+    if (page !== "Quotation Form" && page !== "Quotation View") {
       setSelectedProducts([]);
       setInitialImages([]);
     } else if (items && items.length > 0) {
@@ -47,6 +48,13 @@ export default function Home() {
         return <QuotationList onNavigate={handleNavigate} />;
       case "Customers":
         return <CustomerList />;
+      case "Quotation View":
+        return activeQuotationId ? (
+          <QuotationView 
+            quotationId={activeQuotationId} 
+            onNavigate={handleNavigate} 
+          />
+        ) : <QuotationList onNavigate={handleNavigate} />;
       case "Quotation Form":
         return <QuotationForm onNavigate={handleNavigate} quotationId={activeQuotationId} initialItems={selectedProducts} initialImages={initialImages} />;
       case "Select Products":
