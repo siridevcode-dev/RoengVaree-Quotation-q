@@ -4,7 +4,7 @@ import path from "path";
 import fs from "fs";
 
 export async function POST(req: NextRequest) {
-  const auth = authenticateRequest(req);
+  const auth = await authenticateRequest(req);
   if ("error" in auth) return jsonError(auth.error, auth.status);
 
   try {

@@ -37,7 +37,6 @@ export async function POST(req: NextRequest) {
   const newId = `U${String(count + 1).padStart(3, "0")}`;
 
   try {
-  try {
     await db.execute({
       sql: `INSERT INTO users (id, name, username, phone, email, position, role, status, password_hash, last_active)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
