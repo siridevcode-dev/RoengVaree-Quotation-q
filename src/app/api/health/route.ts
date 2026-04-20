@@ -10,9 +10,9 @@ export async function GET() {
     await db.execute("SELECT 1");
     
     return NextResponse.json({ status: "ok", database: "connected and initialized" });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
-      { status: "error", message: "Database connection failed" },
+      { status: "error", message: "Database connection failed", details: error.message },
       { status: 500 }
     );
   }
