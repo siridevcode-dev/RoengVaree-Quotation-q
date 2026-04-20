@@ -460,10 +460,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       await api.settings.update(stateToSave);
       
-      // Update local state AFTER successful API call or optimistically?
-      // Let's do it after for safety, or optimistically if we prefer. 
-      // The current implementation is simpler with direct update.
-      if (newSettings.profile) setSettings(prev => ({ ...prev, profile: { ...prev.profile, ...newSettings.profile } }));
+      // Update local state
+      if (newSettings.profile) {
+        setSettings(prev => ({ ...prev, profile: { ...prev.profile, ...newSettings.profile } }));
+        // Also update currentUser if this is a profile update
+        if (currentUser) {
+          await updateUser(currentUser.id, newSettings.profile);
+        }
+      }
+      
       if (newSettings.companySettings) setSettings(prev => ({ ...prev, companySettings: { ...prev.companySettings, ...newSettings.companySettings } }));
       if (newSettings.quotationSettings) setSettings(prev => ({ ...prev, quotationSettings: { ...prev.quotationSettings, ...newSettings.quotationSettings } }));
       if (newSettings.notifications) setSettings(prev => ({ ...prev, notifications: { ...prev.notifications, ...newSettings.notifications } }));
@@ -475,19 +480,38 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       showToast("บันทึกการตั้งค่าไม่สำเร็จ", "error");
       throw err;
     }
-  }, [settings, categories, boatModels, showToast]);
+  }, [settings, categories, boatModels, currentUser, updateUser, showToast]);
 
   // ----- Boat Specs Action -----
-  const updateBoatSpecification = useCallback(async (model: string, spec: BoatSpecification) => {
+  const updateBoatSpecification = useCallback(async (model: string, spec: BoatSpecification & { newModel?: string }) => {
     try {
-      await api.boatSpecs.update(model, spec);
-      setBoatSpecifications(prev => ({ ...prev, [model]: spec }));
+      // Check if this is a new model or an existing one
+      const exists = boatModels.includes(model);
+      
+      if (exists) {
+        await api.boatSpecs.update(model, spec);
+        
+        // Handle local state update
+        if (spec.newModel) {
+          // Rename logic
+          setBoatSpecifications(prev => {
+            const { [model]: oldSpec, ...rest } = prev;
+            return { ...rest, [spec.newModel!]: spec };
+          });
+        } else {
+          setBoatSpecifications(prev => ({ ...prev, [model]: spec }));
+        }
+      } else {
+        // New model
+        await api.boatSpecs.create({ ...spec, model });
+        setBoatSpecifications(prev => ({ ...prev, [model]: spec }));
+      }
     } catch (err) {
       console.error("Failed to update boat specs:", err);
       showToast("บันทึกข้อมูลเรือไม่สำเร็จ", "error");
       throw err;
     }
-  }, [showToast]);
+  }, [boatModels, showToast]);
 
   // ----- Reset All Data -----
   const resetAllData = useCallback(() => {

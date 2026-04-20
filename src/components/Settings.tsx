@@ -14,18 +14,25 @@ export default function Settings() {
     email: currentUser?.email || settings.profile.email || "",
     phone: currentUser?.phone || settings.profile.phone || "",
     position: currentUser?.position || currentUser?.role || settings.profile.position || "",
+    role: currentUser?.role || "Editor",
+    status: currentUser?.status || "Active",
+    password: "",
+    confirmPassword: "",
   });
 
   // Sync profile data if currentUser changes
   useEffect(() => {
     if (currentUser) {
-      setProfileData({
+      setProfileData(prev => ({
+        ...prev,
         name: currentUser.name || "",
         username: currentUser.username || "",
         email: currentUser.email || settings.profile.email || "",
         phone: currentUser.phone || "",
         position: currentUser.position || currentUser.role || settings.profile.position || "",
-      });
+        role: currentUser.role || "Editor",
+        status: currentUser.status || "Active",
+      }));
     }
   }, [currentUser, settings.profile]);
   
@@ -51,6 +58,13 @@ export default function Settings() {
 
   const handleSave = async () => {
     try {
+      if (activeTab === "profile") {
+        if (profileData.password && profileData.password !== profileData.confirmPassword) {
+          alert("รหัสผ่านไม่ตรงกัน");
+          return;
+        }
+      }
+
       const updates: any = {
         companySettings: settings.companySettings,
         quotationSettings: settings.quotationSettings,
@@ -58,14 +72,26 @@ export default function Settings() {
       };
 
       if (activeTab === "profile" && currentUser) {
-        updates.profile = profileData;
+        // We include EVERYTHING the API expects to avoid downgrading role/status
+        updates.profile = {
+          ...profileData,
+          role: currentUser.role,
+          status: currentUser.status
+        };
       }
 
       await updateSettings(updates);
+      
+      // Clear passwords after save
+      if (activeTab === "profile") {
+        setProfileData(prev => ({ ...prev, password: "", confirmPassword: "" }));
+      }
+      
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-    } catch {
-      console.error("Failed to save settings");
+    } catch (err: any) {
+      console.error("Failed to save settings:", err);
+      alert(err.message || "ไม่สามารถบันทึกการตั้งค่าได้");
     }
   };
 
@@ -142,8 +168,8 @@ export default function Settings() {
               <div>
                 <label className="text-xs font-medium text-gray-500 mb-1.5 block">เปลี่ยนรหัสผ่าน</label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input type="password" placeholder="รหัสผ่านใหม่" className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
-                  <input type="password" placeholder="ยืนยันรหัสผ่านใหม่" className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="password" placeholder="รหัสผ่านใหม่" value={profileData.password} onChange={(e) => setProfileData({ ...profileData, password: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="password" placeholder="ยืนยันรหัสผ่านใหม่" value={profileData.confirmPassword} onChange={(e) => setProfileData({ ...profileData, confirmPassword: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
               </div>
             </div>
@@ -397,8 +423,7 @@ function BoatSpecificationTab() {
         await updateSettings({ boatModels: newModels });
         
         // Transfer specs to new name
-        await updateBoatSpecification(tempModelName, tempSpec);
-        // Delete old (if API supports it, for now we just leave it or add a delete API)
+        await updateBoatSpecification(editingBoat, { ...tempSpec, newModel: tempModelName });
       } else {
         // Standard spec update
         await updateBoatSpecification(editingBoat, tempSpec);
