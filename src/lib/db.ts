@@ -14,7 +14,7 @@ export function getDb(): Client {
   }
   if (!_db) {
     _db = createClient({
-      url: DB_URL,
+      url: DB_URL!,
       authToken: DB_AUTH_TOKEN,
     });
   }
