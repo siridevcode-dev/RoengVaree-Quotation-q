@@ -21,6 +21,10 @@ export async function GET(req: NextRequest) {
 
   const finalResult = quotations.map((q) => {
     const lineItems = allItems.filter(li => li.quotation_id === q.id);
+    let customImages: string[] | undefined;
+    try {
+      customImages = q.custom_images ? JSON.parse(q.custom_images as string) : undefined;
+    } catch { customImages = undefined; }
     return {
       id: q.id,
       customer: q.customer_name,
@@ -44,6 +48,7 @@ export async function GET(req: NextRequest) {
       createdBy: q.created_by,
       memberName: q.member_name,
       memberPhone: q.member_phone,
+      customImages,
       lineItems: lineItems.map((li: any) => ({
         id: li.id,
         name: li.name,
@@ -68,6 +73,11 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const db = getDb();
 
+    // Serialize customImages to JSON string for storage
+    const customImagesJson = body.customImages && Array.isArray(body.customImages) && body.customImages.length > 0
+      ? JSON.stringify(body.customImages)
+      : "";
+
     const statements: any[] = [];
 
     statements.push({
@@ -75,8 +85,8 @@ export async function POST(req: NextRequest) {
         id, customer_name, customer_email, customer_phone, customer_address, customer_tax_id,
         amount, status, date, valid_until, notes, terms, global_vat_enabled,
         boat_model, summary_discount_amount, summary_discount_percentage,
-        include_optional_equipment, frequency, created_by, member_name, member_phone
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        include_optional_equipment, frequency, created_by, member_name, member_phone, custom_images
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
         body.id,
         body.customer || body.customerName || "",
@@ -98,7 +108,8 @@ export async function POST(req: NextRequest) {
         body.frequency || "ไม่ระบุ",
         body.createdBy || auth.user.name,
         body.memberName || auth.user.name,
-        body.memberPhone || auth.user.phone
+        body.memberPhone || auth.user.phone,
+        customImagesJson
       ]
     });
 

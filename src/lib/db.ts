@@ -85,6 +85,7 @@ export async function initDb() {
       created_by TEXT DEFAULT '',
       member_name TEXT DEFAULT '',
       member_phone TEXT DEFAULT '',
+      custom_images TEXT DEFAULT '',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );

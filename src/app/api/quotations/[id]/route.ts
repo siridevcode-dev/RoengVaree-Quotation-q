@@ -21,6 +21,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   });
   const lineItems = itemsResult.rows;
 
+  let customImages: string[] | undefined;
+  try {
+    customImages = q.custom_images ? JSON.parse(q.custom_images as string) : undefined;
+  } catch { customImages = undefined; }
+
   return Response.json({
     id: q.id,
     customer: q.customer_name,
@@ -43,6 +48,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     createdBy: q.created_by,
     memberName: q.member_name,
     memberPhone: q.member_phone,
+    customImages,
     lineItems: (lineItems as any[]).map((li) => ({
       id: li.id,
       name: li.name,
@@ -71,6 +77,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const existing = existingResult.rows[0];
   if (!existing) return jsonError("ไม่พบใบเสนอราคา", 404);
 
+  // Serialize customImages to JSON string for storage
+  const customImagesJson = body.customImages && Array.isArray(body.customImages) && body.customImages.length > 0
+    ? JSON.stringify(body.customImages)
+    : "";
+
   const statements: any[] = [];
   statements.push({
     sql: `UPDATE quotations SET
@@ -81,6 +92,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       boat_model = ?, summary_discount_amount = ?, summary_discount_percentage = ?,
       include_optional_equipment = ?, frequency = ?,
       created_by = ?, member_name = ?, member_phone = ?,
+      custom_images = ?,
       updated_at = CURRENT_TIMESTAMP
     WHERE id = ?`,
     args: [
@@ -104,6 +116,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       body.createdBy || auth.user.name,
       body.memberName || auth.user.name,
       body.memberPhone || auth.user.phone,
+      customImagesJson,
       id
     ]
   });
