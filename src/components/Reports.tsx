@@ -62,14 +62,14 @@ export default function Reports() {
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="max-w-[1400px] mx-auto p-6 space-y-6">
+      <div className="max-w-[1400px] mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">รายงาน</h1>
-            <p className="text-sm text-gray-500 mt-1">วิเคราะห์ผลการดำเนินงาน</p>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">รายงาน</h1>
+            <p className="text-xs md:text-sm text-gray-500 mt-0.5 md:mt-1">วิเคราะห์ผลการดำเนินงาน</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <select value={period} onChange={(e) => setPeriod(e.target.value)} className="px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500">
               <option value="yearly">รายปี 2026</option>
               <option value="q1">ไตรมาส 1</option>
@@ -87,30 +87,30 @@ export default function Reports() {
                 a.download = `quotation-report-${new Date().toISOString().split('T')[0]}.csv`;
                 a.click();
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-all">
+              className="inline-flex items-center gap-2 px-3 md:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-all">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-              ส่งออก CSV
+              <span className="hidden sm:inline">ส่งออก</span> CSV
             </button>
           </div>
         </div>
 
         {/* Summary Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-3 md:p-5">
             <p className="text-sm text-gray-500">รายได้รวมทั้งปี</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">{formatCurrency(totalRevenue)}</p>
+            <p className="text-lg md:text-2xl font-bold text-gray-900 mt-1">{formatCurrency(totalRevenue)}</p>
           </div>
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-3 md:p-5">
             <p className="text-sm text-gray-500">ใบเสนอราคาทั้งหมด</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">{totalQuotations}</p>
+            <p className="text-lg md:text-2xl font-bold text-gray-900 mt-1">{totalQuotations}</p>
           </div>
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-3 md:p-5">
             <p className="text-sm text-gray-500">อนุมัติแล้ว</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">{totalApproved}</p>
+            <p className="text-lg md:text-2xl font-bold text-gray-900 mt-1">{totalApproved}</p>
           </div>
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-3 md:p-5">
             <p className="text-sm text-gray-500">อัตราอนุมัติ</p>
-            <p className="text-2xl font-bold text-emerald-600 mt-1">{approvalRate}%</p>
+            <p className="text-lg md:text-2xl font-bold text-emerald-600 mt-1">{approvalRate}%</p>
           </div>
         </div>
 

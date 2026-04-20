@@ -15,9 +15,15 @@ services:
       - ./data:/app/data
       - ./public/uploads:/app/public/uploads
     environment:
-      - NODE_ENV=production
-      - JWT_SECRET=roengvaree_secure_secret_2026
-      - PORT=3000
+      - NODE_ENV=${NODE_ENV:-production}
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=${PORT:-3000}
+      - HOSTNAME=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     logging:
       driver: "json-file"
       options:

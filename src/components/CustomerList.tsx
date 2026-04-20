@@ -69,16 +69,16 @@ export default function CustomerList() {
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="max-w-[1400px] mx-auto p-6 space-y-6">
+      <div className="max-w-[1400px] mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">ลูกค้า</h1>
-            <p className="text-sm text-gray-500 mt-1">จัดการข้อมูลลูกค้า ({customers.length} ราย)</p>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">ลูกค้า</h1>
+            <p className="text-xs md:text-sm text-gray-500 mt-0.5 md:mt-1">จัดการข้อมูลลูกค้า ({customers.length} ราย)</p>
           </div>
           <button
             onClick={openAddForm}
-            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-md shadow-teal-600/20 active:scale-[0.98]"
+            className="inline-flex items-center justify-center gap-2 px-4 md:px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-md shadow-teal-600/20 active:scale-[0.98] w-full sm:w-auto"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -88,7 +88,7 @@ export default function CustomerList() {
         </div>
 
         {/* Search */}
-        <div className="relative max-w-md">
+        <div className="relative w-full max-w-md">
           <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -156,7 +156,7 @@ export default function CustomerList() {
                     </div>
                   </div>
                   {canEditOrDelete && (
-                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                       <button 
                         onClick={() => openEditForm(c)} 
                         className="w-9 h-9 rounded-lg flex items-center justify-center text-gray-400 hover:text-teal-600 hover:bg-teal-50 transition-all" 

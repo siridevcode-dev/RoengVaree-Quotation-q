@@ -23,13 +23,17 @@ export default function Home() {
   const [activePage, setActivePage] = useState("Quotations");
   const [activeQuotationId, setActiveQuotationId] = useState<string | undefined>(undefined);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+  const [initialImages, setInitialImages] = useState<string[]>([]);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  const handleNavigate = (page: string, quotationId?: string, items?: Product[]) => {
+  const handleNavigate = (page: string, quotationId?: string, items?: Product[], customImages?: string[]) => {
     setActiveQuotationId(quotationId);
     if (page !== "Quotation Form") {
       setSelectedProducts([]);
+      setInitialImages([]);
     } else if (items && items.length > 0) {
       setSelectedProducts(items);
+      setInitialImages(customImages || []);
     }
     setActivePage(page);
   };
@@ -44,7 +48,7 @@ export default function Home() {
       case "Customers":
         return <CustomerList />;
       case "Quotation Form":
-        return <QuotationForm onNavigate={handleNavigate} quotationId={activeQuotationId} initialItems={selectedProducts} />;
+        return <QuotationForm onNavigate={handleNavigate} quotationId={activeQuotationId} initialItems={selectedProducts} initialImages={initialImages} />;
       case "Select Products":
         return (
           <ProductSelector 
@@ -79,12 +83,21 @@ export default function Home() {
   return (
     <div className="flex h-screen bg-[#f0f4f8] animate-in fade-in duration-700">
       {/* Sidebar */}
-      <Sidebar activePage={activePage} onPageChange={(p) => handleNavigate(p)} />
+      <Sidebar 
+        activePage={activePage} 
+        onPageChange={(p) => handleNavigate(p)} 
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
+      />
 
       {/* Main area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
-        <Header activePage={activePage} onNavigate={handleNavigate} />
+        <Header 
+          activePage={activePage} 
+          onNavigate={handleNavigate}
+          onMobileMenuToggle={() => setMobileSidebarOpen(true)}
+        />
 
         {/* Content */}
         {renderActivePage()}

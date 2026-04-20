@@ -32,6 +32,7 @@ export interface Quotation {
   createdBy?: string;
   memberName?: string;
   memberPhone?: string;
+  customImages?: string[];
 }
 
 export interface BoatSpecification {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAppContext } from "@/context/AppContext";
+import { safeLocalStorageSet } from "@/lib/image-utils";
 
 interface Template {
   id: number;
@@ -14,6 +15,7 @@ interface Template {
   nextDue: string;
   isActive: boolean;
   lineItems?: any[];
+  customImages?: string[];
 }
 
 const initialTemplates: Template[] = [
@@ -37,7 +39,7 @@ const frequencyColor: Record<string, string> = {
 };
 
 interface RepeatQueriesProps {
-  onNavigate: (page: string, quotationId?: string, items?: any[]) => void;
+  onNavigate: (page: string, quotationId?: string, items?: any[], customImages?: string[]) => void;
 }
 
 export default function RepeatQueries({ onNavigate }: RepeatQueriesProps) {
@@ -55,7 +57,12 @@ export default function RepeatQueries({ onNavigate }: RepeatQueriesProps) {
 
   useEffect(() => {
     if (mounted) {
-      localStorage.setItem("qm_templates", JSON.stringify(templates));
+      const json = JSON.stringify(templates);
+      if (!safeLocalStorageSet("qm_templates", json)) {
+        // Quota exceeded — retry without images
+        const slim = templates.map(({ customImages: _imgs, ...rest }) => rest);
+        safeLocalStorageSet("qm_templates", JSON.stringify(slim));
+      }
     }
   }, [templates, mounted]);
 
@@ -94,27 +101,27 @@ export default function RepeatQueries({ onNavigate }: RepeatQueriesProps) {
           category: "บริการ"
         }));
     
-    // Pass the items to the Quote Form route
-    onNavigate("Quotation Form", undefined, finalItems);
+    // Pass the items and customImages to the Quote Form route
+    onNavigate("Quotation Form", undefined, finalItems, t.customImages || []);
   };
 
   const thirtyDaysFromNow = new Date(Date.now() + 30 * 86400000);
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="max-w-[1400px] mx-auto p-6 space-y-6">
+      <div className="max-w-[1400px] mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Quotation Templates</h1>
-            <p className="text-sm text-gray-500 mt-1">เทมเพลตใบเสนอราคาที่ใช้ซ้ำ ({templates.length} รายการ)</p>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">Quotation Templates</h1>
+            <p className="text-xs md:text-sm text-gray-500 mt-0.5 md:mt-1">เทมเพลตใบเสนอราคาที่ใช้ซ้ำ ({templates.length} รายการ)</p>
           </div>
           <button
             onClick={() => {
               showToast("กรุณาเลือกรายการสินค้าในหน้า 'สร้างใบเสนอราคา' แล้วกดปุ่ม 'บันทึกเป็นเทมเพลต' ที่ด้านล่างสุดของฟอร์ม", "info");
               onNavigate("Quotation Form");
             }}
-            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-md shadow-teal-600/20 active:scale-[0.98]"
+            className="inline-flex items-center justify-center gap-2 px-4 md:px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-md shadow-teal-600/20 active:scale-[0.98] w-full sm:w-auto"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
             สร้างเทมเพลตใหม่
@@ -122,7 +129,7 @@ export default function RepeatQueries({ onNavigate }: RepeatQueriesProps) {
         </div>
 
         {/* Summary Bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
             <p className="text-xs text-gray-500">เทมเพลตที่ใช้งาน</p>
             <p className="text-xl font-bold text-gray-900 mt-0.5">{templates.filter((t) => t.isActive).length}</p>
@@ -172,7 +179,11 @@ export default function RepeatQueries({ onNavigate }: RepeatQueriesProps) {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filtered.map((t) => (
-                  <tr key={t.id} className={`group hover:bg-teal-50/30 transition-colors ${!t.isActive ? "opacity-50" : ""}`}>
+                  <tr 
+                    key={t.id} 
+                    onClick={() => handleCreateFromTemplate(t)} 
+                    className={`group hover:bg-teal-50/30 transition-colors cursor-pointer ${!t.isActive ? "opacity-50" : ""}`}
+                  >
                     <td className="px-5 py-3.5">
                       <p className="text-sm font-semibold text-gray-800">{t.name}</p>
                       <p className="text-xs text-gray-400">{t.items} รายการ</p>
@@ -187,19 +198,14 @@ export default function RepeatQueries({ onNavigate }: RepeatQueriesProps) {
                     <td className="px-5 py-3.5 text-sm text-gray-500 text-center">{t.lastUsed}</td>
                     <td className="px-5 py-3.5 text-sm text-gray-500 text-center">{t.nextDue}</td>
                     <td className="px-5 py-3.5 text-center">
-                      <button onClick={() => toggleActive(t.id)} className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-all ${t.isActive ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"}`}>
+                      <button onClick={(e) => { e.stopPropagation(); toggleActive(t.id); }} className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-all ${t.isActive ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"}`}>
                         {t.isActive ? "ใช้งาน" : "ปิดใช้"}
                       </button>
                     </td>
                     <td className="px-4 py-3.5">
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => handleCreateFromTemplate(t)} className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-teal-600 hover:bg-teal-50 transition-all" title="สร้างใบเสนอราคา">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                        </button>
-                        <button onClick={() => setTemplates((prev) => prev.filter((x) => x.id !== t.id))} className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all" title="ลบ">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>
-                      </div>
+                      <button onClick={(e) => { e.stopPropagation(); setTemplates((prev) => prev.filter((x) => x.id !== t.id)); }} className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all md:opacity-0 md:group-hover:opacity-100" title="ลบ">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </button>
                     </td>
                   </tr>
                 ))}

@@ -231,16 +231,16 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="max-w-[1400px] mx-auto p-6 space-y-6">
+      <div className="max-w-[1400px] mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
         {/* Page Title */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">ใบเสนอราคา</h1>
-            <p className="text-sm text-gray-500 mt-1">จัดการใบเสนอราคาทั้งหมด ({quotations.length} รายการ)</p>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">ใบเสนอราคา</h1>
+            <p className="text-xs md:text-sm text-gray-500 mt-0.5 md:mt-1">จัดการใบเสนอราคาทั้งหมด ({quotations.length} รายการ)</p>
           </div>
           <button
             onClick={() => onNavigate("Select Products")}
-            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-md shadow-teal-600/20 active:scale-[0.98]"
+            className="inline-flex items-center justify-center gap-2 px-4 md:px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-md shadow-teal-600/20 active:scale-[0.98] w-full sm:w-auto"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -250,8 +250,8 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
         </div>
 
         {/* Filter Bar */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
-          <div className="flex flex-wrap items-center gap-4">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-3 md:p-4">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
             <div className="relative flex-1 min-w-[200px]">
               <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -264,7 +264,7 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
                 className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
               />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 -mx-1 px-1 sm:mx-0 sm:px-0">
               {statusOptions.map((s) => (
                 <button
                   key={s}

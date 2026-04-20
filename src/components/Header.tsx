@@ -6,9 +6,10 @@ import { useAppContext } from "@/context/AppContext";
 interface HeaderProps {
   activePage: string;
   onNavigate?: (page: string) => void;
+  onMobileMenuToggle?: () => void;
 }
 
-export default function Header({ activePage, onNavigate }: HeaderProps) {
+export default function Header({ activePage, onNavigate, onMobileMenuToggle }: HeaderProps) {
   const [profileOpen, setProfileOpen] = useState(false);
   const { settings, logout, currentUser } = useAppContext();
   const profileName = currentUser?.name || settings?.profile?.name || "User";
@@ -20,19 +21,32 @@ export default function Header({ activePage, onNavigate }: HeaderProps) {
   };
 
   return (
-    <header id="header" className="h-16 bg-white border-b border-gray-200 flex items-center justify-center relative z-30 print:hidden">
-      <div className="w-full max-w-[1400px] flex items-center justify-between px-6">
-      {/* Breadcrumb / Page context */}
-      <div className="flex items-center gap-2 text-sm text-gray-500">
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z" />
-        </svg>
-        <span>/</span>
-        <span className="text-teal-600 font-medium">{activePage}</span>
+    <header id="header" className="h-14 md:h-16 bg-white border-b border-gray-200 flex items-center justify-center relative z-30 print:hidden flex-shrink-0">
+      <div className="w-full max-w-[1400px] flex items-center justify-between px-3 md:px-6">
+      {/* Left section: hamburger + breadcrumb */}
+      <div className="flex items-center gap-2 md:gap-3 min-w-0">
+        {/* Hamburger menu - mobile only */}
+        <button
+          onClick={onMobileMenuToggle}
+          className="w-9 h-9 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-600 transition-colors md:hidden flex-shrink-0"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-1.5 md:gap-2 text-sm text-gray-500 min-w-0">
+          <svg className="w-4 h-4 hidden md:block flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z" />
+          </svg>
+          <span className="hidden md:block">/</span>
+          <span className="text-teal-600 font-medium text-sm truncate">{activePage}</span>
+        </div>
       </div>
 
       {/* Right section */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
         {/* Notifications */}
         <button className="relative w-9 h-9 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,21 +55,21 @@ export default function Header({ activePage, onNavigate }: HeaderProps) {
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
         </button>
 
-        {/* Divider */}
-        <div className="w-px h-8 bg-gray-200"></div>
+        {/* Divider - hidden on mobile */}
+        <div className="w-px h-8 bg-gray-200 hidden md:block"></div>
 
         {/* User profile */}
         <div className="relative">
           <button
             onClick={() => setProfileOpen(!profileOpen)}
-            className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-2 px-1.5 md:px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <div className="w-8 h-8 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-sm">
               {profileInitial}
             </div>
-            <span className="text-sm font-medium text-gray-700">{profileName}</span>
+            <span className="text-sm font-medium text-gray-700 hidden md:block">{profileName}</span>
             <svg
-              className={`w-4 h-4 text-gray-400 transition-transform ${profileOpen ? "rotate-180" : ""}`}
+              className={`w-4 h-4 text-gray-400 transition-transform hidden md:block ${profileOpen ? "rotate-180" : ""}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

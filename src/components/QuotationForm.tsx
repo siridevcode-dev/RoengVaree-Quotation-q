@@ -5,6 +5,7 @@ import html2canvas from "html2canvas-pro";
 import { jsPDF } from "jspdf";
 import { useAppContext } from "@/context/AppContext";
 import QuotationDocument from "./QuotationDocument";
+import { compressImage, safeLocalStorageSet } from "@/lib/image-utils";
 
 interface LineItem {
   id: number;
@@ -27,7 +28,7 @@ const defaultItem = (): LineItem => ({
   vatEnabled: true,
 });
 
-export default function QuotationForm({ onNavigate, quotationId, initialItems }: { onNavigate?: (page: string, id?: string) => void, quotationId?: string, initialItems?: any[] }) {
+export default function QuotationForm({ onNavigate, quotationId, initialItems, initialImages }: { onNavigate?: (page: string, id?: string) => void, quotationId?: string, initialItems?: any[], initialImages?: string[] }) {
   const { addQuotation, updateQuotation, quotations, settings, customers, setCustomers, showToast, products, boatModels, currentUser, generateNextId, users, addCustomer, updateCustomer } = useAppContext();
   const formRef = useRef<HTMLDivElement>(null);
   const pdfRef = useRef<HTMLDivElement>(null);
@@ -76,6 +77,8 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems }:
   const [templateFrequency, setTemplateFrequency] = useState("รายเดือน");
   const [includeOptionalEquipment, setIncludeOptionalEquipment] = useState(true);
   const [selectedMemberId, setSelectedMemberId] = useState(currentUser?.id || "");
+  const [customImages, setCustomImages] = useState<string[]>([]);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
 
   // Automatic boat model detection (NEW)
@@ -139,6 +142,9 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems }:
         if (existing.frequency !== undefined) {
           setFrequency(existing.frequency);
         }
+        if (existing.customImages) {
+          setCustomImages(existing.customImages);
+        }
         if (existing.memberName) {
           const found = users.find(u => u.name === existing.memberName);
           if (found) setSelectedMemberId(found.id);
@@ -171,6 +177,10 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems }:
             break;
           }
         }
+      }
+      // Restore custom images from template
+      if (initialImages && initialImages.length > 0) {
+        setCustomImages(initialImages);
       }
       hasHydrated.current = true;
     }
@@ -364,7 +374,8 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems }:
       frequency,
       createdBy: currentUser?.name || "System",
       memberName: users.find(u => u.id === selectedMemberId)?.name || currentUser?.name || "System",
-      memberPhone: users.find(u => u.id === selectedMemberId)?.phone || currentUser?.phone || "-"
+      memberPhone: users.find(u => u.id === selectedMemberId)?.phone || currentUser?.phone || "-",
+      customImages: customImages.length > 0 ? customImages : undefined
     };
 
     if (quotationId) {
@@ -407,13 +418,27 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems }:
         lastUsed: "-",
         nextDue: "-",
         isActive: true,
-        lineItems: [...items] // Deep copy items
+        lineItems: [...items], // Deep copy items
+        customImages: customImages.length > 0 ? [...customImages] : undefined
       };
       
       templates.push(newTemplate);
-      localStorage.setItem("qm_templates", JSON.stringify(templates));
+      const jsonStr = JSON.stringify(templates);
       
-      if (typeof showToast === 'function') {
+      // Try saving with images first
+      if (!safeLocalStorageSet("qm_templates", jsonStr)) {
+        // Quota exceeded — retry without images on ALL templates
+        const templatesWithoutImages = templates.map((t: any) => {
+          const { customImages: _imgs, ...rest } = t;
+          return rest;
+        });
+        const fallbackJson = JSON.stringify(templatesWithoutImages);
+        if (!safeLocalStorageSet("qm_templates", fallbackJson)) {
+          showToast("พื้นที่จัดเก็บเต็ม กรุณาลบเทมเพลตเก่าที่ไม่ใช้แล้วลองใหม่", "error");
+          return;
+        }
+        showToast(`บันทึกเทมเพลต '${finalName}' สำเร็จ! (ไม่รวมรูปภาพเนื่องจากพื้นที่จัดเก็บจำกัด)`, "info");
+      } else {
         showToast(`บันทึกเทมเพลต '${finalName}' สำเร็จ!`, "success");
       }
       
@@ -422,7 +447,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems }:
       }
     } catch (err: any) {
       console.error("Save template error:", err);
-      alert("ไม่สามารถบันทึกเทมเพลตได้: " + (err?.message || String(err)));
+      showToast("ไม่สามารถบันทึกเทมเพลตได้: " + (err?.message || String(err)), "error");
     }
   };
 
@@ -456,7 +481,8 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems }:
     frequency,
     boatModel: effectiveBoatModel,
     memberName: users.find(u => u.id === selectedMemberId)?.name || currentUser?.name || "System",
-    memberPhone: users.find(u => u.id === selectedMemberId)?.phone || currentUser?.phone || "-"
+    memberPhone: users.find(u => u.id === selectedMemberId)?.phone || currentUser?.phone || "-",
+    customImages: customImages.length > 0 ? customImages : undefined
   });
 
   const generatePDF = async () => {
@@ -499,6 +525,8 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems }:
       let tableHeaderEndY = 0;
       let tableBodyEndY = 0;
       const rowRects: { top: number, bottom: number }[] = [];
+      // Track forced page break positions (elements with data-page-break-before="always")
+      const forceBreakYPositions: number[] = [];
 
       const elRect = element.getBoundingClientRect();
 
@@ -530,6 +558,13 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems }:
         });
       }
 
+      // Detect elements that force a page break before them
+      const forceBreakEls = element.querySelectorAll('[data-page-break-before="always"]');
+      forceBreakEls.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        forceBreakYPositions.push(Math.round((rect.top - elRect.top) * renderScale));
+      });
+
       // Generate pages with smart header repetition and row-aware slicing
       const totalCanvasHeight = canvas.height;
       let contentY = 0;
@@ -545,12 +580,22 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems }:
         const availableForContent = pageHeightInCanvas - extraHeaderH;
         let contentSlice = Math.min(availableForContent, totalCanvasHeight - contentY);
 
-        // Prevent cutting a row in half
+        // Check for forced page breaks within this slice
         const potentialSliceEnd = contentY + contentSlice;
-        if (potentialSliceEnd < totalCanvasHeight) {
+        for (const breakY of forceBreakYPositions) {
+          // If a forced break point falls within the current slice (but not at the very start)
+          if (breakY > contentY + 10 && breakY < potentialSliceEnd) {
+            contentSlice = breakY - contentY;
+            break;
+          }
+        }
+
+        // Prevent cutting a row/avoid-element in half
+        const finalSliceEnd = contentY + contentSlice;
+        if (finalSliceEnd < totalCanvasHeight) {
           for (const row of rowRects) {
             // Find if the potential slice end cuts right through a row
-            if (row.top > contentY && row.top < potentialSliceEnd && row.bottom > potentialSliceEnd) {
+            if (row.top > contentY && row.top < finalSliceEnd && row.bottom > finalSliceEnd) {
               // Adjust slice to end just before this row starts
               const adjustedSlice = row.top - contentY;
               if (adjustedSlice > 0) {
@@ -934,11 +979,15 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems }:
                                 <div className="relative">
                                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400">฿</span>
                                   <input
-                                    type="number"
-                                    value={item.unitPrice}
-                                    onChange={(e) => updateItem(item.id, "unitPrice", Number(e.target.value) || 0)}
-                                    min="0"
-                                    step="0.01"
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={item.unitPrice ? item.unitPrice.toLocaleString("en-US") : ""}
+                                    onChange={(e) => {
+                                      const raw = e.target.value.replace(/,/g, "");
+                                      const num = parseFloat(raw);
+                                      updateItem(item.id, "unitPrice", isNaN(num) ? 0 : num);
+                                    }}
+                                    placeholder="0"
                                     className="w-full pl-6 pr-2.5 py-2 text-sm text-center bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
                                   />
                                 </div>
@@ -1071,6 +1120,101 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems }:
                     className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all resize-none placeholder:text-gray-400"
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* Image Upload Section */}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6 print:hidden">
+              <div className="px-5 py-3.5 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  รูปภาพประกอบใบเสนอราคา ({customImages.length} รูป)
+                </h2>
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => {
+                    const files = e.target.files;
+                    if (!files) return;
+                    Array.from(files).forEach(file => {
+                      if (file.size > 5 * 1024 * 1024) {
+                        showToast(`รูป ${file.name} ขนาดเกิน 5MB`, "error");
+                        return;
+                      }
+                      const reader = new FileReader();
+                      reader.onload = async (ev) => {
+                        const base64 = ev.target?.result as string;
+                        if (base64) {
+                          try {
+                            const compressed = await compressImage(base64, 800, 800, 0.6);
+                            setCustomImages(prev => [...prev, compressed]);
+                          } catch {
+                            // Fallback to original if compression fails
+                            setCustomImages(prev => [...prev, base64]);
+                          }
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    });
+                    e.target.value = "";
+                  }}
+                />
+                <button
+                  onClick={() => imageInputRef.current?.click()}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-teal-700 bg-teal-50 border border-teal-200 rounded-lg hover:bg-teal-100 transition-all active:scale-[0.98]"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  เพิ่มรูป
+                </button>
+              </div>
+              <div className="p-4">
+                {customImages.length === 0 ? (
+                  <div 
+                    onClick={() => imageInputRef.current?.click()}
+                    className="border-2 border-dashed border-gray-200 rounded-xl py-8 flex flex-col items-center gap-2 cursor-pointer hover:border-teal-400 hover:bg-teal-50/30 transition-all"
+                  >
+                    <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p className="text-xs text-gray-400">คลิกเพื่อเพิ่มรูปภาพประกอบ (สูงสุด 5MB/รูป)</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    {customImages.map((img, idx) => (
+                      <div key={idx} className="relative group rounded-lg overflow-hidden border border-gray-200 shadow-sm bg-gray-50">
+                        <img src={img} alt={`uploaded-${idx}`} className="w-full aspect-[4/3] object-cover" />
+                        <button
+                          onClick={() => setCustomImages(prev => prev.filter((_, i) => i !== idx))}
+                          className="absolute top-1.5 right-1.5 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600"
+                          title="ลบรูปนี้"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent px-2 py-1">
+                          <span className="text-[10px] text-white font-bold">รูปที่ {idx + 1}</span>
+                        </div>
+                      </div>
+                    ))}
+                    <div 
+                      onClick={() => imageInputRef.current?.click()}
+                      className="border-2 border-dashed border-gray-200 rounded-lg aspect-[4/3] flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-teal-400 hover:bg-teal-50/30 transition-all"
+                    >
+                      <svg className="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      <span className="text-[10px] text-gray-400">เพิ่มรูป</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

@@ -21,6 +21,11 @@ export default function ProductSelector({ onConfirm, onCancel }: ProductSelector
   const allCategories = ["ทั้งหมด", ...categories.filter(c => c !== "มาตรฐาน" && c !== "อุปกรณ์เสริม")];
 
   const filtered = products.filter((p) => {
+    // Hide standard and optional equipment from selector
+    const cat = (p.category || "").trim().toLowerCase();
+    if (cat === "มาตรฐาน" || cat.includes("standard") || cat.includes("std-") || cat === "มาตรฐาน r52") return false;
+    if (cat === "อุปกรณ์เสริม" || cat.includes("optional") || cat.includes("opt-") || cat === "อุปกรณ์เสริม r52") return false;
+
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase());
     const matchCat = filterCat === "ทั้งหมด" || p.category === filterCat;
     const matchModel = filterModel === "ทั้งหมด" || p.boatModel === filterModel || p.boatModel === "ทุกรุ่น";
@@ -40,34 +45,34 @@ export default function ProductSelector({ onConfirm, onCancel }: ProductSelector
 
   return (
     <div className="flex-1 overflow-auto bg-gray-50/50">
-      <div className="max-w-[1000px] mx-auto p-6 space-y-6">
+      <div className="max-w-[1000px] mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">เลือกสินค้า / บริการ</h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">เลือกสินค้า / บริการ</h1>
+            <p className="text-xs md:text-sm text-gray-500 mt-0.5 md:mt-1">
               เลือกรายการที่ต้องการเพิ่มเข้าใบเสนอราคา ({selectedIds.length} รายการที่เลือก)
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button 
               onClick={onCancel}
-              className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-all"
+              className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-all"
             >
               ยกเลิก
             </button>
             <button 
               onClick={handleConfirm}
               disabled={selectedIds.length === 0}
-              className="px-6 py-2 text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-md shadow-teal-600/20 disabled:opacity-50 disabled:shadow-none"
+              className="flex-1 sm:flex-none px-4 md:px-6 py-2 text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-md shadow-teal-600/20 disabled:opacity-50 disabled:shadow-none"
             >
-              ถัดไป (สร้างใบเสนอราคา)
+              ถัดไป
             </button>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
+        <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm space-y-3 md:space-y-4">
           <div className="relative">
             <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

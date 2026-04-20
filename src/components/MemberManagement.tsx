@@ -103,8 +103,8 @@ export default function MemberManagement() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">จัดการสมาชิกและสิทธิ์</h1>
-            <p className="text-gray-500 text-sm mt-1">จัดการผู้ใช้งานในระบบและกำหนดขอบเขตการเข้าถึงข้อมูล</p>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">จัดการสมาชิกและสิทธิ์</h1>
+            <p className="text-gray-500 text-xs md:text-sm mt-0.5 md:mt-1">จัดการผู้ใช้งานในระบบและกำหนดขอบเขตการเข้าถึงข้อมูล</p>
           </div>
           {isAdminOrManager && (
             <button

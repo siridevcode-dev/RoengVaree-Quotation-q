@@ -60,27 +60,27 @@ export default function Dashboard() {
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="max-w-[1400px] mx-auto p-6 space-y-6">
+      <div className="max-w-[1400px] mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
         {/* Page Title */}
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-sm text-gray-500 mt-1">ภาพรวมระบบจัดการใบเสนอราคา</p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">
           {stats.map((stat) => (
-            <div key={stat.label} className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 hover:shadow-md transition-shadow">
+            <div key={stat.label} className="bg-white rounded-xl border border-gray-200 shadow-sm p-3 md:p-5 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm text-gray-500 font-medium">{stat.label}</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                  <p className="text-xs md:text-sm text-gray-500 font-medium">{stat.label}</p>
+                  <p className="text-lg md:text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
                 </div>
                 <div className={`w-10 h-10 bg-gradient-to-br ${stat.color} rounded-lg flex items-center justify-center text-lg`}>
                   {stat.icon}
                 </div>
               </div>
-              <div className="mt-3 flex items-center gap-1.5">
+              <div className="mt-2 md:mt-3 flex items-center gap-1.5 flex-wrap">
                 <span className={`text-xs font-semibold ${stat.up ? "text-emerald-600" : "text-red-500"}`}>
                   {stat.change}
                 </span>
@@ -91,7 +91,7 @@ export default function Dashboard() {
         </div>
 
         {/* Charts & Activity Row */}
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-4 md:gap-6">
           {/* Revenue Chart */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
@@ -145,7 +145,7 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Quotations Table */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hidden md:block">
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-gray-800">ใบเสนอราคาล่าสุด</h2>
             <button className="text-xs font-medium text-teal-600 hover:text-teal-700 transition-colors">ดูทั้งหมด →</button>

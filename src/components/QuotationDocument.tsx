@@ -26,6 +26,7 @@ interface QuotationDocumentProps {
     frequency?: string;
     memberName?: string;
     memberPhone?: string;
+    customImages?: string[];
   };
 }
 
@@ -578,42 +579,55 @@ const QuotationDocument = forwardRef<HTMLDivElement, QuotationDocumentProps>(
           </div>
 
 
-          {/* Boat Images Gallery (Compact - max 5 images in tight grid) */}
+          {/* Boat Images Gallery - shows ALL images in groups of 5 (1 hero + 4 grid) */}
           {(() => {
             const boatSpecs = effectiveBoatModel ? boatSpecifications[effectiveBoatModel] : null;
             const boatImages = boatSpecs?.images || [];
+            const customImgs = previewData?.customImages || quotation?.customImages || [];
 
-            if (!effectiveBoatModel || boatImages.length === 0) return null;
+            // Merge: custom images first, then boat spec images
+            const allImages = [...customImgs, ...boatImages];
 
-            // Limit to max 5 images to keep PDF within 5 pages
-            const displayImages = boatImages.slice(0, 5);
+            if (allImages.length === 0) return null;
+
+            const galleryTitle = effectiveBoatModel ? `Visual Gallery • ${effectiveBoatModel} Series` : "Visual Gallery";
+
+            // Split images into groups of 5: [hero, grid1, grid2, grid3, grid4]
+            const groups: string[][] = [];
+            for (let i = 0; i < allImages.length; i += 5) {
+              groups.push(allImages.slice(i, i + 5));
+            }
 
             return (
-              <div className="mt-4 pt-4 border-t border-slate-100">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-2 text-center">Visual Gallery • {effectiveBoatModel} Series</h4>
+              <>
+                {groups.map((group, groupIdx) => (
+                  <div key={groupIdx} className="mt-4 pt-4 border-t border-slate-100" data-page-break-before="always">
+                    {groupIdx === 0 && (
+                      <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-2 text-center">{galleryTitle}</h4>
+                    )}
 
-                {/* Hero image - compact */}
-                {displayImages[0] && (
-                  <div className="mb-2">
-                    <div className="rounded-[12px] overflow-hidden border border-slate-200 shadow-sm bg-white" style={{ aspectRatio: '16/7' }}>
-                      <img src={displayImages[0]} alt={`${effectiveBoatModel} hero view`} className="w-full h-full object-cover" />
-                    </div>
-                  </div>
-                )}
-
-                {/* Secondary images - compact 2x2 grid */}
-                {displayImages.length > 1 && (
-                  <div className="grid grid-cols-2 gap-2 w-full">
-                    {displayImages.slice(1, 5).map((img, i) => (
-                      <div key={i}>
-                        <div className="rounded-[8px] overflow-hidden border border-slate-200 shadow-sm bg-white" style={{ aspectRatio: '16/9' }}>
-                          <img src={img} alt={`${effectiveBoatModel} view ${i + 2}`} className="w-full h-full object-cover" />
-                        </div>
+                    {/* Hero image (first in each group) */}
+                    <div className="mb-2 page-break-avoid">
+                      <div className="rounded-[12px] overflow-hidden border border-slate-200 shadow-sm bg-white" style={{ aspectRatio: '16/10' }}>
+                        <img src={group[0]} alt={`gallery hero ${groupIdx + 1}`} className="w-full h-full object-cover" />
                       </div>
-                    ))}
+                    </div>
+
+                    {/* Remaining images in 2x2 grid */}
+                    {group.length > 1 && (
+                      <div className="grid grid-cols-2 gap-2 w-full page-break-avoid">
+                        {group.slice(1).map((img, i) => (
+                          <div key={i}>
+                            <div className="rounded-[8px] overflow-hidden border border-slate-200 shadow-sm bg-white" style={{ aspectRatio: '16/9' }}>
+                              <img src={img} alt={`gallery view ${groupIdx * 5 + i + 2}`} className="w-full h-full object-cover" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
+                ))}
+              </>
             );
           })()}
         </div>

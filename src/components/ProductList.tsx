@@ -233,14 +233,14 @@ export default function ProductList() {
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="max-w-[1400px] mx-auto p-6 space-y-6">
+      <div className="max-w-[1400px] mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">สินค้า / บริการ</h1>
-            <p className="text-sm text-gray-500 mt-1">จัดการรายการสินค้าและบริการ ({products.length} รายการ)</p>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">สินค้า / บริการ</h1>
+            <p className="text-xs md:text-sm text-gray-500 mt-0.5 md:mt-1">จัดการรายการสินค้าและบริการ ({products.length} รายการ)</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             <input 
               type="file" 
               ref={fileInputRef} 
@@ -250,19 +250,19 @@ export default function ProductList() {
             />
             <button 
               onClick={() => fileInputRef.current?.click()} 
-              className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-teal-700 bg-white border border-teal-200 rounded-lg hover:bg-teal-50 transition-all active:scale-[0.98] shadow-sm"
+              className="inline-flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm font-semibold text-teal-700 bg-white border border-teal-200 rounded-lg hover:bg-teal-50 transition-all active:scale-[0.98] shadow-sm"
               title="นำเข้าสินค้าจากไฟล์ Excel (.xlsx)"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-              นำเข้า Excel
+              <span className="hidden sm:inline">นำเข้า</span> Excel
             </button>
-            <button onClick={() => setShowCategoryManager(true)} className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-teal-700 bg-teal-50 border border-teal-200 rounded-lg hover:bg-teal-100 transition-all active:scale-[0.98]">
+            <button onClick={() => setShowCategoryManager(true)} className="inline-flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm font-semibold text-teal-700 bg-teal-50 border border-teal-200 rounded-lg hover:bg-teal-100 transition-all active:scale-[0.98]">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-              จัดการระบบ
+              <span className="hidden sm:inline">จัดการ</span>ระบบ
             </button>
-            <button onClick={openAddForm} className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-md shadow-teal-600/20 active:scale-[0.98]">
+            <button onClick={openAddForm} className="inline-flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 text-xs md:text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-md shadow-teal-600/20 active:scale-[0.98]">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-              เพิ่มสินค้า/บริการ
+              เพิ่มสินค้า/<span className="hidden sm:inline">บริการ</span>
             </button>
           </div>
         </div>
@@ -273,7 +273,7 @@ export default function ProductList() {
             <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             <input type="text" placeholder="ค้นหาชื่อ หรือ SKU..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all" />
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 overflow-x-auto pb-1">
             {allCategories.map((cat) => (
               <button 
                 key={cat} 
@@ -367,10 +367,16 @@ export default function ProductList() {
                       <div>
                         <label className="text-xs font-medium text-gray-500 mb-1.5 block">ราคาต่อหน่วย (฿)</label>
                         <input 
-                          type="number" 
-                          value={formData.unitPrice || ""} 
-                          onChange={(e) => setFormData({ ...formData, unitPrice: e.target.value === "" ? 0 : Number(e.target.value) })} 
+                          type="text"
+                          inputMode="decimal"
+                          value={formData.unitPrice ? formData.unitPrice.toLocaleString("en-US") : ""} 
+                          onChange={(e) => {
+                            const raw = e.target.value.replace(/,/g, "");
+                            const num = parseFloat(raw);
+                            setFormData({ ...formData, unitPrice: isNaN(num) ? 0 : num });
+                          }} 
                           onFocus={(e) => e.target.select()}
+                          placeholder="0"
                           className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" 
                         />
                       </div>

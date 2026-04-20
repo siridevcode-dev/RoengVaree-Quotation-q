@@ -79,27 +79,28 @@ export default function Settings() {
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="max-w-[1000px] mx-auto p-6 space-y-6">
+      <div className="max-w-[1000px] mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">ตั้งค่า</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">ตั้งค่า</h1>
           <p className="text-sm text-gray-500 mt-1">จัดการการตั้งค่าระบบ</p>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+        <div className="flex gap-1 bg-gray-100 rounded-lg p-1 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-all ${
+              className={`flex-shrink-0 md:flex-1 flex items-center justify-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm font-medium rounded-md transition-all whitespace-nowrap ${
                 activeTab === tab.id
                   ? "bg-white text-gray-900 shadow-sm"
                   : "text-gray-500 hover:text-gray-700"
               }`}
             >
               <span>{tab.icon}</span>
-              {tab.label}
+              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="sm:hidden">{tab.label.length > 8 ? tab.label.substring(0, 6) + '...' : tab.label}</span>
             </button>
           ))}
         </div>
