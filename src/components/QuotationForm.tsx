@@ -897,6 +897,40 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
               </div>
             </div>
             
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="px-5 py-3.5 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  Member (Salesperson)
+                </h2>
+              </div>
+              <div className="p-5">
+                <label className="text-xs font-medium text-gray-500 mb-1.5 block">ผู้เสนอราคา / พนักงานขาย</label>
+                <select
+                  value={selectedMemberId}
+                  onChange={(e) => setSelectedMemberId(e.target.value)}
+                  className="w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all appearance-none pr-10 cursor-pointer"
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "right 12px center",
+                  }}
+                >
+                  <option value="">-- เลือกผู้เสนอราคา --</option>
+                  {users.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.name} ({u.role})
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-2 text-[10px] text-gray-400 font-medium italic">
+                  * ชื่อและเบอร์โทรของผู้ที่เลือกจะไปปรากฏในช่อง "ผู้เสนอราคา" ในใบเสนอราคา PDF
+                </p>
+              </div>
+            </div>
+
             <BoatSpecsPreview model={effectiveBoatModel} />
 
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">

@@ -309,9 +309,9 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
                     <td className="px-4 py-3.5 text-center">
                       <div className="flex items-center justify-center gap-1.5">
                         <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ background: 'linear-gradient(135deg,#283583,#6366f1)' }}>
-                          {(q.createdBy || "ส").charAt(0)}
+                          {(q.memberName || q.createdBy || "ส").charAt(0)}
                         </div>
-                        <span className="text-xs text-gray-600 font-medium hidden lg:block">{q.createdBy || "สมชาย ใจดี"}</span>
+                        <span className="text-xs text-gray-600 font-medium hidden lg:block">{q.memberName || q.createdBy || "สมชาย ใจดี"}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3.5" onClick={(e) => e.stopPropagation()}>
