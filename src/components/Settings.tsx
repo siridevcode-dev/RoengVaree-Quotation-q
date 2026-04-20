@@ -190,7 +190,7 @@ export default function Settings() {
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">คำนำหน้าเลขที่</label>
                   <input type="text" value={quotationSettings.prefix || ""} onChange={(e) => updateSettings({ quotationSettings: { ...quotationSettings, prefix: e.target.value } })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
-                  <p className="text-[10px] text-gray-400 mt-1">ตัวอย่าง: "Q" จะได้ "Q2604-0001". หากใส่ปีในนี้ ระบบจะไม่ออกเลขปีซ้ำ</p>
+                  <p className="text-[10px] text-gray-400 mt-1">ตัวอย่าง: ใส่ "Q2026-4-" ระบบจะต่อท้ายด้วย "0001" ให้เอง (ห้ามใส่เลขรันลำดับไว้ในนี้)</p>
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">จำนวนวันที่ใช้ได้</label>
