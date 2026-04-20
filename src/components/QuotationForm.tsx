@@ -184,7 +184,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
       }
       hasHydrated.current = true;
     }
-  }, [quotationId, initialItems, quotations, boatModels, setCustomerName, setCustomerEmail, setCustomerPhone, setCustomerAddress, setCustomerTaxId, setItems, setNotes, setTerms, setStatus, setGlobalVatEnabled, setSummaryDiscountAmount, setSummaryDiscountPercentage, setBoatModel, setIncludeOptionalEquipment, setFrequency]);
+  }, [quotationId, initialItems, initialImages, quotations, boatModels, setCustomerName, setCustomerEmail, setCustomerPhone, setCustomerAddress, setCustomerTaxId, setItems, setNotes, setTerms, setStatus, setGlobalVatEnabled, setSummaryDiscountAmount, setSummaryDiscountPercentage, setBoatModel, setIncludeOptionalEquipment, setFrequency, setCustomImages, users]);
 
   const updateItem = (id: number, field: keyof LineItem, value: string | number | boolean) => {
     setItems((prev) =>
@@ -1138,29 +1138,36 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                   accept="image/*"
                   multiple
                   className="hidden"
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     const files = e.target.files;
-                    if (!files) return;
-                    Array.from(files).forEach(file => {
-                      if (file.size > 5 * 1024 * 1024) {
-                        showToast(`รูป ${file.name} ขนาดเกิน 5MB`, "error");
-                        return;
+                    if (!files || files.length === 0) return;
+                    
+                    showToast(`กำลังประมวลผล ${files.length} รูปภาพ...`, "info");
+                    
+                    for (const file of Array.from(files)) {
+                      if (file.size > 10 * 1024 * 1024) {
+                        showToast(`รูป ${file.name} ขนาดเกิน 10MB`, "error");
+                        continue;
                       }
-                      const reader = new FileReader();
-                      reader.onload = async (ev) => {
-                        const base64 = ev.target?.result as string;
+                      
+                      try {
+                        const base64 = await new Promise<string>((resolve, reject) => {
+                          const reader = new FileReader();
+                          reader.onload = (ev) => resolve(ev.target?.result as string);
+                          reader.onerror = reject;
+                          reader.readAsDataURL(file);
+                        });
+
                         if (base64) {
-                          try {
-                            const compressed = await compressImage(base64, 800, 800, 0.6);
-                            setCustomImages(prev => [...prev, compressed]);
-                          } catch {
-                            // Fallback to original if compression fails
-                            setCustomImages(prev => [...prev, base64]);
-                          }
+                          const compressed = await compressImage(base64, 1200, 1200, 0.7);
+                          setCustomImages(prev => [...prev, compressed]);
                         }
-                      };
-                      reader.readAsDataURL(file);
-                    });
+                      } catch (err) {
+                        console.error("Image process error:", err);
+                        showToast(`ไม่สามารถประมวลผลรูป ${file.name}`, "error");
+                      }
+                    }
+                    
                     e.target.value = "";
                   }}
                 />
@@ -1178,12 +1185,58 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                 {customImages.length === 0 ? (
                   <div 
                     onClick={() => imageInputRef.current?.click()}
-                    className="border-2 border-dashed border-gray-200 rounded-xl py-8 flex flex-col items-center gap-2 cursor-pointer hover:border-teal-400 hover:bg-teal-50/30 transition-all"
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      e.currentTarget.classList.add('border-teal-500', 'bg-teal-50/50');
+                    }}
+                    onDragLeave={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      e.currentTarget.classList.remove('border-teal-500', 'bg-teal-50/50');
+                    }}
+                    onDrop={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      e.currentTarget.classList.remove('border-teal-500', 'bg-teal-50/50');
+                      
+                      const files = e.dataTransfer.files;
+                      if (!files || files.length === 0) return;
+                      
+                      showToast(`กำลังประมวลผล ${files.length} รูปภาพ...`, "info");
+                      
+                      for (const file of Array.from(files)) {
+                        if (!file.type.startsWith('image/')) continue;
+                        if (file.size > 10 * 1024 * 1024) {
+                          showToast(`รูป ${file.name} ขนาดเกิน 10MB`, "error");
+                          continue;
+                        }
+                        
+                        try {
+                          const base64 = await new Promise<string>((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = (ev) => resolve(ev.target?.result as string);
+                            reader.onerror = reject;
+                            reader.readAsDataURL(file);
+                          });
+                          const compressed = await compressImage(base64, 1200, 1200, 0.7);
+                          setCustomImages(prev => [...prev, compressed]);
+                        } catch (err) {
+                          showToast(`ไม่สามารถประมวลผลรูป ${file.name}`, "error");
+                        }
+                      }
+                    }}
+                    className="border-2 border-dashed border-gray-200 rounded-xl py-10 flex flex-col items-center gap-3 cursor-pointer hover:border-teal-400 hover:bg-teal-50/30 transition-all group"
                   >
-                    <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <p className="text-xs text-gray-400">คลิกเพื่อเพิ่มรูปภาพประกอบ (สูงสุด 5MB/รูป)</p>
+                    <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-teal-100 transition-colors">
+                      <svg className="w-6 h-6 text-gray-400 group-hover:text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-semibold text-gray-600 group-hover:text-teal-700">คลิกหรือลากรูปภาพมาวางที่นี่</p>
+                      <p className="text-xs text-gray-400 mt-1">รองรับไฟล์ภาพหลายรูปพร้อมกัน (สูงสุด 10MB/รูป)</p>
+                    </div>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
