@@ -19,49 +19,45 @@ const statCards = [
     label: "ใบเสนอราคาทั้งหมด",
     key: "total",
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     ),
-    gradient: "from-blue-500 to-indigo-600",
-    bg: "bg-blue-50",
-    text: "text-blue-700",
+    gradient: "from-blue-600 to-indigo-700",
+    shadow: "shadow-indigo-500/30",
   },
   {
     label: "อนุมัติแล้ว",
     key: "approved",
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
     gradient: "from-emerald-500 to-teal-600",
-    bg: "bg-emerald-50",
-    text: "text-emerald-700",
+    shadow: "shadow-emerald-500/30",
   },
   {
     label: "รอดำเนินการ",
     key: "pending",
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
-    gradient: "from-amber-500 to-orange-500",
-    bg: "bg-amber-50",
-    text: "text-amber-700",
+    gradient: "from-amber-400 to-orange-500",
+    shadow: "shadow-orange-500/30",
   },
   {
     label: "รายได้รวม",
     key: "revenue",
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
-    gradient: "from-violet-500 to-purple-600",
-    bg: "bg-violet-50",
-    text: "text-violet-700",
+    gradient: "from-violet-500 to-fuchsia-600",
+    shadow: "shadow-fuchsia-500/30",
   },
 ];
 
@@ -103,8 +99,8 @@ export default function Dashboard() {
   const topCustomers = [...customers].sort((a, b) => b.totalRevenue - a.totalRevenue).slice(0, 4);
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50/40">
-      <div className="max-w-[1400px] mx-auto p-4 md:p-6 space-y-5 md:space-y-6 animate-fade-in">
+    <div className="flex-1 overflow-auto bg-gradient-to-br from-indigo-50/50 via-white to-blue-50/50">
+      <div className="max-w-[1400px] mx-auto p-4 md:p-6 space-y-6 md:space-y-8 animate-fade-in">
         {/* Page Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -120,29 +116,39 @@ export default function Dashboard() {
         </div>
 
         {/* Stat Cards */}
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 stagger-children">
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6 stagger-children">
           {statCards.map((card) => (
-            <div key={card.key} className="stat-card animate-fade-in">
-              <div className="flex items-start justify-between mb-3">
-                <div className={`w-10 h-10 ${card.bg} rounded-xl flex items-center justify-center ${card.text}`}>
+            <div 
+              key={card.key} 
+              className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-5 md:p-6 text-white shadow-lg ${card.shadow} transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group`}
+            >
+              {/* Decorative background shape */}
+              <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-500"></div>
+              
+              <div className="relative z-10 flex items-start justify-between mb-4">
+                <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/20 shadow-inner">
                   {card.icon}
                 </div>
-                <svg className="w-4 h-4 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
+                <div className="bg-white/20 backdrop-blur-md rounded-full p-1.5 cursor-pointer hover:bg-white/30 transition-colors">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                </div>
               </div>
-              <p className="text-xs font-medium text-gray-500 mb-1">{card.label}</p>
-              <p className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">
-                {statValues[card.key]}
-              </p>
+              <div className="relative z-10">
+                <p className="text-sm font-medium text-white/80 mb-1">{card.label}</p>
+                <p className="text-2xl md:text-3xl font-black text-white tracking-tight drop-shadow-sm">
+                  {statValues[card.key]}
+                </p>
+              </div>
             </div>
           ))}
         </div>
 
         {/* Charts Row */}
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-4 md:gap-5">
+        <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-5 md:gap-6">
           {/* Revenue Bar Chart */}
-          <div className="card overflow-hidden">
+          <div className="card overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border-indigo-50/50">
             <div className="card-header">
               <div>
                 <h2 className="text-sm font-bold text-gray-800">รายได้รายเดือน</h2>
@@ -158,12 +164,12 @@ export default function Dashboard() {
                 {monthlyRevenue.map((val, i) => (
                   <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
                     <div
-                      className="w-full rounded-t-lg transition-all duration-700 cursor-pointer relative group min-h-[4px]"
+                      className="w-full rounded-t-xl transition-all duration-700 cursor-pointer relative group min-h-[4px]"
                       style={{
                         height: `${Math.max((val / maxRevenue) * 160, 4)}px`,
                         background: val > 0
-                          ? 'linear-gradient(to top, #283583, #6366f1)'
-                          : '#e2e8f0',
+                          ? 'linear-gradient(to top, #4f46e5, #a855f7)'
+                          : '#f1f5f9',
                       }}
                     >
                       {val > 0 && (
@@ -182,27 +188,27 @@ export default function Dashboard() {
           </div>
 
           {/* Top Customers */}
-          <div className="card overflow-hidden">
+          <div className="card overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border-indigo-50/50 flex flex-col">
             <div className="card-header">
               <h2 className="text-sm font-bold text-gray-800">ลูกค้ายอดนิยม</h2>
               <span className="text-xs text-gray-400">จากรายได้สูงสุด</span>
             </div>
-            <div className="p-3 space-y-1">
+            <div className="p-4 space-y-3 flex-1 flex flex-col justify-center">
               {topCustomers.length > 0 ? topCustomers.map((c, i) => (
-                <div key={c.id || `c-${i}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group cursor-pointer">
+                <div key={c.id || `c-${i}`} className="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-indigo-50/50 transition-colors group cursor-pointer border border-transparent hover:border-indigo-100">
                   <div
-                    className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-black flex-shrink-0 shadow-sm"
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-black flex-shrink-0 shadow-md transform group-hover:scale-110 transition-transform duration-300"
                     style={{
-                      background: ['linear-gradient(135deg,#f59e0b,#ef4444)', 'linear-gradient(135deg,#283583,#6366f1)', 'linear-gradient(135deg,#10b981,#14b8a6)', 'linear-gradient(135deg,#8b5cf6,#6366f1)'][i] || 'linear-gradient(135deg,#94a3b8,#64748b)',
+                      background: ['linear-gradient(135deg, #f59e0b, #ef4444)', 'linear-gradient(135deg, #3b82f6, #4f46e5)', 'linear-gradient(135deg, #10b981, #14b8a6)', 'linear-gradient(135deg, #8b5cf6, #d946ef)'][i] || 'linear-gradient(135deg,#94a3b8,#64748b)',
                     }}
                   >
                     {i + 1}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-800 truncate">{c.name}</p>
-                    <p className="text-xs text-gray-400">{c.totalQuotations} ใบเสนอราคา</p>
+                    <p className="text-sm font-bold text-gray-800 truncate group-hover:text-indigo-700 transition-colors">{c.name}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{c.totalQuotations} ใบเสนอราคา</p>
                   </div>
-                  <span className="text-sm font-bold text-gray-700 flex-shrink-0">{formatCurrency(c.totalRevenue)}</span>
+                  <span className="text-sm font-black text-gray-800 flex-shrink-0 bg-gray-50 px-2.5 py-1 rounded-lg group-hover:bg-indigo-100 group-hover:text-indigo-800 transition-colors">{formatCurrency(c.totalRevenue)}</span>
                 </div>
               )) : (
                 <div className="empty-state py-8">
@@ -219,8 +225,8 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Quotations Table */}
-        <div className="card overflow-hidden hidden md:block">
-          <div className="card-header">
+        <div className="card overflow-hidden hidden md:block shadow-sm border-indigo-50/50">
+          <div className="card-header bg-white">
             <h2 className="text-sm font-bold text-gray-800">ใบเสนอราคาล่าสุด</h2>
             <span className="text-xs text-gray-400">{recentQuotations.length} รายการล่าสุด</span>
           </div>
@@ -237,10 +243,10 @@ export default function Dashboard() {
               </thead>
               <tbody>
                 {recentQuotations.map((q) => (
-                  <tr key={q.id}>
-                    <td className="px-4 py-3.5 text-sm font-bold" style={{ color: '#283583' }}>{q.id}</td>
-                    <td className="px-4 py-3.5 text-sm font-medium text-gray-700">{q.customer}</td>
-                    <td className="px-4 py-3.5 text-sm font-bold text-gray-800 text-right">{formatCurrency(q.amount)}</td>
+                  <tr key={q.id} className="hover:bg-indigo-50/30 transition-colors">
+                    <td className="px-5 py-4 text-sm font-black text-indigo-600">{q.id}</td>
+                    <td className="px-5 py-4 text-sm font-bold text-gray-800">{q.customer}</td>
+                    <td className="px-5 py-4 text-sm font-black text-gray-800 text-right">{formatCurrency(q.amount)}</td>
                     <td className="px-4 py-3.5 text-center" onClick={(e) => e.stopPropagation()}>
                       <div className={`relative inline-block ${activeStatusEdit === q.id ? "z-50" : ""}`}>
                         <button
@@ -250,7 +256,7 @@ export default function Dashboard() {
                             setDropdownPos({ top: rect.bottom, left: rect.left });
                             setActiveStatusEdit(activeStatusEdit === q.id ? null : q.id);
                           }}
-                          className={`badge ${statusColor[q.status] || "bg-gray-100 text-gray-600"} hover:scale-105 transition-transform cursor-pointer`}
+                          className={`badge ${statusColor[q.status] || "bg-gray-100 text-gray-600"} hover:scale-105 transition-transform cursor-pointer shadow-sm`}
                         >
                           {q.status}
                         </button>
@@ -286,7 +292,7 @@ export default function Dashboard() {
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3.5 text-sm text-gray-400 text-right">{q.date}</td>
+                    <td className="px-5 py-4 text-sm font-medium text-gray-500 text-right">{q.date}</td>
                   </tr>
                 ))}
               </tbody>
