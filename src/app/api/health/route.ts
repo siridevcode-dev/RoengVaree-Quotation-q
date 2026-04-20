@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { getDb, initDb } from "@/lib/db";
 
 export async function GET() {
   try {
     // Check if DB is accessible
     const db = getDb();
-    const { initDb } = require("@/lib/db");
     await initDb(); // This will create tables if they don't exist
     await db.execute("SELECT 1");
     
