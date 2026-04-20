@@ -2,8 +2,12 @@ import { createClient, Client } from "@libsql/client";
 import path from "path";
 import { seedDatabase } from "./seed";
 
-const DB_URL = process.env.TURSO_DATABASE_URL || `file:${path.join(process.cwd(), "data", "roengvaree.db")}`;
+const DB_URL = process.env.TURSO_DATABASE_URL;
 const DB_AUTH_TOKEN = process.env.TURSO_AUTH_TOKEN;
+
+if (!DB_URL) {
+  throw new Error("CRITICAL: TURSO_DATABASE_URL is missing from environment variables!");
+}
 
 // Singleton pattern for server-side DB connection
 let _db: Client | null = null;
