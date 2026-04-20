@@ -92,12 +92,7 @@ export default function Sidebar({ activePage, onPageChange, mobileOpen, onMobile
   
   const isAdminOrManager = currentUser?.role === "Admin" || currentUser?.role === "Manager";
 
-  const filteredNavItems = navItems.filter(item => {
-    if (item.label === "Members") {
-      return isAdminOrManager;
-    }
-    return true;
-  });
+  const filteredNavItems = navItems;
 
   const handleNavClick = (label: string) => {
     onPageChange(label === "สร้างใบเสนอราคา" ? "Select Products" : label);
