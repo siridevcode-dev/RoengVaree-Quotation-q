@@ -3,15 +3,16 @@ import { getDb } from "@/lib/db";
 import { authenticateRequest, jsonError } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
-  const auth = authenticateRequest(req);
+  const auth = await authenticateRequest(req);
   if ("error" in auth) return jsonError(auth.error, auth.status);
 
   const db = getDb();
-  const specs = db.prepare("SELECT * FROM boat_specs ORDER BY model").all() as any[];
+  const dbResult = await db.execute("SELECT * FROM boat_specs ORDER BY model");
+  const specs = dbResult.rows as any[];
 
-  const result: Record<string, any> = {};
+  const finalResult: Record<string, any> = {};
   for (const s of specs) {
-    result[s.model] = {
+    finalResult[s.model] = {
       loa: s.loa, beam: s.beam, draft: s.draft,
       freshWaterCapacity: s.fresh_water_capacity,
       gasTank: s.gas_tank, height: s.height,
@@ -21,26 +22,27 @@ export async function GET(req: NextRequest) {
     };
   }
 
-  return Response.json(result);
+  return Response.json(finalResult);
 }
 
 export async function POST(req: NextRequest) {
-  const auth = authenticateRequest(req);
+  const auth = await authenticateRequest(req);
   if ("error" in auth) return jsonError(auth.error, auth.status);
 
   const body = await req.json();
   const db = getDb();
 
   try {
-    db.prepare(`
-      INSERT INTO boat_specs (model, loa, beam, draft, fresh_water_capacity, gas_tank, height, rec_engine, speed_design, passenger, images_json)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      body.model || "", body.loa || "-", body.beam || "-", body.draft || "-",
-      body.freshWaterCapacity || "-", body.gasTank || "-", body.height || "-",
-      body.recEngine || "-", body.speedDesign || "-", body.passenger || "-",
-      JSON.stringify(body.images || [])
-    );
+    await db.execute({
+      sql: `INSERT INTO boat_specs (model, loa, beam, draft, fresh_water_capacity, gas_tank, height, rec_engine, speed_design, passenger, images_json)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        body.model || "", body.loa || "-", body.beam || "-", body.draft || "-",
+        body.freshWaterCapacity || "-", body.gasTank || "-", body.height || "-",
+        body.recEngine || "-", body.speedDesign || "-", body.passenger || "-",
+        JSON.stringify(body.images || [])
+      ]
+    });
 
     return Response.json({ success: true }, { status: 201 });
   } catch (error: any) {

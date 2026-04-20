@@ -3,11 +3,12 @@ import { getDb } from "@/lib/db";
 import { authenticateRequest, jsonError } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
-  const auth = authenticateRequest(req);
+  const auth = await authenticateRequest(req);
   if ("error" in auth) return jsonError(auth.error, auth.status);
 
   const db = getDb();
-  const customers = db.prepare("SELECT * FROM customers ORDER BY created_at DESC").all() as any[];
+  const result = await db.execute("SELECT * FROM customers ORDER BY created_at DESC");
+  const customers = result.rows as any[];
 
   return Response.json(customers.map((c) => ({
     id: c.id,
@@ -23,25 +24,26 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const auth = authenticateRequest(req);
+  const auth = await authenticateRequest(req);
   if ("error" in auth) return jsonError(auth.error, auth.status);
 
   const body = await req.json();
   const db = getDb();
 
-  const result = db.prepare(`
-    INSERT INTO customers (name, email, phone, address, tax_id, total_quotations, total_revenue, last_activity)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(
-    body.name || "",
-    body.email || "",
-    body.phone || "",
-    body.address || "",
-    body.taxId || "",
-    body.totalQuotations || 0,
-    body.totalRevenue || 0,
-    body.lastActivity || new Date().toLocaleDateString("th-TH")
-  );
+  const result = await db.execute({
+    sql: `INSERT INTO customers (name, email, phone, address, tax_id, total_quotations, total_revenue, last_activity)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [
+      body.name || "",
+      body.email || "",
+      body.phone || "",
+      body.address || "",
+      body.taxId || "",
+      body.totalQuotations || 0,
+      body.totalRevenue || 0,
+      body.lastActivity || new Date().toLocaleDateString("th-TH")
+    ]
+  });
 
-  return Response.json({ success: true, id: result.lastInsertRowid }, { status: 201 });
+  return Response.json({ success: true, id: Number(result.lastInsertRowid) }, { status: 201 });
 }

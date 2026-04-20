@@ -1,19 +1,15 @@
-import type Database from "better-sqlite3";
+import { Client } from "@libsql/client";
 import { hashPassword } from "./auth";
 
-export function seedDatabase(db: Database.Database) {
+export async function seedDatabase(db: Client) {
   // Check if already seeded
-  const userCount = (db.prepare("SELECT COUNT(*) as count FROM users").get() as any).count;
+  const result = await db.execute("SELECT COUNT(*) as count FROM users");
+  const userCount = result.rows[0].count as number;
   if (userCount > 0) return;
 
   console.log("🌱 Seeding database with initial data...");
 
   // ----- Users -----
-  const insertUser = db.prepare(`
-    INSERT INTO users (id, name, username, phone, email, position, role, status, password_hash, last_active)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-
   const usersData = [
     ["U001", "สมชาย ใจดี", "somchai", "081-234-5678", "somchai@roengvaree.com", "ผู้จัดการฝ่ายขาย", "Admin", "Active", hashPassword("password123"), "30/03/2026 07:05"],
     ["U002", "วิภาดา สายลม", "wiphada", "082-345-6789", "", "", "Manager", "Active", hashPassword("password123"), "30/03/2026 06:12"],
@@ -22,19 +18,16 @@ export function seedDatabase(db: Database.Database) {
     ["U005", "Manager", "Manager", "", "", "Manager", "Manager", "Active", hashPassword("Manager1234"), ""],
   ];
 
-  const seedUsers = db.transaction(() => {
-    for (const u of usersData) {
-      insertUser.run(...u);
-    }
-  });
-  seedUsers();
+  await db.batch(
+    usersData.map(u => ({
+      sql: `INSERT INTO users (id, name, username, phone, email, position, role, status, password_hash, last_active)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: u
+    })),
+    "write"
+  );
 
   // ----- Customers -----
-  const insertCustomer = db.prepare(`
-    INSERT INTO customers (name, email, phone, address, tax_id, total_quotations, total_revenue, last_activity)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-
   const customersData = [
     ["Acme Corporation", "contact@acme.com", "02-123-4567", "เลขที่ 123 ถ.สุขุมวิท กรุงเทพฯ", "0105-5XX-XXXX", 24, 1520000, "29/03/2026"],
     ["TechStart Inc.", "info@techstart.co.th", "02-234-5678", "เลขที่ 456 ถ.พหลโยธิน กรุงเทพฯ", "0105-6XX-XXXX", 12, 620000, "28/03/2026"],
@@ -42,25 +35,21 @@ export function seedDatabase(db: Database.Database) {
     ["บริษัท สยามเทค จำกัด", "info@siamtech.co.th", "02-456-7890", "เลขที่ 321 ถ.เพชรบุรี กรุงเทพฯ", "0105-8XX-XXXX", 15, 750000, "26/03/2026"],
   ];
 
-  const seedCustomers = db.transaction(() => {
-    for (const c of customersData) {
-      insertCustomer.run(...c);
-    }
-  });
-  seedCustomers();
+  await db.batch(
+    customersData.map(c => ({
+      sql: `INSERT INTO customers (name, email, phone, address, tax_id, total_quotations, total_revenue, last_activity)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: c
+    })),
+    "write"
+  );
 
   // ----- Products -----
-  const insertProduct = db.prepare(`
-    INSERT INTO products (name, category, unit_price, unit, description, sku, in_stock, boat_model)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-
   const productsData = [
     ["เรือสปีดโบ๊ท 24 ฟุต", "เรือ", 850000, "ลำ", "เรือสปีดโบ๊ทพร้อมใช้งาน รวมชุดเบาะและระบบไฟ", "BOAT-001", 1, ""],
     ["งานซ่อมทำสีตัวถังเรือ", "ซ่อมเรือ", 45000, "งาน", "ขัดเคลือบและทำสีเงางามรอบคัน", "REP-001", 1, ""],
     ["เครื่องยนต์ Outboard 150HP", "เครื่องยนต์", 320000, "เครื่อง", "เครื่องยนต์ 4 จังหวะ ประหยัดน้ำมัน", "ENG-001", 1, ""],
     ["บริการเช็คระยะประจำปี", "ซ่อมเรือ", 12500, "ครั้ง", "เปลี่ยนถ่ายน้ำมันเครื่องและเช็คระบบไฟ", "SER-001", 1, ""],
-    // Standard Equipment (R52)
     ["เปลือกเรือสปีดโบ๊ทไฟเบอร์ขนาด 52 ฟุต รุ่น R52", "มาตรฐาน", 0, "ชุด", "52-feet fiber speed boat hull, model R55", "STD-001", 1, "R52"],
     ["กันกระแทกรอบเรือ", "มาตรฐาน", 0, "ชุด", "Rubber fender around the boat", "STD-002", 1, "R52"],
     ["ป้อมขับเรือและแผงหน้าปัด", "มาตรฐาน", 0, "ชุด", "Boat Console Plans", "STD-003", 1, "R52"],
@@ -94,7 +83,6 @@ export function seedDatabase(db: Database.Database) {
     ["ชุดดับเพลิง", "มาตรฐาน", 0, "ชุด", "Fire suit", "STD-031", 1, "R52"],
     ["ทุ่นกันกระแทก", "มาตรฐาน", 0, "ชิ้น", "Fender", "STD-032", 1, "R52"],
     ["บันไดวนท้ายเรือรอบเครื่องยนต์", "มาตรฐาน", 0, "ชุด", "Stern stairs", "STD-033", 1, "R52"],
-    // Optional Equipment (R52)
     ["EVA สำหรับปูพื้นเรือ (ต่อ ตร.ม.)", "อุปกรณ์เสริม", 4200, "ตร.ม.", "EVA for boat decking", "OPT-001", 1, "R52"],
     ["GPS/AIS", "อุปกรณ์เสริม", 26000, "ชุด", "Navigation system", "OPT-002", 1, "R52"],
     ["วิทยุสื่อสาร", "อุปกรณ์เสริม", 18000, "ชุด", "Radio communication", "OPT-003", 1, "R52"],
@@ -107,19 +95,16 @@ export function seedDatabase(db: Database.Database) {
     ["เครื่องเสียงบลูทูธ + ลำโพง 4 ตัว", "อุปกรณ์เสริม", 30000, "ชุด", "Marine boat audio system", "OPT-010", 1, "R52"],
   ];
 
-  const seedProducts = db.transaction(() => {
-    for (const p of productsData) {
-      insertProduct.run(...p);
-    }
-  });
-  seedProducts();
+  await db.batch(
+    productsData.map(p => ({
+      sql: `INSERT INTO products (name, category, unit_price, unit, description, sku, in_stock, boat_model)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: p
+    })),
+    "write"
+  );
 
   // ----- Quotations (sample) -----
-  const insertQuotation = db.prepare(`
-    INSERT INTO quotations (id, customer_name, amount, status, date, valid_until)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `);
-
   const quotationsData = [
     ["Q-2603-001", "Acme Corporation", 125000, "อนุมัติแล้ว", "29/03/2026", "28/04/2026"],
     ["Q-2603-002", "TechStart Inc.", 89500, "รอดำเนินการ", "28/03/2026", "27/04/2026"],
@@ -127,16 +112,15 @@ export function seedDatabase(db: Database.Database) {
     ["Q-2603-004", "บริษัท สยามเทค จำกัด", 67800, "ฉบับร่าง", "26/03/2026", "25/04/2026"],
   ];
 
-  const seedQuotations = db.transaction(() => {
-    for (const q of quotationsData) {
-      insertQuotation.run(...q);
-    }
-  });
-  seedQuotations();
+  await db.batch(
+    quotationsData.map(q => ({
+      sql: "INSERT INTO quotations (id, customer_name, amount, status, date, valid_until) VALUES (?, ?, ?, ?, ?, ?)",
+      args: q
+    })),
+    "write"
+  );
 
   // ----- Settings -----
-  const insertSetting = db.prepare("INSERT INTO settings (key, value) VALUES (?, ?)");
-
   const settingsData = [
     ["profile", JSON.stringify({ name: "สมชาย ใจดี", username: "somchai", email: "somchai@roengvaree.com", phone: "081-234-5678", company: "RoengVaree Co., Ltd.", position: "ผู้จัดการฝ่ายขาย" })],
     ["companySettings", JSON.stringify({ name: "RoengVaree Co., Ltd.", taxId: "0105-564-123456", address: "เลขที่ 99 ถ.สุขุมวิท กรุงเทพฯ", phone: "02-123-4567", email: "info@roengvaree.com", website: "www.roengvaree.com", logo: "" })],
@@ -146,21 +130,24 @@ export function seedDatabase(db: Database.Database) {
     ["boatModels", JSON.stringify(["R52", "R33"])],
   ];
 
-  const seedSettings = db.transaction(() => {
-    for (const s of settingsData) {
-      insertSetting.run(...s);
-    }
-  });
-  seedSettings();
+  await db.batch(
+    settingsData.map(s => ({
+      sql: "INSERT INTO settings (key, value) VALUES (?, ?)",
+      args: s
+    })),
+    "write"
+  );
 
   // ----- Boat Specifications -----
-  const insertSpec = db.prepare(`
-    INSERT INTO boat_specs (model, loa, beam, draft, fresh_water_capacity, gas_tank, height, rec_engine, speed_design, passenger, images_json)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-
-  insertSpec.run("R52", "15.6 m", "4 m", "0.6 m", "150 L", "400 L", "3.5 m", "250Hpx3", "30 Knt", "60+3 Person", "[]");
-  insertSpec.run("R33", "-", "-", "-", "-", "-", "-", "-", "-", "-", "[]");
+  await db.execute({
+    sql: "INSERT INTO boat_specs (model, loa, beam, draft, fresh_water_capacity, gas_tank, height, rec_engine, speed_design, passenger, images_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    args: ["R52", "15.6 m", "4 m", "0.6 m", "150 L", "400 L", "3.5 m", "250Hpx3", "30 Knt", "60+3 Person", "[]"]
+  });
+  
+  await db.execute({
+    sql: "INSERT INTO boat_specs (model, loa, beam, draft, fresh_water_capacity, gas_tank, height, rec_engine, speed_design, passenger, images_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    args: ["R33", "-", "-", "-", "-", "-", "-", "-", "-", "-", "[]"]
+  });
 
   console.log("✅ Database seeded successfully!");
 }

@@ -12,10 +12,12 @@ export async function POST(req: NextRequest) {
     }
 
     const db = getDb();
-    const user = db.prepare(`
-      SELECT * FROM users 
-      WHERE username = ? OR name = ? OR phone = ?
-    `).get(username, username, username) as any;
+    const result = await db.execute({
+      sql: `SELECT * FROM users 
+            WHERE username = ? OR name = ? OR phone = ?`,
+      args: [username, username, username]
+    });
+    const user = result.rows[0] as any;
 
     if (!user) {
       return jsonError("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", 401);
@@ -30,8 +32,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Update last active
-    db.prepare("UPDATE users SET last_active = ? WHERE id = ?")
-      .run(new Date().toLocaleString("th-TH"), user.id);
+    await db.execute({
+      sql: "UPDATE users SET last_active = ? WHERE id = ?",
+      args: [new Date().toLocaleString("th-TH"), user.id]
+    });
 
     const token = signToken({
       userId: user.id,

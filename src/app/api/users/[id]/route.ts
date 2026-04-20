@@ -3,15 +3,17 @@ import { getDb } from "@/lib/db";
 import { authenticateRequest, requireRole, hashPassword, jsonError } from "@/lib/auth";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = authenticateRequest(req);
+  const auth = await authenticateRequest(req);
   if ("error" in auth) return jsonError(auth.error, auth.status);
 
   const { id } = await params;
   const db = getDb();
-  const u = db.prepare(`
-    SELECT id, name, username, phone, email, position, role, status, last_active
-    FROM users WHERE id = ?
-  `).get(id) as any;
+  const result = await db.execute({
+    sql: `SELECT id, name, username, phone, email, position, role, status, last_active
+          FROM users WHERE id = ?`,
+    args: [id]
+  });
+  const u = result.rows[0] as any;
   if (!u) return jsonError("ไม่พบสมาชิก", 404);
 
   return Response.json({
@@ -22,7 +24,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = authenticateRequest(req);
+  const auth = await authenticateRequest(req);
   if ("error" in auth) return jsonError(auth.error, auth.status);
 
   const { id } = await params;
@@ -49,13 +51,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   sql += ` WHERE id = ?`;
   params_arr.push(id);
 
-  db.prepare(sql).run(...params_arr);
+  await db.execute({ sql, args: params_arr });
 
   return Response.json({ success: true });
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = authenticateRequest(req);
+  const auth = await authenticateRequest(req);
   if ("error" in auth) return jsonError(auth.error, auth.status);
 
   if (!requireRole(auth.user, "Admin", "Manager")) {
@@ -64,8 +66,11 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
   const { id } = await params;
   const db = getDb();
-  const result = db.prepare("DELETE FROM users WHERE id = ?").run(id);
-  if (result.changes === 0) return jsonError("ไม่พบสมาชิก", 404);
+  const result = await db.execute({
+    sql: "DELETE FROM users WHERE id = ?",
+    args: [id]
+  });
+  if (result.rowsAffected === 0) return jsonError("ไม่พบสมาชิก", 404);
 
   return Response.json({ success: true });
 }

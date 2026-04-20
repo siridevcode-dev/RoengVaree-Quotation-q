@@ -5,9 +5,11 @@ export async function GET() {
   try {
     // Check if DB is accessible
     const db = getDb();
-    db.prepare("SELECT 1").get();
+    const { initDb } = require("@/lib/db");
+    await initDb(); // This will create tables if they don't exist
+    await db.execute("SELECT 1");
     
-    return NextResponse.json({ status: "ok", database: "connected" });
+    return NextResponse.json({ status: "ok", database: "connected and initialized" });
   } catch (error) {
     return NextResponse.json(
       { status: "error", message: "Database connection failed" },

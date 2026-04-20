@@ -47,7 +47,7 @@ export function verifyToken(token: string): JwtPayload | null {
 }
 
 // ----- Auth Middleware -----
-export function authenticateRequest(req: NextRequest): { user: AuthUser } | { error: string; status: number } {
+export async function authenticateRequest(req: NextRequest): Promise<{ user: AuthUser } | { error: string; status: number }> {
   const authHeader = req.headers.get("authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return { error: "ไม่มี token สำหรับยืนยันตัวตน", status: 401 };
@@ -60,10 +60,13 @@ export function authenticateRequest(req: NextRequest): { user: AuthUser } | { er
   }
 
   const db = getDb();
-  const user = db.prepare(`
-    SELECT id, name, username, phone, email, position, role, status, last_active
-    FROM users WHERE id = ?
-  `).get(payload.userId) as AuthUser | undefined;
+  const result = await db.execute({
+    sql: `SELECT id, name, username, phone, email, position, role, status, last_active
+          FROM users WHERE id = ?`,
+    args: [payload.userId]
+  });
+  
+  const user = result.rows[0] as unknown as AuthUser | undefined;
 
   if (!user) {
     return { error: "ไม่พบผู้ใช้งาน", status: 401 };

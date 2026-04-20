@@ -1,33 +1,34 @@
-import Database from "better-sqlite3";
+import { createClient, Client } from "@libsql/client";
 import path from "path";
 import { seedDatabase } from "./seed";
 
-const DB_PATH = path.join(process.cwd(), "data", "roengvaree.db");
+const DB_URL = process.env.TURSO_DATABASE_URL || `file:${path.join(process.cwd(), "data", "roengvaree.db")}`;
+const DB_AUTH_TOKEN = process.env.TURSO_AUTH_TOKEN;
 
 // Singleton pattern for server-side DB connection
-let _db: Database.Database | null = null;
+let _db: Client | null = null;
 
-export function getDb(): Database.Database {
+export function getDb(): Client {
   if (!_db) {
-    // Ensure data directory exists
-    const fs = require("fs");
-    const dir = path.dirname(DB_PATH);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
+    _db = createClient({
+      url: DB_URL,
+      authToken: DB_AUTH_TOKEN,
+    });
 
-    _db = new Database(DB_PATH);
-    _db.pragma("journal_mode = WAL");
-    _db.pragma("foreign_keys = ON");
-
-    initSchema(_db);
-    seedDatabase(_db);
+    // In Next.js, we might want to handle initialization carefully
+    // Since we are switching to async, the initSchema and seedDatabase
+    // should probably be handled outside or checked differently.
+    // For now, we'll try to keep the logic similar but note it's async now.
   }
   return _db;
 }
 
-function initSchema(db: Database.Database) {
-  db.exec(`
+export async function initDb() {
+  const db = getDb();
+  
+  // We'll execute the schema creation
+  // Note: initSchema and seedDatabase need to be converted to async
+  await db.execute(`
     -- Users table
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
@@ -42,7 +43,9 @@ function initSchema(db: Database.Database) {
       last_active TEXT DEFAULT '',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+  `);
 
+  await db.execute(`
     -- Customers table
     CREATE TABLE IF NOT EXISTS customers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,7 +59,9 @@ function initSchema(db: Database.Database) {
       last_activity TEXT DEFAULT '',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+  `);
 
+  await db.execute(`
     -- Quotations table
     CREATE TABLE IF NOT EXISTS quotations (
       id TEXT PRIMARY KEY,
@@ -83,7 +88,9 @@ function initSchema(db: Database.Database) {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+  `);
 
+  await db.execute(`
     -- Quotation Line Items
     CREATE TABLE IF NOT EXISTS quotation_items (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -98,7 +105,9 @@ function initSchema(db: Database.Database) {
       sort_order INTEGER DEFAULT 0,
       FOREIGN KEY (quotation_id) REFERENCES quotations(id) ON DELETE CASCADE
     );
+  `);
 
+  await db.execute(`
     -- Products table
     CREATE TABLE IF NOT EXISTS products (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -112,7 +121,9 @@ function initSchema(db: Database.Database) {
       boat_model TEXT DEFAULT '',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+  `);
 
+  await db.execute(`
     -- Templates
     CREATE TABLE IF NOT EXISTS templates (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -127,13 +138,17 @@ function initSchema(db: Database.Database) {
       line_items_json TEXT DEFAULT '[]',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+  `);
 
+  await db.execute(`
     -- Settings (key-value)
     CREATE TABLE IF NOT EXISTS settings (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
     );
+  `);
 
+  await db.execute(`
     -- Boat Specifications
     CREATE TABLE IF NOT EXISTS boat_specs (
       model TEXT PRIMARY KEY,
@@ -149,4 +164,6 @@ function initSchema(db: Database.Database) {
       images_json TEXT DEFAULT '[]'
     );
   `);
+
+  await seedDatabase(db);
 }

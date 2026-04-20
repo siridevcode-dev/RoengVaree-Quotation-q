@@ -3,22 +3,24 @@ import { getDb } from "@/lib/db";
 import { authenticateRequest, jsonError } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
-  const auth = authenticateRequest(req);
+  const auth = await authenticateRequest(req);
   if ("error" in auth) return jsonError(auth.error, auth.status);
 
   const db = getDb();
-  const quotations = db.prepare(`
+  const result = await db.execute(`
     SELECT q.*, 
       (SELECT COUNT(*) FROM quotation_items qi WHERE qi.quotation_id = q.id) as items_count
     FROM quotations q 
     ORDER BY q.created_at DESC
-  `).all() as any[];
+  `);
+  const quotations = result.rows as any[];
 
-  // For each quotation, fetch its line items
-  const getItems = db.prepare("SELECT * FROM quotation_items WHERE quotation_id = ? ORDER BY sort_order");
+  // Fetch all items for these quotations to avoid N+1 issues
+  const itemsResult = await db.execute("SELECT * FROM quotation_items ORDER BY sort_order");
+  const allItems = itemsResult.rows as any[];
 
-  const result = quotations.map((q) => {
-    const lineItems = getItems.all(q.id);
+  const finalResult = quotations.map((q) => {
+    const lineItems = allItems.filter(li => li.quotation_id === q.id);
     return {
       id: q.id,
       customer: q.customer_name,
@@ -55,33 +57,27 @@ export async function GET(req: NextRequest) {
     };
   });
 
-  return Response.json(result);
+  return Response.json(finalResult);
 }
 
 export async function POST(req: NextRequest) {
-  const auth = authenticateRequest(req);
+  const auth = await authenticateRequest(req);
   if ("error" in auth) return jsonError(auth.error, auth.status);
 
   try {
     const body = await req.json();
     const db = getDb();
 
-    const insertQuotation = db.prepare(`
-      INSERT INTO quotations (
+    const statements: any[] = [];
+
+    statements.push({
+      sql: `INSERT INTO quotations (
         id, customer_name, customer_email, customer_phone, customer_address, customer_tax_id,
         amount, status, date, valid_until, notes, terms, global_vat_enabled,
         boat_model, summary_discount_amount, summary_discount_percentage,
         include_optional_equipment, frequency, created_by, member_name, member_phone
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    const insertItem = db.prepare(`
-      INSERT INTO quotation_items (quotation_id, name, description, quantity, unit_price, discount, vat_enabled, category, sort_order)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    const saveQuotation = db.transaction(() => {
-      insertQuotation.run(
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [
         body.id,
         body.customer || body.customerName || "",
         body.customerEmail || "",
@@ -103,11 +99,15 @@ export async function POST(req: NextRequest) {
         body.createdBy || auth.user.name,
         body.memberName || auth.user.name,
         body.memberPhone || auth.user.phone
-      );
+      ]
+    });
 
-      if (body.lineItems && Array.isArray(body.lineItems)) {
-        body.lineItems.forEach((item: any, index: number) => {
-          insertItem.run(
+    if (body.lineItems && Array.isArray(body.lineItems)) {
+      body.lineItems.forEach((item: any, index: number) => {
+        statements.push({
+          sql: `INSERT INTO quotation_items (quotation_id, name, description, quantity, unit_price, discount, vat_enabled, category, sort_order)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          args: [
             body.id,
             item.name || "",
             item.description || "",
@@ -117,25 +117,31 @@ export async function POST(req: NextRequest) {
             item.vatEnabled !== false ? 1 : 0,
             item.category || "",
             index
-          );
+          ]
         });
-      }
+      });
+    }
 
-      // Update customer stats
-      const existingCustomer = db.prepare("SELECT id FROM customers WHERE name = ?").get(body.customer || body.customerName || "") as any;
-      if (existingCustomer) {
-        db.prepare(`
-          UPDATE customers 
-          SET total_quotations = total_quotations + 1, 
-              total_revenue = total_revenue + ?,
-              last_activity = ?
-          WHERE id = ?
-        `).run(body.amount || 0, new Date().toLocaleDateString("th-TH"), existingCustomer.id);
-      } else if (body.customer || body.customerName) {
-        db.prepare(`
-          INSERT INTO customers (name, email, phone, address, tax_id, total_quotations, total_revenue, last_activity)
-          VALUES (?, ?, ?, ?, ?, 1, ?, ?)
-        `).run(
+    const customerResult = await db.execute({
+      sql: "SELECT id FROM customers WHERE name = ?",
+      args: [body.customer || body.customerName || ""]
+    });
+    const existingCustomer = customerResult.rows[0];
+
+    if (existingCustomer) {
+      statements.push({
+        sql: `UPDATE customers 
+              SET total_quotations = total_quotations + 1, 
+                  total_revenue = total_revenue + ?,
+                  last_activity = ?
+              WHERE id = ?`,
+        args: [body.amount || 0, new Date().toLocaleDateString("th-TH"), existingCustomer.id]
+      });
+    } else if (body.customer || body.customerName) {
+      statements.push({
+        sql: `INSERT INTO customers (name, email, phone, address, tax_id, total_quotations, total_revenue, last_activity)
+              VALUES (?, ?, ?, ?, ?, 1, ?, ?)`,
+        args: [
           body.customer || body.customerName,
           body.customerEmail || "",
           body.customerPhone || "",
@@ -143,11 +149,11 @@ export async function POST(req: NextRequest) {
           body.customerTaxId || "",
           body.amount || 0,
           new Date().toLocaleDateString("th-TH")
-        );
-      }
-    });
+        ]
+      });
+    }
 
-    saveQuotation();
+    await db.batch(statements, "write");
 
     return Response.json({ success: true, id: body.id }, { status: 201 });
   } catch (error: any) {

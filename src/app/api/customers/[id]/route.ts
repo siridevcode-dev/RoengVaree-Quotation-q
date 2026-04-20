@@ -3,12 +3,16 @@ import { getDb } from "@/lib/db";
 import { authenticateRequest, jsonError } from "@/lib/auth";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = authenticateRequest(req);
+  const auth = await authenticateRequest(req);
   if ("error" in auth) return jsonError(auth.error, auth.status);
 
   const { id } = await params;
   const db = getDb();
-  const c = db.prepare("SELECT * FROM customers WHERE id = ?").get(id) as any;
+  const result = await db.execute({
+    sql: "SELECT * FROM customers WHERE id = ?",
+    args: [id]
+  });
+  const c = result.rows[0] as any;
   if (!c) return jsonError("ไม่พบข้อมูลลูกค้า", 404);
 
   return Response.json({
@@ -19,29 +23,32 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = authenticateRequest(req);
+  const auth = await authenticateRequest(req);
   if ("error" in auth) return jsonError(auth.error, auth.status);
 
   const { id } = await params;
   const body = await req.json();
   const db = getDb();
 
-  db.prepare(`
-    UPDATE customers SET name = ?, email = ?, phone = ?, address = ?, tax_id = ?
-    WHERE id = ?
-  `).run(body.name || "", body.email || "", body.phone || "", body.address || "", body.taxId || "", id);
+  await db.execute({
+    sql: "UPDATE customers SET name = ?, email = ?, phone = ?, address = ?, tax_id = ? WHERE id = ?",
+    args: [body.name || "", body.email || "", body.phone || "", body.address || "", body.taxId || "", id]
+  });
 
   return Response.json({ success: true });
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = authenticateRequest(req);
+  const auth = await authenticateRequest(req);
   if ("error" in auth) return jsonError(auth.error, auth.status);
 
   const { id } = await params;
   const db = getDb();
-  const result = db.prepare("DELETE FROM customers WHERE id = ?").run(id);
-  if (result.changes === 0) return jsonError("ไม่พบข้อมูลลูกค้า", 404);
+  const result = await db.execute({
+    sql: "DELETE FROM customers WHERE id = ?",
+    args: [id]
+  });
+  if (result.rowsAffected === 0) return jsonError("ไม่พบข้อมูลลูกค้า", 404);
 
   return Response.json({ success: true });
 }

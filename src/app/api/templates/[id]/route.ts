@@ -27,12 +27,15 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = authenticateRequest(req);
+  const auth = await authenticateRequest(req);
   if ("error" in auth) return jsonError(auth.error, auth.status);
 
   const { id } = await params;
   const db = getDb();
-  db.prepare("DELETE FROM templates WHERE id = ?").run(id);
+  await db.execute({
+    sql: "DELETE FROM templates WHERE id = ?",
+    args: [id]
+  });
 
   return Response.json({ success: true });
 }
