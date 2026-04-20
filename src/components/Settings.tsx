@@ -20,6 +20,11 @@ export default function Settings() {
     confirmPassword: "",
   });
 
+  // Local state for other settings to avoid immediate API calls on every keystroke
+  const [companyData, setCompanyData] = useState(settings.companySettings);
+  const [quotationData, setQuotationData] = useState(settings.quotationSettings);
+  const [notificationsData, setNotificationsData] = useState(settings.notifications);
+
   // Sync profile data if currentUser changes
   useEffect(() => {
     if (currentUser) {
@@ -36,23 +41,12 @@ export default function Settings() {
     }
   }, [currentUser, settings.profile]);
   
-  const companySettings = settings.companySettings;
-  const quotationSettings = settings.quotationSettings;
-  const notifications = settings.notifications;
-  
-  const setCompanySettings = (newCompanySettings: any) => {
-    // We update local state in Settings component if we want, but better to update SettingsType in AppContext
-    // For now, let's just make the handleSave call updateSettings.
-    // However, the current code relies on companySettings, quotationSettings, notifications variables.
-    // I will modify handleSave to use the latest state.
-  };
-  
-  // These remain as local state or we should use updateSettings? 
-  // Actually, the current component seems to be using 'settings' directly from context in many places, 
-  // but it expects these helper functions to exist. 
-  // Let's modify the component to use local state for pending changes if needed, 
-  // or just call updateSettings immediately. 
-  // Given the complexity, let's stick to the current pattern but use updateSettings in handleSave.
+  // Sync states if settings change (e.g. from refreshData)
+  useEffect(() => {
+    setCompanyData(settings.companySettings);
+    setQuotationData(settings.quotationSettings);
+    setNotificationsData(settings.notifications);
+  }, [settings.companySettings, settings.quotationSettings, settings.notifications]);
 
   const [saved, setSaved] = useState(false);
 
@@ -66,9 +60,9 @@ export default function Settings() {
       }
 
       const updates: any = {
-        companySettings: settings.companySettings,
-        quotationSettings: settings.quotationSettings,
-        notifications: settings.notifications,
+        companySettings: companyData,
+        quotationSettings: quotationData,
+        notifications: notificationsData,
       };
 
       if (activeTab === "profile" && currentUser) {
@@ -165,12 +159,18 @@ export default function Settings() {
                   <input type="text" value={profileData.position || ""} onChange={(e) => setProfileData({ ...profileData, position: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
               </div>
-              <div>
-                <label className="text-xs font-medium text-gray-500 mb-1.5 block">เปลี่ยนรหัสผ่าน</label>
+              <div className="pt-2">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7a4 4 0 00-8 0v4h8z" /></svg>
+                  </div>
+                  <label className="text-sm font-bold text-gray-700">เปลี่ยนรหัสผ่าน</label>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <input type="password" placeholder="รหัสผ่านใหม่" value={profileData.password} onChange={(e) => setProfileData({ ...profileData, password: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                   <input type="password" placeholder="ยืนยันรหัสผ่านใหม่" value={profileData.confirmPassword} onChange={(e) => setProfileData({ ...profileData, confirmPassword: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
+                <p className="text-[11px] text-gray-400 mt-2">* เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัสผ่าน</p>
               </div>
             </div>
           )}
@@ -182,27 +182,27 @@ export default function Settings() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">ชื่อบริษัท</label>
-                  <input type="text" value={companySettings.name || ""} onChange={(e) => updateSettings({ companySettings: { ...companySettings, name: e.target.value } })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="text" value={companyData.name || ""} onChange={(e) => setCompanyData({ ...companyData, name: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">เลขประจำตัวผู้เสียภาษี</label>
-                  <input type="text" value={companySettings.taxId || ""} onChange={(e) => updateSettings({ companySettings: { ...companySettings, taxId: e.target.value } })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="text" value={companyData.taxId || ""} onChange={(e) => setCompanyData({ ...companyData, taxId: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">เบอร์โทร</label>
-                  <input type="text" value={companySettings.phone || ""} onChange={(e) => updateSettings({ companySettings: { ...companySettings, phone: e.target.value } })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="text" value={companyData.phone || ""} onChange={(e) => setCompanyData({ ...companyData, phone: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
                 <div className="md:col-span-2">
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">ที่อยู่</label>
-                  <textarea value={companySettings.address || ""} onChange={(e) => updateSettings({ companySettings: { ...companySettings, address: e.target.value } })} rows={2} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 resize-none" />
+                  <textarea value={companyData.address || ""} onChange={(e) => setCompanyData({ ...companyData, address: e.target.value })} rows={2} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 resize-none" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">อีเมล</label>
-                  <input type="email" value={companySettings.email || ""} onChange={(e) => updateSettings({ companySettings: { ...companySettings, email: e.target.value } })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="email" value={companyData.email || ""} onChange={(e) => setCompanyData({ ...companyData, email: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">เว็บไซต์</label>
-                  <input type="text" value={companySettings.website || ""} onChange={(e) => updateSettings({ companySettings: { ...companySettings, website: e.target.value } })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="text" value={companyData.website || ""} onChange={(e) => setCompanyData({ ...companyData, website: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
               </div>
             </div>
@@ -215,16 +215,16 @@ export default function Settings() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">คำนำหน้าเลขที่</label>
-                  <input type="text" value={quotationSettings.prefix || ""} onChange={(e) => updateSettings({ quotationSettings: { ...quotationSettings, prefix: e.target.value } })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="text" value={quotationData.prefix || ""} onChange={(e) => setQuotationData({ ...quotationData, prefix: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                   <p className="text-[10px] text-gray-400 mt-1">ตัวอย่าง: ใส่ "Q2026-4-" ระบบจะต่อท้ายด้วย "0001" ให้เอง (ห้ามใส่เลขรันลำดับไว้ในนี้)</p>
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">จำนวนวันที่ใช้ได้</label>
-                  <input type="number" value={quotationSettings.validDays} onChange={(e) => updateSettings({ quotationSettings: { ...quotationSettings, validDays: Number(e.target.value) } })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="number" value={quotationData.validDays} onChange={(e) => setQuotationData({ ...quotationData, validDays: Number(e.target.value) })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">สกุลเงิน</label>
-                  <select value={quotationSettings.currency} onChange={(e) => updateSettings({ quotationSettings: { ...quotationSettings, currency: e.target.value } })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500">
+                  <select value={quotationData.currency} onChange={(e) => setQuotationData({ ...quotationData, currency: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500">
                     <option value="THB">฿ บาท (THB)</option>
                     <option value="USD">$ ดอลลาร์ (USD)</option>
                     <option value="EUR">€ ยูโร (EUR)</option>
@@ -237,21 +237,21 @@ export default function Settings() {
                   <p className="text-xs text-gray-500">เปิดใช้งาน VAT เป็นค่าเริ่มต้น</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <input type="number" value={quotationSettings.vatRate} onChange={(e) => updateSettings({ quotationSettings: { ...quotationSettings, vatRate: Number(e.target.value) } })} className="w-16 px-2 py-1.5 text-sm text-center bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30" />
+                  <input type="number" value={quotationData.vatRate} onChange={(e) => setQuotationData({ ...quotationData, vatRate: Number(e.target.value) })} className="w-16 px-2 py-1.5 text-sm text-center bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30" />
                   <span className="text-sm text-gray-600">%</span>
-                  <button onClick={() => updateSettings({ quotationSettings: { ...quotationSettings, defaultVat: !quotationSettings.defaultVat } })} className={`relative w-11 h-6 rounded-full transition-colors ${quotationSettings.defaultVat ? "bg-teal-600" : "bg-gray-300"}`}>
-                    <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${quotationSettings.defaultVat ? "left-6" : "left-1"}`} />
+                  <button onClick={() => setQuotationData({ ...quotationData, defaultVat: !quotationData.defaultVat })} className={`relative w-11 h-6 rounded-full transition-colors ${quotationData.defaultVat ? "bg-teal-600" : "bg-gray-300"}`}>
+                    <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${quotationData.defaultVat ? "left-6" : "left-1"}`} />
                   </button>
                 </div>
               </div>
               <div>
                 <label className="text-xs font-medium text-gray-500 mb-1.5 block">หมายเหตุเริ่มต้น</label>
-                <textarea value={quotationSettings.defaultNotes || ""} onChange={(e) => updateSettings({ quotationSettings: { ...quotationSettings, defaultNotes: e.target.value } })} rows={2} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 resize-none" />
+                <textarea value={quotationData.defaultNotes || ""} onChange={(e) => setQuotationData({ ...quotationData, defaultNotes: e.target.value })} rows={2} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 resize-none" />
               </div>
               <div>
                 <label className="text-xs font-medium text-gray-500 mb-2 block">เงื่อนไขเริ่มต้น (Default Terms)</label>
                 <div className="space-y-2.5">
-                  {Array.isArray(quotationSettings.defaultTerms) && quotationSettings.defaultTerms.map((term: string, index: number) => (
+                  {Array.isArray(quotationData.defaultTerms) && quotationData.defaultTerms.map((term: string, index: number) => (
                     <div key={index} className="flex items-center gap-2 group animate-in fade-in slide-in-from-left-2 duration-200">
                       <div className="flex-none w-6 h-6 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-400">
                         {index + 1}
@@ -260,17 +260,17 @@ export default function Settings() {
                         type="text" 
                         value={term || ""} 
                         onChange={(e) => {
-                          const newTerms = [...quotationSettings.defaultTerms];
+                          const newTerms = [...quotationData.defaultTerms];
                           newTerms[index] = e.target.value;
-                          updateSettings({ quotationSettings: { ...quotationSettings, defaultTerms: newTerms } });
+                          setQuotationData({ ...quotationData, defaultTerms: newTerms });
                         }} 
                         className="flex-1 px-4 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all" 
                         placeholder={`ระบุเงื่อนไขข้อที่ ${index + 1}...`}
                       />
                       <button 
                         onClick={() => {
-                          const newTerms = quotationSettings.defaultTerms.filter((_term: string, i: number) => i !== index);
-                          updateSettings({ quotationSettings: { ...quotationSettings, defaultTerms: newTerms } });
+                          const newTerms = quotationData.defaultTerms.filter((_term: string, i: number) => i !== index);
+                          setQuotationData({ ...quotationData, defaultTerms: newTerms });
                         }}
                         className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
                         title="ลบเงื่อนไขนี้"
@@ -281,8 +281,8 @@ export default function Settings() {
                   ))}
                   <button 
                     onClick={() => {
-                      const currentTerms = Array.isArray(quotationSettings.defaultTerms) ? quotationSettings.defaultTerms : [];
-                      updateSettings({ quotationSettings: { ...quotationSettings, defaultTerms: [...currentTerms, ""] } });
+                      const currentTerms = Array.isArray(quotationData.defaultTerms) ? quotationData.defaultTerms : [];
+                      setQuotationData({ ...quotationData, defaultTerms: [...currentTerms, ""] });
                     }}
                     className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-teal-700 bg-teal-50/50 border border-teal-100 border-dashed rounded-lg hover:bg-teal-50 hover:border-teal-300 transition-all w-full justify-center mt-2 group"
                   >
@@ -312,10 +312,10 @@ export default function Settings() {
                       <p className="text-xs text-gray-500">{item.desc}</p>
                     </div>
                     <button
-                      onClick={() => updateSettings({ notifications: { ...notifications, [item.key]: !notifications[item.key] } })}
-                      className={`relative w-11 h-6 rounded-full transition-colors ${notifications[item.key] ? "bg-teal-600" : "bg-gray-300"}`}
+                      onClick={() => setNotificationsData({ ...notificationsData, [item.key]: !notificationsData[item.key] })}
+                      className={`relative w-11 h-6 rounded-full transition-colors ${notificationsData[item.key] ? "bg-teal-600" : "bg-gray-300"}`}
                     >
-                      <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${notifications[item.key] ? "left-6" : "left-1"}`} />
+                      <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${notificationsData[item.key] ? "left-6" : "left-1"}`} />
                     </button>
                   </div>
                 ))}
@@ -423,10 +423,10 @@ function BoatSpecificationTab() {
         await updateSettings({ boatModels: newModels });
         
         // Transfer specs to new name
-        await updateBoatSpecification(editingBoat, { ...tempSpec, newModel: tempModelName });
+        await updateBoatSpecification(editingBoat, { ...tempSpec, newModel: tempModelName }, false);
       } else {
         // Standard spec update
-        await updateBoatSpecification(editingBoat, tempSpec);
+        await updateBoatSpecification(editingBoat, tempSpec, false);
       }
       setEditingBoat(null);
     }
@@ -448,7 +448,7 @@ function BoatSpecificationTab() {
     };
 
     await updateSettings({ boatModels: newModels });
-    await updateBoatSpecification(finalName, newSpec);
+    await updateBoatSpecification(finalName, newSpec, true);
     
     // Only start edit and don't scroll if in specs tab (because it switches view)
     if (activeSubTab === "specs") {

@@ -483,12 +483,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [settings, categories, boatModels, currentUser, updateUser, showToast]);
 
   // ----- Boat Specs Action -----
-  const updateBoatSpecification = useCallback(async (model: string, spec: BoatSpecification & { newModel?: string }) => {
+  const updateBoatSpecification = useCallback(async (model: string, spec: BoatSpecification & { newModel?: string }, isNew: boolean = false) => {
     try {
-      // Check if this is a new model or an existing one
-      const exists = boatModels.includes(model);
-      
-      if (exists) {
+      if (isNew) {
+        // New model
+        await api.boatSpecs.create({ ...spec, model });
+        setBoatSpecifications(prev => ({ ...prev, [model]: spec }));
+      } else {
+        // Existing model (update or rename)
         await api.boatSpecs.update(model, spec);
         
         // Handle local state update
@@ -501,17 +503,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         } else {
           setBoatSpecifications(prev => ({ ...prev, [model]: spec }));
         }
-      } else {
-        // New model
-        await api.boatSpecs.create({ ...spec, model });
-        setBoatSpecifications(prev => ({ ...prev, [model]: spec }));
       }
     } catch (err) {
       console.error("Failed to update boat specs:", err);
       showToast("บันทึกข้อมูลเรือไม่สำเร็จ", "error");
       throw err;
     }
-  }, [boatModels, showToast]);
+  }, [showToast]);
 
   // ----- Reset All Data -----
   const resetAllData = useCallback(() => {
