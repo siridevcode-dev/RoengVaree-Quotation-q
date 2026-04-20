@@ -151,7 +151,7 @@ interface AppContextProps {
   updateSettings: (newSettings: Partial<SettingsType> & { categories?: string[], boatModels?: string[] }) => Promise<void>;
   
   // Boat Specs
-  updateBoatSpecification: (model: string, spec: BoatSpecification, isNew?: boolean) => Promise<void>;
+  updateBoatSpecification: (model: string, spec: BoatSpecification & { newModel?: string }, isNew?: boolean) => Promise<void>;
 
   logout: () => void;
   login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>;
