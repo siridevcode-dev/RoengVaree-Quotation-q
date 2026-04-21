@@ -186,10 +186,10 @@ const QuotationDocument = forwardRef<HTMLDivElement, QuotationDocumentProps>(
       <div
         ref={ref}
         data-pdf-safe="true"
-        className="bg-white p-10 mx-auto flex flex-col shadow-2xl print:shadow-none print:p-0 print:m-0 print:w-full print:absolute print:left-0 print:top-0"
+        className="bg-white p-10 mx-auto flex flex-col shadow-2xl print:shadow-none print:p-8 print:m-0 print:w-full print:absolute print:left-0 print:top-0"
         style={{
           width: "210mm",
-          minHeight: "297mm",
+          minHeight: "296mm",
           boxSizing: "border-box",
           position: "relative",
           WebkitPrintColorAdjust: "exact",
@@ -554,7 +554,7 @@ const QuotationDocument = forwardRef<HTMLDivElement, QuotationDocumentProps>(
           </div>
 
           {/* Signatures placed strictly at the bottom using mt-auto avoiding overlaps */}
-          <div className="mt-auto pt-4 pb-2 break-inside-avoid-page page-break-avoid" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+          <div className="mt-auto pt-4 pb-10 break-inside-avoid-page page-break-avoid" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
             <div className="flex justify-between px-8 text-center">
               <div className="w-[260px]">
                 <div className="mb-3 h-20 w-full flex items-end justify-center" style={{ borderBottom: "2px solid #283583" }}></div>

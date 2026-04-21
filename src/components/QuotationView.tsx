@@ -98,7 +98,7 @@ export default function QuotationView({ quotationId, onNavigate }: QuotationView
         if (pageNum > 0) pdf.addPage();
         const isInTableBody = headerCanvas && contentY > tableHeaderEndY && contentY < tableBodyEndY;
         const extraHeaderH = isInTableBody ? continuedBarHeight + headerHeightInCanvas : 0;
-        const availableForContent = pageHeightInCanvas - extraHeaderH;
+        const availableForContent = pageHeightInCanvas - extraHeaderH - Math.round(20 * renderScale);
         let contentSlice = Math.min(availableForContent, totalCanvasHeight - contentY);
         
         const finalSliceEnd = contentY + contentSlice;
