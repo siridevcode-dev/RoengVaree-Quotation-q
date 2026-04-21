@@ -1571,13 +1571,41 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
 }
 
 function BoatSpecsPreview({ model }: { model: string }) {
-  const { boatSpecifications } = useAppContext();
+  const { boatSpecifications, updateBoatSpecification, showToast } = useAppContext();
   const specs = boatSpecifications[model];
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editedSpecs, setEditedSpecs] = React.useState<any>(null);
+  const [isSaving, setIsSaving] = React.useState(false);
 
-  if (!model || !specs) return null;
+  // Sync editedSpecs with global specs when model or specs change, but only if not editing
+  React.useEffect(() => {
+    if (specs) {
+      setEditedSpecs({ ...specs });
+    }
+  }, [specs, model]);
+
+  if (!model || !specs || !editedSpecs) return null;
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await updateBoatSpecification(model, editedSpecs);
+      showToast(`อัปเดตสเปคของรุ่น ${model} สำเร็จ`, "success");
+      setIsEditing(false);
+    } catch (err) {
+      showToast("ไม่สามารถบันทึกข้อมูลสเปคได้", "error");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setEditedSpecs({ ...specs });
+    setIsEditing(false);
+  };
 
   return (
-    <div className="bg-white rounded-xl border border-teal-100 shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+    <div className="bg-white rounded-xl border border-teal-100 shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300 mb-6">
       <div className="px-5 py-3.5 border-b border-teal-50 bg-teal-50/30 flex items-center justify-between">
         <h2 className="text-sm font-semibold text-teal-800 flex items-center gap-2">
           <svg className="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1585,25 +1613,66 @@ function BoatSpecsPreview({ model }: { model: string }) {
           </svg>
           Technical Specifications: {model}
         </h2>
-        <span className="text-[10px] font-bold text-teal-600 bg-white px-2 py-0.5 rounded-full border border-teal-100 uppercase tracking-wider">Auto-Sync</span>
+        <div className="flex items-center gap-2">
+          {!isEditing ? (
+            <button 
+              onClick={() => setIsEditing(true)}
+              className="text-[10px] font-bold text-teal-600 bg-white px-3 py-1 rounded-lg border border-teal-100 uppercase tracking-wider hover:bg-teal-50 transition-colors"
+            >
+              Edit Specs
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={handleCancel}
+                className="text-[10px] font-bold text-gray-500 bg-white px-3 py-1 rounded-lg border border-gray-100 uppercase tracking-wider hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleSave}
+                disabled={isSaving}
+                className="text-[10px] font-bold text-white bg-teal-600 px-3 py-1 rounded-lg border border-teal-600 uppercase tracking-wider hover:bg-teal-700 transition-colors flex items-center gap-1"
+              >
+                {isSaving && <svg className="animate-spin h-2.5 w-2.5 text-white" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>}
+                Save Specs
+              </button>
+            </div>
+          )}
+          <span className="text-[10px] font-bold text-teal-600 bg-white/50 px-2 py-0.5 rounded-full border border-teal-100/50 uppercase tracking-wider">Auto-Sync</span>
+        </div>
       </div>
       <div className="p-5">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-4">
-          <SpecItem label="LOA" value={specs.loa} />
-          <SpecItem label="Beam" value={specs.beam} />
-          <SpecItem label="Draft" value={specs.draft} />
-          <SpecItem label="Passenger" value={specs.passenger} />
-          <SpecItem label="Fuel Tank" value={specs.gasTank} />
-          <SpecItem label="Water Tank" value={specs.freshWaterCapacity} />
-          <SpecItem label="Height" value={specs.height} />
-          <SpecItem label="Engine" value={specs.recEngine} />
+          <SpecEditItem label="LOA" field="loa" value={editedSpecs.loa} isEditing={isEditing} onChange={(f, v) => setEditedSpecs((prev: any) => ({ ...prev, [f]: v }))} />
+          <SpecEditItem label="Beam" field="beam" value={editedSpecs.beam} isEditing={isEditing} onChange={(f, v) => setEditedSpecs((prev: any) => ({ ...prev, [f]: v }))} />
+          <SpecEditItem label="Draft" field="draft" value={editedSpecs.draft} isEditing={isEditing} onChange={(f, v) => setEditedSpecs((prev: any) => ({ ...prev, [f]: v }))} />
+          <SpecEditItem label="Passenger" field="passenger" value={editedSpecs.passenger} isEditing={isEditing} onChange={(f, v) => setEditedSpecs((prev: any) => ({ ...prev, [f]: v }))} />
+          <SpecEditItem label="Fuel Tank" field="gasTank" value={editedSpecs.gasTank} isEditing={isEditing} onChange={(f, v) => setEditedSpecs((prev: any) => ({ ...prev, [f]: v }))} />
+          <SpecEditItem label="Water Tank" field="freshWaterCapacity" value={editedSpecs.freshWaterCapacity} isEditing={isEditing} onChange={(f, v) => setEditedSpecs((prev: any) => ({ ...prev, [f]: v }))} />
+          <SpecEditItem label="Height" field="height" value={editedSpecs.height} isEditing={isEditing} onChange={(f, v) => setEditedSpecs((prev: any) => ({ ...prev, [f]: v }))} />
+          <SpecEditItem label="Engine" field="recEngine" value={editedSpecs.recEngine} isEditing={isEditing} onChange={(f, v) => setEditedSpecs((prev: any) => ({ ...prev, [f]: v }))} />
         </div>
       </div>
     </div>
   );
 }
 
-function SpecItem({ label, value }: { label: string, value: string }) {
+function SpecEditItem({ label, field, value, isEditing, onChange }: { label: string, field: string, value: string, isEditing: boolean, onChange: (f: string, v: string) => void }) {
+  if (isEditing) {
+    return (
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] font-bold text-teal-600 uppercase tracking-wider">{label}</label>
+        <input 
+          type="text"
+          value={value || ""}
+          onChange={(e) => onChange(field, e.target.value)}
+          className="text-sm font-semibold text-gray-800 bg-teal-50/50 border border-teal-100 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-teal-500"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-1">
       <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{label}</span>
