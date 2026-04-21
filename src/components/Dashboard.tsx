@@ -66,7 +66,8 @@ export default function Dashboard() {
   const [activeStatusEdit, setActiveStatusEdit] = useState<string | null>(null);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
 
-  const currentYear = new Date().getFullYear() + 543;
+  const currentYearBE = new Date().getFullYear() + 543;
+  const currentYearAD = new Date().getFullYear();
   const months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
 
   const monthlyRevenue = months.map((_, i) => {
@@ -74,7 +75,11 @@ export default function Dashboard() {
       .filter(q => {
         const parts = q.date.split("/");
         if (parts.length < 3) return false;
-        return parseInt(parts[1]) - 1 === i && parseInt(parts[2]) === currentYear && q.status === "อนุมัติแล้ว";
+        const qMonth = parseInt(parts[1]);
+        const qYear = parseInt(parts[2]);
+        // Handle both AD and BE years in data
+        const isMatchYear = qYear === currentYearAD || qYear === currentYearBE;
+        return qMonth - 1 === i && isMatchYear && q.status === "อนุมัติแล้ว";
       })
       .reduce((sum, q) => sum + q.amount, 0) / 1000;
   });
@@ -111,7 +116,7 @@ export default function Dashboard() {
             <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <span>ปี {currentYear}</span>
+            <span>ปี {currentYearBE}</span>
           </div>
         </div>
 
@@ -155,8 +160,8 @@ export default function Dashboard() {
                 <p className="text-xs text-gray-400 mt-0.5">เฉพาะที่อนุมัติแล้ว</p>
               </div>
               <select className="text-xs px-2.5 py-1.5 border border-gray-200 rounded-lg bg-white focus:outline-none text-gray-600 cursor-pointer">
-                <option>ปี {currentYear}</option>
-                <option>ปี {currentYear - 1}</option>
+                <option>ปี {currentYearBE}</option>
+                <option>ปี {currentYearBE - 1}</option>
               </select>
             </div>
             <div className="p-5">
