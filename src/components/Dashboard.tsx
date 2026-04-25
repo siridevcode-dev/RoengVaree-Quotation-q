@@ -273,37 +273,6 @@ export default function Dashboard() {
                         >
                           {q.status}
                         </button>
-
-                        {activeStatusEdit === q.id && (
-                          <>
-                            <div className="fixed inset-0 z-[100]" onClick={() => setActiveStatusEdit(null)} />
-                            <DynamicBox
-                              className="fixed bg-white rounded-2xl shadow-xl border border-gray-100 w-48 py-2 z-[101] animate-scale-in overflow-hidden"
-                              top={`${dropdownPos.top + 6}px`}
-                              left={`${Math.min(dropdownPos.left - 100, typeof window !== 'undefined' ? window.innerWidth - 200 : 0)}px`}
-                            >
-                              <div className="px-4 py-2 border-b border-gray-50 mb-1">
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">เลือกสถานะ</p>
-                              </div>
-                              {["ฉบับร่าง", "ส่งแล้ว", "รอดำเนินการ", "อนุมัติแล้ว", "ปฏิเสธ"].map((status) => (
-                                <button
-                                  key={status}
-                                  onClick={async () => {
-                                    if (status !== q.status) {
-                                      await updateQuotation({ ...q, status: status as any });
-                                      showToast(`เปลี่ยนสถานะเป็น "${status}" เรียบร้อย`, "success");
-                                    }
-                                    setActiveStatusEdit(null);
-                                  }}
-                                  className={`w-full text-left px-4 py-2.5 text-[13px] font-medium transition-colors hover:bg-gray-50 flex items-center justify-between ${q.status === status ? "text-indigo-600" : "text-gray-600"}`}
-                                >
-                                  {status}
-                                  {q.status === status && <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />}
-                                </button>
-                              ))}
-                            </DynamicBox>
-                          </>
-                        )}
                       </div>
                     </td>
                     <td className="px-5 py-4 text-sm font-medium text-gray-500 text-right">{q.date}</td>
@@ -324,6 +293,42 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Status Edit Dropdown (Fixed Positioning) */}
+      {activeStatusEdit && (
+        <>
+          <div className="fixed inset-0 z-[100]" onClick={() => setActiveStatusEdit(null)} />
+          <DynamicBox 
+            className="fixed bg-white rounded-2xl shadow-xl border border-gray-100 w-48 py-2 z-[101] animate-scale-in overflow-hidden"
+            top={`${dropdownPos.top + 6}px`}
+            left={`${Math.min(dropdownPos.left - 100, typeof window !== 'undefined' ? window.innerWidth - 200 : 0)}px`}
+          >
+            <div className="px-4 py-2 border-b border-gray-50 mb-1">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">เลือกสถานะ</p>
+            </div>
+            {["ฉบับร่าง", "ส่งแล้ว", "รอดำเนินการ", "อนุมัติแล้ว", "ปฏิเสธ"].map((status) => {
+              const activeQ = quotations.find(q => q.id === activeStatusEdit);
+              if (!activeQ) return null;
+              return (
+                <button
+                  key={status}
+                  onClick={async () => {
+                    if (status !== activeQ.status) {
+                      await updateQuotation({ ...activeQ, status: status as any });
+                      showToast(`เปลี่ยนสถานะเป็น "${status}" เรียบร้อย`, "success");
+                    }
+                    setActiveStatusEdit(null);
+                  }}
+                  className={`w-full text-left px-4 py-2.5 text-[13px] font-medium transition-colors hover:bg-gray-50 flex items-center justify-between ${activeQ.status === status ? "text-indigo-600" : "text-gray-600"}`}
+                >
+                  {status}
+                  {activeQ.status === status && <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />}
+                </button>
+              );
+            })}
+          </DynamicBox>
+        </>
+      )}
     </div>
   );
 }
