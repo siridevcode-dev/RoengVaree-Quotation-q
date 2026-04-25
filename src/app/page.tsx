@@ -14,6 +14,7 @@ import Settings from "@/components/Settings";
 import MemberManagement from "@/components/MemberManagement";
 import ProductSelector from "@/components/ProductSelector";
 import QuotationView from "@/components/QuotationView";
+import ProductionCosts from "@/components/ProductionCosts";
 import { Product } from "@/context/AppContext";
 
 import { useAppContext } from "@/context/AppContext";
@@ -69,6 +70,8 @@ export default function Home() {
         );
       case "Products":
         return <ProductList />;
+      case "Production costs":
+        return <ProductionCosts />;
       case "Reports":
         return <Reports />;
       case "Quotation Templates":
