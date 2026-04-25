@@ -87,7 +87,9 @@ const QuotationDocument = forwardRef<HTMLDivElement, QuotationDocumentProps>(
 
       const vatableAmount = items.reduce((sum, item) => {
         if (!checkVat || item.vatEnabled === false) return sum;
-        return sum + (item.quantity * item.unitPrice - (item.discount || 0));
+        const base = item.quantity * item.unitPrice;
+        const discountAmount = base * ((item.discount || 0) / 100);
+        return sum + (base - discountAmount);
       }, 0);
 
       const vat = checkVat ? vatableAmount * (vatRate / 100) : 0;

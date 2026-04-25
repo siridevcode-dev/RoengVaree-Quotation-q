@@ -3,21 +3,10 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import html2canvas from "html2canvas-pro";
 import { jsPDF } from "jspdf";
-import { useAppContext } from "@/context/AppContext";
+import { useAppContext, LineItem, Quotation } from "@/context/AppContext";
 import QuotationDocument from "./QuotationDocument";
 import { compressImage, safeLocalStorageSet } from "@/lib/image-utils";
 import { api } from "@/lib/api-client";
-
-interface LineItem {
-  id: number | string;
-  name: string;
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  discount: number;
-  vatEnabled: boolean;
-  category?: string;
-}
 
 const defaultItem = (): LineItem => ({
   id: Date.now(),
@@ -187,7 +176,8 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
     }
   }, [quotationId, initialItems, initialImages, quotations, boatModels, setCustomerName, setCustomerEmail, setCustomerPhone, setCustomerAddress, setCustomerTaxId, setItems, setNotes, setTerms, setStatus, setGlobalVatEnabled, setSummaryDiscountAmount, setSummaryDiscountPercentage, setBoatModel, setIncludeOptionalEquipment, setFrequency, setCustomImages, users]);
 
-  const updateItem = (id: number | string, field: keyof LineItem, value: string | number | boolean) => {
+  const updateItem = (id: number | string | undefined, field: keyof LineItem, value: string | number | boolean) => {
+    if (id === undefined) return;
     setItems((prev) =>
       prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
     );
@@ -201,7 +191,8 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
     setItems((prev) => [...prev, { ...defaultItem(), category }]);
   };
 
-  const removeItem = (id: number | string) => {
+  const removeItem = (id: number | string | undefined) => {
+    if (id === undefined) return;
     if (items.length > 1) {
       setItems((prev) => prev.filter((item) => item.id !== id));
     }
@@ -209,7 +200,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
 
   const getRowTotal = (item: LineItem) => {
     const base = item.quantity * item.unitPrice;
-    const discountAmount = base * (item.discount / 100);
+    const discountAmount = base * ((item.discount || 0) / 100);
     return base - discountAmount;
   };
 
@@ -225,7 +216,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
     // Calculate optional equipment subtotal
     const optionalSubtotal = optionalItems.reduce((sum, item) => {
       const base = item.quantity * item.unitPrice;
-      const disc = base * (item.discount / 100);
+      const disc = base * ((item.discount || 0) / 100);
       return sum + (base - disc);
     }, 0);
     
@@ -233,14 +224,14 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
     const nonOptionalSubtotal = nonOptionalItems.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
     const nonOptionalLineDiscount = nonOptionalItems.reduce((sum, item) => {
       const base = item.quantity * item.unitPrice;
-      return sum + base * (item.discount / 100);
+      return sum + base * ((item.discount || 0) / 100);
     }, 0);
     
     // Full subtotal (all items)
     const fullSubtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
     const fullLineItemDiscount = items.reduce((sum, item) => {
       const base = item.quantity * item.unitPrice;
-      return sum + base * (item.discount / 100);
+      return sum + base * ((item.discount || 0) / 100);
     }, 0);
     
     // Effective subtotal based on toggle
