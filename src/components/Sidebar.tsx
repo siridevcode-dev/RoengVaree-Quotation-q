@@ -90,7 +90,6 @@ export default function Sidebar({ activePage, onPageChange, mobileOpen, onMobile
   const [collapsed, setCollapsed] = useState(false);
   const { currentUser } = useAppContext();
   
-  const isAdminOrManager = currentUser?.role === "Admin" || currentUser?.role === "Manager";
 
   const filteredNavItems = navItems;
 
@@ -123,7 +122,7 @@ export default function Sidebar({ activePage, onPageChange, mobileOpen, onMobile
           </div>
           {(!collapsed || mobileOpen) && (
             <div className="flex flex-col min-w-0 leading-none">
-              <span className="text-[13px] font-black tracking-wide truncate" style={{ color: '#283583' }}>
+              <span className="text-[13px] font-black tracking-wide truncate text-[#283583]">
                 ROENGVAREE
               </span>
               <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-gray-400 mt-0.5">
@@ -135,6 +134,7 @@ export default function Sidebar({ activePage, onPageChange, mobileOpen, onMobile
         {/* Collapse button - desktop only */}
         <button
           onClick={() => setCollapsed(!collapsed)}
+          title={collapsed ? "ขยายเมนู" : "ย่อเมนู"}
           className="w-7 h-7 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0 hidden md:flex"
         >
           <svg
@@ -149,6 +149,7 @@ export default function Sidebar({ activePage, onPageChange, mobileOpen, onMobile
         {/* Close - mobile only */}
         <button
           onClick={onMobileClose}
+          title="ปิดเมนู"
           className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors md:hidden"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -167,10 +168,9 @@ export default function Sidebar({ activePage, onPageChange, mobileOpen, onMobile
               onClick={() => handleNavClick(item.label)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative overflow-hidden ${
                 active
-                  ? "text-white shadow-md"
+                  ? "text-white shadow-md bg-gradient-to-br from-[#283583] to-[#3b4ba4] shadow-[0_4px_12px_rgba(40,53,131,0.25)]"
                   : "text-gray-500 hover:bg-gray-50/80 hover:text-gray-800"
               }`}
-              style={active ? { background: 'linear-gradient(135deg, #283583 0%, #3b4ba4 100%)', boxShadow: '0 4px 12px rgba(40,53,131,0.25)' } : {}}
               title={collapsed && !mobileOpen ? item.label : undefined}
             >
               {/* Active indicator bar */}
@@ -193,8 +193,8 @@ export default function Sidebar({ activePage, onPageChange, mobileOpen, onMobile
       {/* Bottom badge */}
       {(!collapsed || mobileOpen) && (
         <div className="p-3 border-t border-gray-100/80 flex-shrink-0">
-          <div className="rounded-xl p-3 flex items-center gap-2.5" style={{ background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)' }}>
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(135deg, #283583, #4f46e5)' }}>
+          <div className="rounded-xl p-3 flex items-center gap-2.5 bg-gradient-to-br from-[#eef2ff] to-[#e0e7ff]">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-[#283583] to-[#4f46e5]">
               <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>

@@ -123,9 +123,11 @@ body {
 /* ======================================================
    SCROLLBAR
    ====================================================== */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--gray-300) transparent;
+@supports (scrollbar-width: thin) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--gray-300) transparent;
+  }
 }
 
 ::-webkit-scrollbar {
@@ -152,7 +154,8 @@ input[type="number"]::-webkit-inner-spin-button {
   margin: 0;
 }
 input[type="number"] {
-  -moz-appearance: textfield;
+  -moz-appearance: textfield; /* Firefox */
+  appearance: textfield; /* Standard */
 }
 
 /* ======================================================
@@ -391,3 +394,12 @@ input[type="number"] {
   color: var(--gray-400);
   margin-bottom: 4px;
 }
+/* ======================================================
+   DYNAMIC UTILITIES (For Lint Compliance)
+   ====================================================== */
+.dynamic-height { height: var(--h); }
+.dynamic-width  { width: var(--w); }
+.dynamic-top    { top: var(--top); }
+.dynamic-left   { left: var(--left); }
+.dynamic-bg     { background-color: var(--bg); }
+.dynamic-color  { color: var(--color); }

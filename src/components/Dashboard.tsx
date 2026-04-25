@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppContext } from "@/context/AppContext";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const statusColor: Record<string, string> = {
   "อนุมัติแล้ว": "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
@@ -134,11 +134,14 @@ export default function Dashboard() {
                 <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/20 shadow-inner">
                   {card.icon}
                 </div>
-                <div className="bg-white/20 backdrop-blur-md rounded-full p-1.5 cursor-pointer hover:bg-white/30 transition-colors">
+                <button 
+                  title="ดูรายละเอียดแนวโน้ม"
+                  className="bg-white/20 backdrop-blur-md rounded-full p-1.5 cursor-pointer hover:bg-white/30 transition-colors border-none"
+                >
                   <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                   </svg>
-                </div>
+                </button>
               </div>
               <div className="relative z-10">
                 <p className="text-sm font-medium text-white/80 mb-1">{card.label}</p>
@@ -159,7 +162,10 @@ export default function Dashboard() {
                 <h2 className="text-sm font-bold text-gray-800">รายได้รายเดือน</h2>
                 <p className="text-xs text-gray-400 mt-0.5">เฉพาะที่อนุมัติแล้ว</p>
               </div>
-              <select className="text-xs px-2.5 py-1.5 border border-gray-200 rounded-lg bg-white focus:outline-none text-gray-600 cursor-pointer">
+              <select 
+                title="เลือกปีที่แสดงข้อมูล"
+                className="text-xs px-2.5 py-1.5 border border-gray-200 rounded-lg bg-white focus:outline-none text-gray-600 cursor-pointer"
+              >
                 <option>ปี {currentYearBE}</option>
                 <option>ปี {currentYearBE - 1}</option>
               </select>
@@ -168,21 +174,18 @@ export default function Dashboard() {
               <div className="flex items-end gap-1.5 h-[180px]">
                 {monthlyRevenue.map((val, i) => (
                   <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-                    <div
-                      className="w-full rounded-t-xl transition-all duration-700 cursor-pointer relative group min-h-[4px]"
-                      style={{
-                        height: `${Math.max((val / maxRevenue) * 160, 4)}px`,
-                        background: val > 0
-                          ? 'linear-gradient(to top, #4f46e5, #a855f7)'
-                          : '#f1f5f9',
-                      }}
+                    <DynamicBox
+                      className={`w-full rounded-t-xl transition-all duration-700 cursor-pointer relative group min-h-[4px] ${
+                        val > 0 ? 'bg-gradient-to-t from-indigo-600 to-purple-500' : 'bg-slate-100'
+                      }`}
+                      height={`${Math.max((val / maxRevenue) * 160, 4)}px`}
                     >
                       {val > 0 && (
                         <div className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-lg">
                           ฿{val.toFixed(1)}K
                         </div>
                       )}
-                    </div>
+                    </DynamicBox>
                     <span className="text-[9px] md:text-[10px] text-gray-400 font-medium">
                       {months[i]}
                     </span>
@@ -202,10 +205,14 @@ export default function Dashboard() {
               {topCustomers.length > 0 ? topCustomers.map((c, i) => (
                 <div key={c.id || `c-${i}`} className="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-indigo-50/50 transition-colors group cursor-pointer border border-transparent hover:border-indigo-100">
                   <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-black flex-shrink-0 shadow-md transform group-hover:scale-110 transition-transform duration-300"
-                    style={{
-                      background: ['linear-gradient(135deg, #f59e0b, #ef4444)', 'linear-gradient(135deg, #3b82f6, #4f46e5)', 'linear-gradient(135deg, #10b981, #14b8a6)', 'linear-gradient(135deg, #8b5cf6, #d946ef)'][i] || 'linear-gradient(135deg,#94a3b8,#64748b)',
-                    }}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-black flex-shrink-0 shadow-md transform group-hover:scale-110 transition-transform duration-300 bg-gradient-to-br ${
+                      [
+                        'from-amber-500 to-red-500',
+                        'from-blue-500 to-indigo-600',
+                        'from-emerald-500 to-teal-500',
+                        'from-violet-500 to-fuchsia-500'
+                      ][i] || 'from-slate-400 to-slate-600'
+                    }`}
                   >
                     {i + 1}
                   </div>
@@ -261,6 +268,7 @@ export default function Dashboard() {
                             setDropdownPos({ top: rect.bottom, left: rect.left });
                             setActiveStatusEdit(activeStatusEdit === q.id ? null : q.id);
                           }}
+                          title="คลิกเพื่อเปลี่ยนสถานะ"
                           className={`badge ${statusColor[q.status] || "bg-gray-100 text-gray-600"} hover:scale-105 transition-transform cursor-pointer shadow-sm`}
                         >
                           {q.status}
@@ -269,9 +277,10 @@ export default function Dashboard() {
                         {activeStatusEdit === q.id && (
                           <>
                             <div className="fixed inset-0 z-[100]" onClick={() => setActiveStatusEdit(null)} />
-                            <div
+                            <DynamicBox
                               className="fixed bg-white rounded-2xl shadow-xl border border-gray-100 w-48 py-2 z-[101] animate-scale-in overflow-hidden"
-                              style={{ top: `${dropdownPos.top + 6}px`, left: `${Math.min(dropdownPos.left - 100, typeof window !== 'undefined' ? window.innerWidth - 200 : 0)}px` }}
+                              top={`${dropdownPos.top + 6}px`}
+                              left={`${Math.min(dropdownPos.left - 100, typeof window !== 'undefined' ? window.innerWidth - 200 : 0)}px`}
                             >
                               <div className="px-4 py-2 border-b border-gray-50 mb-1">
                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">เลือกสถานะ</p>
@@ -292,7 +301,7 @@ export default function Dashboard() {
                                   {q.status === status && <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />}
                                 </button>
                               ))}
-                            </div>
+                            </DynamicBox>
                           </>
                         )}
                       </div>
@@ -317,4 +326,19 @@ export default function Dashboard() {
       </div>
     </div>
   );
+}
+
+function DynamicBox({ height, width, backgroundColor, color, className, title, children, top, left }: any) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (ref.current) {
+      if (height) ref.current.style.height = height;
+      if (width) ref.current.style.width = width;
+      if (backgroundColor) ref.current.style.backgroundColor = backgroundColor;
+      if (color) ref.current.style.color = color;
+      if (top) ref.current.style.top = top;
+      if (left) ref.current.style.left = left;
+    }
+  }, [height, width, backgroundColor, color, top, left]);
+  return <div ref={ref} className={className} title={title}>{children}</div>;
 }

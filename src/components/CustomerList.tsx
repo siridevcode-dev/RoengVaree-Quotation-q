@@ -8,12 +8,12 @@ const formatCurrency = (val: number) =>
   val.toLocaleString("th-TH", { style: "currency", currency: "THB", minimumFractionDigits: 0 });
 
 const avatarGradients = [
-  "linear-gradient(135deg,#283583,#6366f1)",
-  "linear-gradient(135deg,#0d9488,#14b8a6)",
-  "linear-gradient(135deg,#d97706,#f59e0b)",
-  "linear-gradient(135deg,#dc2626,#ef4444)",
-  "linear-gradient(135deg,#7c3aed,#8b5cf6)",
-  "linear-gradient(135deg,#0284c7,#38bdf8)",
+  "from-indigo-500 to-blue-600",
+  "from-teal-400 to-emerald-600",
+  "from-amber-400 to-orange-600",
+  "from-rose-400 to-pink-600",
+  "from-purple-500 to-indigo-600",
+  "from-sky-500 to-blue-500",
 ];
 
 export default function CustomerList() {
@@ -153,8 +153,8 @@ export default function CustomerList() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-11 h-11 rounded-2xl flex items-center justify-center text-white font-bold text-base flex-shrink-0 shadow-sm"
-                      style={{ background: avatarGradients[idx % avatarGradients.length] }}
+                      className={`w-11 h-11 rounded-2xl flex items-center justify-center text-white font-bold text-base flex-shrink-0 shadow-sm bg-gradient-to-br ${avatarGradients[idx % avatarGradients.length]}`}
+                      title={c.name}
                     >
                       {c.name.charAt(0)}
                     </div>
@@ -192,7 +192,7 @@ export default function CustomerList() {
                   <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                   <span className="text-xs text-gray-500">{c.totalQuotations} ใบเสนอราคา</span>
                 </div>
-                <span className="text-xs font-bold" style={{ color: '#283583' }}>{formatCurrency(c.totalRevenue)}</span>
+                <span className="text-xs font-bold text-[#283583]">{formatCurrency(c.totalRevenue)}</span>
               </div>
             </div>
           ))}

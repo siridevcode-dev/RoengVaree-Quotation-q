@@ -38,7 +38,7 @@ export default function Login() {
           <div className="inline-flex items-center justify-center w-32 h-32 rounded-[32px] bg-white p-4 shadow-xl shadow-teal-500/10 mb-6 group transition-transform duration-500 hover:scale-105 border border-slate-100">
              <img src="/logo.png" alt="RoengVaree Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-4xl font-black tracking-tighter mb-2" style={{ color: '#283583' }}>
+          <h1 className="text-4xl font-black tracking-tighter mb-2 text-[#283583]">
             ROENGVAREE
           </h1>
           <p className="text-slate-500 font-medium tracking-wide">Quotation Management System</p>
@@ -48,16 +48,17 @@ export default function Login() {
         <div className="bg-white border border-slate-200 rounded-[32px] p-10 shadow-2xl shadow-slate-200/50">
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-xs font-black uppercase tracking-[0.2em] ml-1" style={{ color: '#283583' }}>Username / Phone</label>
+              <label className="text-xs font-black uppercase tracking-[0.2em] ml-1 text-[#283583]">Username / Phone</label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <svg className="h-4 w-4 text-slate-400 group-focus-within:transition-colors" style={{ color: '#283583' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-4 w-4 text-[#283583] group-focus-within:transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
                 <input
                   type="text"
                   required
+                  title="ชื่อผู้ใช้หรือเบอร์โทรศัพท์"
                   placeholder="กรอกชื่อผู้ใช้หรือเบอร์โทรศัพท์"
                   className="block w-full pl-11 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-[18px] text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 transition-all"
                   value={username}
@@ -67,7 +68,7 @@ export default function Login() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-black uppercase tracking-[0.2em] ml-1" style={{ color: '#283583' }}>Password</label>
+              <label className="text-xs font-black uppercase tracking-[0.2em] ml-1 text-[#283583]">Password</label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <svg className="h-4 w-4 text-slate-400 group-focus-within:text-teal-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,6 +78,7 @@ export default function Login() {
                 <input
                   type="password"
                   required
+                  title="รหัสผ่าน"
                   placeholder="••••••••"
                   className="block w-full pl-11 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-[18px] text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 transition-all"
                   value={password}
@@ -97,8 +99,8 @@ export default function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-4 px-6 text-white font-black uppercase tracking-widest rounded-[18px] shadow-xl active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden relative"
-              style={{ background: 'linear-gradient(to right, #283583, #3b4ba4)', boxShadow: '0 10px 15px -3px rgba(40, 53, 131, 0.2)' }}
+              title="เข้าสู่ระบบ"
+              className="w-full py-4 px-6 text-white font-black uppercase tracking-widest rounded-[18px] shadow-xl active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden relative bg-gradient-to-r from-[#283583] to-[#3b4ba4] shadow-[0_10px_15px_-3px_rgba(40,53,131,0.2)]"
             >
               <div className="relative z-10 flex items-center justify-center gap-2">
                 {isLoading ? (
@@ -128,7 +130,7 @@ export default function Login() {
           <div className="mt-8 pt-8 border-t border-slate-100 flex flex-col gap-4">
             <div className="flex justify-between items-center px-2">
                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Enterprise Edition</span>
-               <div className="h-1.5 w-1.5 rounded-full shadow-[0_0_12px_rgba(40,53,131,0.8)]" style={{ backgroundColor: '#283583' }}></div>
+               <div className="h-1.5 w-1.5 rounded-full shadow-[0_0_12px_rgba(40,53,131,0.8)] bg-[#283583]"></div>
             </div>
             <p className="text-[11px] text-center text-slate-400 font-medium">
                Authorized personal only. All activity is logged and monitored.

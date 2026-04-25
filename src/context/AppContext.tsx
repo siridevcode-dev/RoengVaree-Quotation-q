@@ -6,6 +6,17 @@ import { api, setToken, clearToken } from "@/lib/api-client";
 // ---------------------------------------------------------
 // Interfaces (unchanged from original)
 // ---------------------------------------------------------
+export interface LineItem {
+  id?: number | string;
+  name: string;
+  quantity: number;
+  unitPrice: number;
+  discount?: number;
+  description?: string;
+  category?: string;
+  vatEnabled?: boolean;
+}
+
 export interface Quotation {
   id: string;
   customer: string;
@@ -20,7 +31,7 @@ export interface Quotation {
   customerPhone?: string;
   customerAddress?: string;
   customerTaxId?: string;
-  lineItems?: any[]; 
+  lineItems?: LineItem[]; 
   notes?: string;
   terms?: string;
   globalVatEnabled?: boolean;
@@ -82,10 +93,39 @@ export interface Product {
 }
 
 export interface SettingsType {
-  profile: any;
-  companySettings: any;
-  quotationSettings: any;
-  notifications: any;
+  profile: {
+    name: string;
+    username: string;
+    email: string;
+    phone: string;
+    company?: string;
+    position?: string;
+  };
+  companySettings: {
+    name: string;
+    taxId: string;
+    address: string;
+    phone: string;
+    email: string;
+    website?: string;
+    logo?: string;
+  };
+  quotationSettings: {
+    prefix: string;
+    validDays: number;
+    defaultVat: boolean;
+    vatRate: number;
+    currency: string;
+    defaultNotes: string;
+    defaultTerms: string[];
+  };
+  notifications: {
+    emailNewQuotation: boolean;
+    emailApproved: boolean;
+    emailRejected: boolean;
+    emailExpiring: boolean;
+    browserNotify: boolean;
+  };
 }
 
 export type UserRole = "Admin" | "Manager" | "Editor" | "Viewer";
@@ -497,7 +537,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (spec.newModel) {
           // Rename logic
           setBoatSpecifications(prev => {
-            const { [model]: oldSpec, ...rest } = prev;
+            const { [model]: _oldSpec, ...rest } = prev;
             return { ...rest, [spec.newModel!]: spec };
           });
         } else {
@@ -520,7 +560,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // ----- Generate Next ID -----
-  const generateNextId = useCallback((type: "Q") => {
+  const generateNextId = useCallback((_type: "Q") => {
     const prefix = settings?.quotationSettings?.prefix || "Q";
     const today = new Date();
     const yyyy = String(today.getFullYear());

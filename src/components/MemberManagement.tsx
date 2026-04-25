@@ -193,6 +193,7 @@ export default function MemberManagement() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleOpenModal(user)}
+                            title="แก้ไขข้อมูลสมาชิก"
                             className="p-2 text-gray-400 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-all"
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -201,6 +202,7 @@ export default function MemberManagement() {
                           </button>
                           <button
                             onClick={() => handleDeleteUser(user.id)}
+                            title="ลบสมาชิก"
                             className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -251,7 +253,11 @@ export default function MemberManagement() {
           <div className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
               <h2 className="text-xl font-bold text-gray-900">{editingUser ? "แก้ไขข้อมูลสมาชิก" : "เพิ่มสมาชิกใหม่"}</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600 p-1">
+              <button 
+                onClick={() => setIsModalOpen(false)} 
+                title="ปิดหน้าต่าง"
+                className="text-gray-400 hover:text-gray-600 p-1"
+              >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -305,6 +311,7 @@ export default function MemberManagement() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    title={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 px-2"
                   >
                     {showPassword ? (
@@ -324,6 +331,7 @@ export default function MemberManagement() {
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold text-gray-700">สิทธิ์การใช้งาน</label>
                   <select
+                    title="เลือกสิทธิ์การใช้งาน"
                     className="w-full px-4 py-2.5 bg-gray-50 border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500/20 text-sm appearance-none"
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })}
@@ -337,6 +345,7 @@ export default function MemberManagement() {
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold text-gray-700">สถานะ</label>
                   <select
+                    title="เลือกสถานะสมาชิก"
                     className="w-full px-4 py-2.5 bg-gray-50 border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500/20 text-sm appearance-none"
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as "Active" | "Inactive" })}

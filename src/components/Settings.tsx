@@ -115,6 +115,7 @@ export default function Settings() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
+              title={tab.label}
               className={`flex-shrink-0 md:flex-1 flex items-center justify-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm font-medium rounded-md transition-all whitespace-nowrap ${
                 activeTab === tab.id
                   ? "bg-white text-gray-900 shadow-sm"
@@ -138,28 +139,28 @@ export default function Settings() {
                 <div className="w-16 h-16 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
                   {profileData.name ? profileData.name.charAt(0).toUpperCase() : "?"}
                 </div>
-                <button className="px-4 py-2 text-sm font-medium text-teal-700 bg-teal-50 border border-teal-200 rounded-lg hover:bg-teal-100 transition-all">เปลี่ยนรูปภาพ</button>
+                <button title="เปลี่ยนรูปภาพโปรไฟล์" className="px-4 py-2 text-sm font-medium text-teal-700 bg-teal-50 border border-teal-200 rounded-lg hover:bg-teal-100 transition-all">เปลี่ยนรูปภาพ</button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">ชื่อ-สกุล</label>
-                  <input type="text" value={profileData.name || ""} onChange={(e) => setProfileData({ ...profileData, name: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="text" title="ชื่อ-สกุล" placeholder="ระบุชื่อ-นามสกุล" value={profileData.name || ""} onChange={(e) => setProfileData({ ...profileData, name: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">Username (ชื่อผู้ใช้)</label>
-                  <input type="text" value={profileData.username || ""} onChange={(e) => setProfileData({ ...profileData, username: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="text" title="ชื่อผู้ใช้" placeholder="ระบุชื่อผู้ใช้" value={profileData.username || ""} onChange={(e) => setProfileData({ ...profileData, username: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">อีเมล</label>
-                  <input type="email" value={profileData.email || ""} onChange={(e) => setProfileData({ ...profileData, email: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="email" title="อีเมล" placeholder="example@email.com" value={profileData.email || ""} onChange={(e) => setProfileData({ ...profileData, email: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">เบอร์โทร</label>
-                  <input type="tel" value={profileData.phone || ""} onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="tel" title="เบอร์โทรศัพท์" placeholder="08x-xxx-xxxx" value={profileData.phone || ""} onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">ตำแหน่ง</label>
-                  <input type="text" value={profileData.position || ""} onChange={(e) => setProfileData({ ...profileData, position: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="text" title="ตำแหน่ง" placeholder="ระบุตำแหน่งงาน" value={profileData.position || ""} onChange={(e) => setProfileData({ ...profileData, position: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
               </div>
               <div className="pt-2">
@@ -170,8 +171,8 @@ export default function Settings() {
                   <label className="text-sm font-bold text-gray-700">เปลี่ยนรหัสผ่าน</label>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input type="password" placeholder="รหัสผ่านใหม่" value={profileData.password} onChange={(e) => setProfileData({ ...profileData, password: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
-                  <input type="password" placeholder="ยืนยันรหัสผ่านใหม่" value={profileData.confirmPassword} onChange={(e) => setProfileData({ ...profileData, confirmPassword: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="password" title="รหัสผ่านใหม่" placeholder="รหัสผ่านใหม่" value={profileData.password} onChange={(e) => setProfileData({ ...profileData, password: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="password" title="ยืนยันรหัสผ่านใหม่" placeholder="ยืนยันรหัสผ่านใหม่" value={profileData.confirmPassword} onChange={(e) => setProfileData({ ...profileData, confirmPassword: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
                 <p className="text-[11px] text-gray-400 mt-2">* เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัสผ่าน</p>
               </div>
@@ -185,27 +186,27 @@ export default function Settings() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">ชื่อบริษัท</label>
-                  <input type="text" value={companyData.name || ""} onChange={(e) => setCompanyData({ ...companyData, name: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="text" title="ชื่อบริษัท" placeholder="ระบุชื่อบริษัท" value={companyData.name || ""} onChange={(e) => setCompanyData({ ...companyData, name: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">เลขประจำตัวผู้เสียภาษี</label>
-                  <input type="text" value={companyData.taxId || ""} onChange={(e) => setCompanyData({ ...companyData, taxId: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="text" title="เลขประจำตัวผู้เสียภาษี" placeholder="ระบุเลขประจำตัวผู้เสียภาษี" value={companyData.taxId || ""} onChange={(e) => setCompanyData({ ...companyData, taxId: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">เบอร์โทร</label>
-                  <input type="text" value={companyData.phone || ""} onChange={(e) => setCompanyData({ ...companyData, phone: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="text" title="เบอร์โทรบริษัท" placeholder="ระบุเบอร์โทรศัพท์" value={companyData.phone || ""} onChange={(e) => setCompanyData({ ...companyData, phone: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
                 <div className="md:col-span-2">
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">ที่อยู่</label>
-                  <textarea value={companyData.address || ""} onChange={(e) => setCompanyData({ ...companyData, address: e.target.value })} rows={2} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 resize-none" />
+                  <textarea title="ที่อยู่บริษัท" placeholder="ระบุที่อยู่บริษัท" value={companyData.address || ""} onChange={(e) => setCompanyData({ ...companyData, address: e.target.value })} rows={2} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 resize-none" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">อีเมล</label>
-                  <input type="email" value={companyData.email || ""} onChange={(e) => setCompanyData({ ...companyData, email: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                   <input type="email" title="อีเมลบริษัท" placeholder="company@email.com" value={companyData.email || ""} onChange={(e) => setCompanyData({ ...companyData, email: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">เว็บไซต์</label>
-                  <input type="text" value={companyData.website || ""} onChange={(e) => setCompanyData({ ...companyData, website: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="text" title="เว็บไซต์บริษัท" placeholder="www.company.com" value={companyData.website || ""} onChange={(e) => setCompanyData({ ...companyData, website: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
               </div>
             </div>
@@ -218,16 +219,16 @@ export default function Settings() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">คำนำหน้าเลขที่</label>
-                  <input type="text" value={quotationData.prefix || ""} onChange={(e) => setQuotationData({ ...quotationData, prefix: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
-                  <p className="text-[10px] text-gray-400 mt-1">ตัวอย่าง: ใส่ "Q2026-4-" ระบบจะต่อท้ายด้วย "0001" ให้เอง (ห้ามใส่เลขรันลำดับไว้ในนี้)</p>
+                  <input type="text" title="คำนำหน้าเลขที่" placeholder="Q2026-" value={quotationData.prefix || ""} onChange={(e) => setQuotationData({ ...quotationData, prefix: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <p className="text-[10px] text-gray-400 mt-1">{`ตัวอย่าง: ใส่ "Q2026-4-" ระบบจะต่อท้ายด้วย "0001" ให้เอง (ห้ามใส่เลขรันลำดับไว้ในนี้)`}</p>
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">จำนวนวันที่ใช้ได้</label>
-                  <input type="number" value={quotationData.validDays} onChange={(e) => setQuotationData({ ...quotationData, validDays: Number(e.target.value) })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                  <input type="number" title="จำนวนวันที่ใช้ได้" placeholder="30" value={quotationData.validDays} onChange={(e) => setQuotationData({ ...quotationData, validDays: Number(e.target.value) })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">สกุลเงิน</label>
-                  <select value={quotationData.currency} onChange={(e) => setQuotationData({ ...quotationData, currency: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500">
+                  <select title="สกุลเงิน" value={quotationData.currency} onChange={(e) => setQuotationData({ ...quotationData, currency: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500">
                     <option value="THB">฿ บาท (THB)</option>
                     <option value="USD">$ ดอลลาร์ (USD)</option>
                     <option value="EUR">€ ยูโร (EUR)</option>
@@ -240,16 +241,20 @@ export default function Settings() {
                   <p className="text-xs text-gray-500">เปิดใช้งาน VAT เป็นค่าเริ่มต้น</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <input type="number" value={quotationData.vatRate} onChange={(e) => setQuotationData({ ...quotationData, vatRate: Number(e.target.value) })} className="w-16 px-2 py-1.5 text-sm text-center bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30" />
+                   <input type="number" title="อัตราภาษีมูลค่าเพิ่ม" placeholder="7" value={quotationData.vatRate} onChange={(e) => setQuotationData({ ...quotationData, vatRate: Number(e.target.value) })} className="w-16 px-2 py-1.5 text-sm text-center bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30" />
                   <span className="text-sm text-gray-600">%</span>
-                  <button onClick={() => setQuotationData({ ...quotationData, defaultVat: !quotationData.defaultVat })} className={`relative w-11 h-6 rounded-full transition-colors ${quotationData.defaultVat ? "bg-teal-600" : "bg-gray-300"}`}>
+                  <button 
+                    onClick={() => setQuotationData({ ...quotationData, defaultVat: !quotationData.defaultVat })} 
+                    title={quotationData.defaultVat ? "ปิดใช้งาน VAT" : "เปิดใช้งาน VAT"}
+                    className={`relative w-11 h-6 rounded-full transition-colors ${quotationData.defaultVat ? "bg-teal-600" : "bg-gray-300"}`}
+                  >
                     <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${quotationData.defaultVat ? "left-6" : "left-1"}`} />
                   </button>
                 </div>
               </div>
               <div>
                 <label className="text-xs font-medium text-gray-500 mb-1.5 block">หมายเหตุเริ่มต้น</label>
-                <textarea value={quotationData.defaultNotes || ""} onChange={(e) => setQuotationData({ ...quotationData, defaultNotes: e.target.value })} rows={2} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 resize-none" />
+                <textarea title="หมายเหตุเริ่มต้น" placeholder="ระบุหมายเหตุที่จะแสดงในใบเสนอราคาเป็นค่าเริ่มต้น" value={quotationData.defaultNotes || ""} onChange={(e) => setQuotationData({ ...quotationData, defaultNotes: e.target.value })} rows={2} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 resize-none" />
               </div>
               <div>
                 <label className="text-xs font-medium text-gray-500 mb-2 block">เงื่อนไขเริ่มต้น (Default Terms)</label>
@@ -287,6 +292,7 @@ export default function Settings() {
                       const currentTerms = Array.isArray(quotationData.defaultTerms) ? quotationData.defaultTerms : [];
                       setQuotationData({ ...quotationData, defaultTerms: [...currentTerms, ""] });
                     }}
+                    title="เพิ่มเงื่อนไขใหม่"
                     className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-teal-700 bg-teal-50/50 border border-teal-100 border-dashed rounded-lg hover:bg-teal-50 hover:border-teal-300 transition-all w-full justify-center mt-2 group"
                   >
                     <svg className="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
@@ -316,6 +322,7 @@ export default function Settings() {
                     </div>
                     <button
                       onClick={() => setNotificationsData({ ...notificationsData, [item.key]: !notificationsData[item.key] })}
+                      title={item.label}
                       className={`relative w-11 h-6 rounded-full transition-colors ${notificationsData[item.key] ? "bg-teal-600" : "bg-gray-300"}`}
                     >
                       <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${notificationsData[item.key] ? "left-6" : "left-1"}`} />
@@ -475,7 +482,7 @@ function BoatSpecificationTab() {
     return (
       <div className="p-6 space-y-6">
         <div className="flex items-center gap-3 mb-2">
-          <button onClick={() => setEditingBoat(null)} className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-all">
+          <button onClick={() => setEditingBoat(null)} title="กลับ" className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-all">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           </button>
           <h2 className="text-lg font-bold text-gray-800">แก้ไขข้อมูลทางเทคนิค</h2>
@@ -564,6 +571,7 @@ function BoatSpecificationTab() {
                     </div>
                     <button 
                       onClick={() => startEdit(model)}
+                      title="แก้ไขข้อมูล"
                       className="p-2.5 bg-white text-teal-500 border border-teal-50 rounded-full hover:bg-teal-50 hover:border-teal-200 hover:shadow-md transition-all shadow-sm"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
@@ -597,6 +605,7 @@ function BoatSpecificationTab() {
               </div>
               <button 
                 onClick={addNewModel}
+                title="เพิ่มรุ่นเรือ"
                 className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-teal-700 bg-teal-50 border border-teal-100 rounded-xl hover:bg-teal-100 hover:border-teal-200 transition-all shadow-sm active:scale-[0.98]"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
@@ -659,6 +668,7 @@ function BoatSpecificationTab() {
                               <button 
                                 onClick={() => triggerUpload(model, i)}
                                 disabled={isUploading}
+                                title="เพิ่มรูปภาพ"
                                 className="w-full h-full flex flex-col items-center justify-center gap-2 text-gray-400 group-hover:text-teal-600 transition-colors disabled:opacity-50"
                               >
                                 <svg className="w-8 h-8 opacity-40 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -680,6 +690,8 @@ function BoatSpecificationTab() {
             {/* Internal hidden file input for uploads */}
             <input 
               type="file" 
+              title="อัปโหลดไฟล์รูปภาพ"
+              placeholder="เลือกไฟล์รูปภาพ"
               ref={fileInputRefUpload} 
               onChange={handleFileChange} 
               accept="image/*" 
@@ -717,6 +729,8 @@ function SpecInput({ label, value, onChange }: { label: string, value: string, o
       <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">{label}</label>
       <input 
         type="text" 
+        title={label}
+        placeholder={`ระบุ${label}`}
         value={value || ""} 
         onChange={(e) => onChange(e.target.value)} 
         className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 focus:bg-white transition-all caret-teal-600" 

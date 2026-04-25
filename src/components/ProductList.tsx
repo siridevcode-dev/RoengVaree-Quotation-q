@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import * as XLSX from "xlsx";
 
 import { useAppContext, Product } from "@/context/AppContext";
@@ -247,6 +247,7 @@ export default function ProductList() {
               onChange={handleExcelImport} 
               accept=".xlsx, .xls" 
               className="hidden" 
+              title="เลือกไฟล์ Excel สำหรับนำเข้าข้อมูลสินค้า"
             />
             <button 
               onClick={() => fileInputRef.current?.click()} 
@@ -256,7 +257,7 @@ export default function ProductList() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
               <span className="hidden sm:inline">นำเข้า</span> Excel
             </button>
-            <button onClick={() => setShowCategoryManager(true)} className="inline-flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm font-semibold text-teal-700 bg-teal-50 border border-teal-200 rounded-lg hover:bg-teal-100 transition-all active:scale-[0.98]">
+            <button onClick={() => setShowCategoryManager(true)} className="inline-flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm font-semibold text-teal-700 bg-teal-50 border border-teal-200 rounded-lg hover:bg-teal-100 transition-all active:scale-[0.98]" title="จัดการหมวดหมู่สินค้าและรุ่นเรือ">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
               <span className="hidden sm:inline">จัดการ</span>ระบบ
             </button>
@@ -281,6 +282,7 @@ export default function ProductList() {
                   setFilterCat(cat);
                   setFilterModel("ทั้งหมด");
                 }} 
+                title={`แสดงหมวดหมู่ ${cat}`}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all ${filterCat === cat ? "bg-teal-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
               >
                 {cat}
@@ -335,12 +337,23 @@ export default function ProductList() {
                   <div className="space-y-4">
                     <div>
                       <label className="text-xs font-medium text-gray-500 mb-1.5 block">ชื่อสินค้า/บริการ *</label>
-                      <input type="text" value={formData.name || ""} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                      <input 
+                        type="text" 
+                        value={formData.name || ""} 
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
+                        className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" 
+                        title="กรอกชื่อสินค้าหรือบริการ"
+                      />
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                       <div>
                         <label className="text-xs font-medium text-gray-500 mb-1.5 block">หมวดหมู่</label>
-                        <select value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500">
+                        <select 
+                          title="เลือกหมวดหมู่"
+                          value={formData.category} 
+                          onChange={(e) => setFormData({ ...formData, category: e.target.value })} 
+                          className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+                        >
                           {categories.map(cat => (
                             <option key={cat} value={cat}>{cat}</option>
                           ))}
@@ -348,7 +361,12 @@ export default function ProductList() {
                       </div>
                       <div>
                         <label className="text-xs font-medium text-gray-500 mb-1.5 block">รุ่นเรือ</label>
-                        <select value={formData.boatModel} onChange={(e) => setFormData({ ...formData, boatModel: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500">
+                        <select 
+                          title="เลือกรุ่นเรือ"
+                          value={formData.boatModel} 
+                          onChange={(e) => setFormData({ ...formData, boatModel: e.target.value })} 
+                          className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+                        >
                           <option value="ทุกรุ่น">ทุกรุ่น</option>
                           {boatModels.map(m => (
                             <option key={m} value={m}>{m}</option>
@@ -357,7 +375,13 @@ export default function ProductList() {
                       </div>
                       <div>
                         <label className="text-xs font-medium text-gray-500 mb-1.5 block">SKU</label>
-                        <input type="text" value={formData.sku || ""} onChange={(e) => setFormData({ ...formData, sku: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                        <input 
+                          type="text" 
+                          value={formData.sku || ""} 
+                          onChange={(e) => setFormData({ ...formData, sku: e.target.value })} 
+                          className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" 
+                          title="ระบุรหัสสินค้า (SKU)"
+                        />
                       </div>
                     </div>
                   </div>
@@ -378,16 +402,30 @@ export default function ProductList() {
                           onFocus={(e) => e.target.select()}
                           placeholder="0"
                           className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" 
+                          title="ราคาต่อหน่วย"
                         />
                       </div>
                       <div>
                         <label className="text-xs font-medium text-gray-500 mb-1.5 block">หน่วย</label>
-                        <input type="text" value={formData.unit || ""} onChange={(e) => setFormData({ ...formData, unit: e.target.value })} placeholder="ชิ้น, เดือน, ระบบ" className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" />
+                        <input 
+                          type="text" 
+                          value={formData.unit || ""} 
+                          onChange={(e) => setFormData({ ...formData, unit: e.target.value })} 
+                          placeholder="ชิ้น, เดือน, ระบบ" 
+                          className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" 
+                          title="หน่วยนับของสินค้า"
+                        />
                       </div>
                     </div>
                     <div>
                       <label className="text-xs font-medium text-gray-500 mb-1.5 block">รายละเอียด</label>
-                      <textarea value={formData.description || ""} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={2} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 resize-none" />
+                      <textarea 
+                        value={formData.description || ""} 
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
+                        rows={2} 
+                        className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 resize-none" 
+                        title="กรอกรายละเอียดสินค้า"
+                      />
                     </div>
                   </div>
                 </div>
@@ -409,7 +447,10 @@ export default function ProductList() {
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden" onClick={(e) => e.stopPropagation()}>
               <div className="px-6 py-4 bg-teal-700 text-white flex justify-between items-center">
                 <h3 className="font-bold">จัดการระบบ</h3>
-                <button onClick={() => setShowCategoryManager(false)}>
+                <button 
+                  onClick={() => setShowCategoryManager(false)}
+                  title="ปิดหน้าต่างจัดการ"
+                >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
@@ -453,7 +494,11 @@ export default function ProductList() {
                       {categories.map(cat => (
                         <div key={cat} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg group">
                           <span className="text-sm font-medium text-gray-700">{cat}</span>
-                          <button onClick={() => removeCategory(cat)} className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                          <button 
+                            onClick={() => removeCategory(cat)} 
+                            title="ลบหมวดหมู่"
+                            className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                          >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                           </button>
                         </div>
@@ -484,7 +529,11 @@ export default function ProductList() {
                       {boatModels.map(m => (
                         <div key={m} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg group">
                           <span className="text-sm font-medium text-gray-700">{m}</span>
-                          <button onClick={() => removeBoatModel(m)} className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                          <button 
+                            onClick={() => removeBoatModel(m)} 
+                            title="ลบรุ่นเรือ"
+                            className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                          >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                           </button>
                         </div>

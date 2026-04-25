@@ -37,8 +37,7 @@ export default function Header({ activePage, onNavigate, onMobileMenuToggle }: H
   return (
     <header
       id="header"
-      className="h-14 md:h-[60px] bg-white/90 backdrop-blur-sm border-b border-gray-200/80 flex items-center relative z-30 print:hidden flex-shrink-0"
-      style={{ boxShadow: '0 1px 0 0 rgb(0 0 0 / 0.05)' }}
+      className="h-14 md:h-[60px] bg-white/90 backdrop-blur-sm border-b border-gray-200/80 flex items-center relative z-30 print:hidden flex-shrink-0 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]"
     >
       <div className="w-full flex items-center justify-between px-3 md:px-5">
         {/* Left: hamburger + breadcrumb */}
@@ -46,6 +45,7 @@ export default function Header({ activePage, onNavigate, onMobileMenuToggle }: H
           {/* Hamburger - mobile */}
           <button
             onClick={onMobileMenuToggle}
+            title="เปิดเมนูข้าง"
             className="w-9 h-9 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors md:hidden flex-shrink-0 active:scale-95"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,8 +62,7 @@ export default function Header({ activePage, onNavigate, onMobileMenuToggle }: H
             </span>
             <span className="hidden md:block text-gray-300 text-xs">/</span>
             <span
-              className="font-semibold text-sm truncate"
-              style={{ color: '#283583' }}
+              className="font-semibold text-sm truncate text-[#283583]"
             >
               {displayPage}
             </span>
@@ -73,7 +72,10 @@ export default function Header({ activePage, onNavigate, onMobileMenuToggle }: H
         {/* Right actions */}
         <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
           {/* Notification bell */}
-          <button className="relative w-9 h-9 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-all active:scale-95">
+          <button 
+            title="การแจ้งเตือน"
+            className="relative w-9 h-9 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-all active:scale-95"
+          >
             <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
@@ -87,11 +89,11 @@ export default function Header({ activePage, onNavigate, onMobileMenuToggle }: H
           <div className="relative">
             <button
               onClick={() => setProfileOpen(!profileOpen)}
+              title="เมนูโปรไฟล์"
               className="flex items-center gap-2 pl-1 pr-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors active:scale-95"
             >
               <div
-                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg, #283583 0%, #4f46e5 100%)' }}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm flex-shrink-0 bg-gradient-to-br from-[#283583] to-[#4f46e5]"
               >
                 {profileInitial}
               </div>
@@ -118,15 +120,6 @@ export default function Header({ activePage, onNavigate, onMobileMenuToggle }: H
                     <p className="text-sm font-semibold text-gray-900">{profileName}</p>
                     <p className="text-xs text-gray-400 mt-0.5">{currentUser?.role || "User"}</p>
                   </div>
-                  <button
-                    onClick={() => handleNavigate("Settings")}
-                    className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2.5"
-                  >
-                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    โปรไฟล์ของฉัน
-                  </button>
                   <button
                     onClick={() => handleNavigate("Settings")}
                     className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2.5"

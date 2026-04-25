@@ -1,8 +1,7 @@
 import { createClient, Client } from "@libsql/client";
-import path from "path";
 import { seedDatabase } from "./seed";
 
-const DB_URL = process.env.TURSO_DATABASE_URL;
+const DB_URL = process.env.TURSO_DATABASE_URL || "file:qm.db";
 const DB_AUTH_TOKEN = process.env.TURSO_AUTH_TOKEN;
 
 // Singleton pattern for server-side DB connection
@@ -12,8 +11,8 @@ export function getDb(): Client {
   if (!DB_URL) {
     throw new Error("CRITICAL: TURSO_DATABASE_URL is missing!");
   }
-  // Debug: Check if URL starts with libsql
-  if (!DB_URL.startsWith("libsql")) {
+  // Debug: Check if URL starts with libsql or file
+  if (!DB_URL.startsWith("libsql") && !DB_URL.startsWith("file:")) {
     throw new Error(`CRITICAL: URL is invalid! It starts with: ${DB_URL.substring(0, 15)}...`);
   }
   if (!_db) {

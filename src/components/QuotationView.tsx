@@ -162,6 +162,7 @@ export default function QuotationView({ quotationId, onNavigate }: QuotationView
           <div className="flex items-center gap-3">
             <button 
               onClick={() => onNavigate("Quotations")}
+              title="กลับไปหน้ารายการใบเสนอราคา"
               className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,8 +194,7 @@ export default function QuotationView({ quotationId, onNavigate }: QuotationView
             </button>
             <button
               onClick={() => onNavigate("Quotation Form", quotationId)}
-              className="btn-primary py-2 px-6 flex items-center gap-2"
-              style={{ background: 'linear-gradient(135deg, #283583, #4f46e5)' }}
+              className="btn-primary py-2 px-6 flex items-center gap-2 bg-gradient-to-br from-[#283583] to-[#4f46e5]"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -213,7 +213,7 @@ export default function QuotationView({ quotationId, onNavigate }: QuotationView
       </div>
 
       {/* Hidden for PDF */}
-      <div style={{ position: "absolute", top: "-9999px", left: "-9999px", zIndex: -50, pointerEvents: "none" }}>
+      <div className="absolute -top-[9999px] -left-[9999px] -z-50 pointer-events-none">
         <QuotationDocument ref={pdfRef} quotation={quotation} />
       </div>
     </div>

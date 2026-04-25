@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppContext } from "@/context/AppContext";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const formatCurrency = (val: number) =>
   val.toLocaleString("th-TH", { style: "currency", currency: "THB", minimumFractionDigits: 0 });
@@ -74,7 +74,12 @@ export default function Reports() {
             <p className="page-subtitle mt-1">วิเคราะห์ผลการดำเนินงาน</p>
           </div>
           <div className="flex items-center gap-2">
-            <select value={period} onChange={(e) => setPeriod(e.target.value)} className="input-modern py-2 text-sm cursor-pointer" style={{ width: 'auto', paddingRight: '32px' }}>
+            <select 
+              value={period} 
+              onChange={(e) => setPeriod(e.target.value)} 
+              title="เลือกช่วงเวลาของรายงาน"
+              className="input-modern py-2 text-sm cursor-pointer w-auto pr-8"
+            >
               <option value="yearly">รายปี {currentYear}</option>
               <option value="q1">ไตรมาส 1</option>
               <option value="q2">ไตรมาส 2</option>
@@ -99,22 +104,19 @@ export default function Reports() {
           </div>
         </div>
 
-        {/* Summary Cards */}
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 stagger-children">
           {summaryCards.map((card) => (
-            <div key={card.label} className="stat-card animate-fade-in">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3 text-sm font-bold flex-shrink-0" style={{ background: card.bg, color: card.color }}>
+            <div key={card.label} className="stat-card animate-fade-in" title={card.label}>
+              <DynamicBox className="w-9 h-9 rounded-xl flex items-center justify-center mb-3 text-sm font-bold flex-shrink-0" backgroundColor={card.bg} color={card.color}>
                 <svg className="w-4.5 h-4.5 w-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-              </div>
+              </DynamicBox>
               <p className="text-xs font-medium text-gray-500 mb-1">{card.label}</p>
-              <p className="text-xl md:text-2xl font-black tracking-tight" style={{ color: card.color }}>{card.value}</p>
+              <DynamicBox className="text-xl md:text-2xl font-black tracking-tight" color={card.color}>{card.value}</DynamicBox>
             </div>
           ))}
         </div>
 
-        {/* Charts Row */}
         <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-4 md:gap-5">
-          {/* Revenue Bar Chart */}
           <div className="card overflow-hidden">
             <div className="card-header">
               <div>
@@ -126,19 +128,16 @@ export default function Reports() {
               <div className="flex items-end gap-1.5 h-[200px]">
                 {monthlyData.map((d, i) => (
                   <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-                    <div
-                      className="w-full rounded-t-lg transition-all duration-700 cursor-pointer relative group min-h-[4px]"
-                      style={{
-                        height: `${Math.max((d.revenue / maxRevenue) * 175, 4)}px`,
-                        background: d.revenue > 0 ? "linear-gradient(to top,#283583,#6366f1)" : "#e2e8f0",
-                      }}
+                    <DynamicBox
+                      className="w-full rounded-t-lg transition-all duration-700 cursor-pointer relative group min-h-[4px] bg-gradient-to-t from-indigo-500 to-blue-900"
+                      height={`${Math.max((d.revenue / maxRevenue) * 175, 4)}px`}
                     >
                       {d.revenue > 0 && (
                         <div className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
                           {formatCurrency(d.revenue)}
                         </div>
                       )}
-                    </div>
+                    </DynamicBox>
                     <span className="text-[9px] md:text-[10px] text-gray-400 font-medium">{d.month}</span>
                   </div>
                 ))}
@@ -146,20 +145,24 @@ export default function Reports() {
             </div>
           </div>
 
-          {/* Status Breakdown */}
           <div className="card overflow-hidden">
             <div className="card-header">
               <h2 className="text-sm font-bold text-gray-800">สถานะใบเสนอราคา</h2>
               <span className="text-xs text-gray-400">ทั้งหมด {totalQuotations}</span>
             </div>
             <div className="p-5 space-y-4">
-              {/* Progress bar */}
               <div className="flex items-center h-3 rounded-full overflow-hidden bg-gray-100 gap-px">
                 {statusBreakdownTemplate.map((s) => {
                   const count = quotations.filter((q) => q.status === s.status).length;
                   const pct = totalQuotations > 0 ? (count / totalQuotations) * 100 : 0;
                   return pct > 0 ? (
-                    <div key={s.status} className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: s.color }} title={`${s.status}: ${count}`} />
+                    <DynamicBox 
+                      key={s.status} 
+                      className="h-full rounded-full transition-all duration-500" 
+                      width={`${pct}%`} 
+                      backgroundColor={s.color} 
+                      title={`${s.status}: ${count} (${pct.toFixed(1)}%)`} 
+                    />
                   ) : null;
                 })}
               </div>
@@ -170,7 +173,7 @@ export default function Reports() {
                   return (
                     <div key={s.status} className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }} />
+                        <DynamicBox className="w-2.5 h-2.5 rounded-full flex-shrink-0" backgroundColor={s.color} />
                         <span className="text-sm text-gray-600">{s.status}</span>
                       </div>
                       <div className="flex items-center gap-3">
@@ -185,9 +188,7 @@ export default function Reports() {
           </div>
         </div>
 
-        {/* Volume + Top Products */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-5">
-          {/* Volume Chart */}
           <div className="card overflow-hidden">
             <div className="card-header">
               <h2 className="text-sm font-bold text-gray-800">จำนวนใบเสนอราคารายเดือน</h2>
@@ -197,12 +198,9 @@ export default function Reports() {
                 <div key={d.month} className="flex items-center gap-3">
                   <span className="text-xs text-gray-500 w-10 font-medium flex-shrink-0">{d.month}</span>
                   <div className="flex-1 flex items-center gap-2 h-6">
-                    <div
-                      className="h-5 rounded-lg transition-all duration-700 min-w-[4px]"
-                      style={{
-                        width: `${Math.max((d.quotations / maxQuotations) * 100, d.quotations > 0 ? 5 : 0)}%`,
-                        background: d.quotations > 0 ? "linear-gradient(to right,#283583,#6366f1)" : "#e2e8f0",
-                      }}
+                    <DynamicBox
+                      className="h-5 rounded-lg transition-all duration-700 min-w-[4px] bg-gradient-to-r from-blue-900 to-indigo-500"
+                      width={`${Math.max((d.quotations / maxQuotations) * 100, d.quotations > 0 ? 5 : 0)}%`}
                     />
                     <span className="text-xs font-bold text-gray-700">{d.quotations}</span>
                   </div>
@@ -232,7 +230,7 @@ export default function Reports() {
                   <tbody>
                     {topProducts.map((p, i) => (
                       <tr key={p.name}>
-                        <td className="px-4 py-3 text-sm font-black" style={{ color: '#283583' }}>{i + 1}</td>
+                        <td className="px-4 py-3 text-sm font-black text-[#283583]">{i + 1}</td>
                         <td className="px-4 py-3 text-sm font-medium text-gray-800">{p.name}</td>
                         <td className="px-4 py-3 text-sm text-gray-500 text-center">{p.count}</td>
                         <td className="px-4 py-3 text-sm font-bold text-gray-800 text-right">{formatCurrency(p.revenue)}</td>
@@ -254,4 +252,19 @@ export default function Reports() {
       </div>
     </div>
   );
+}
+
+function DynamicBox({ height, width, backgroundColor, color, className, title, children, top, left }: any) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (ref.current) {
+      if (height) ref.current.style.height = height;
+      if (width) ref.current.style.width = width;
+      if (backgroundColor) ref.current.style.backgroundColor = backgroundColor;
+      if (color) ref.current.style.color = color;
+      if (top) ref.current.style.top = top;
+      if (left) ref.current.style.left = left;
+    }
+  }, [height, width, backgroundColor, color, top, left]);
+  return <div ref={ref} className={className} title={title}>{children}</div>;
 }

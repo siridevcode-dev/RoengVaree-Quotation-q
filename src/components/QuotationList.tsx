@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import html2canvas from "html2canvas-pro";
 import { jsPDF } from "jspdf";
 import { useAppContext, Quotation } from "@/context/AppContext";
@@ -202,10 +202,9 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
                   onClick={() => setFilterStatus(s)}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap ${
                     filterStatus === s
-                      ? "text-white shadow-sm"
+                      ? "text-white shadow-sm bg-gradient-to-br from-[#283583] to-[#4f46e5]"
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
-                  style={filterStatus === s ? { background: 'linear-gradient(135deg,#283583,#4f46e5)' } : {}}
                 >
                   {s}
                 </button>
@@ -236,7 +235,13 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
               <thead>
                 <tr>
                   <th className="w-10 px-4">
-                    <input type="checkbox" checked={selectedIds.length === filtered.length && filtered.length > 0} onChange={toggleAll} className="w-4 h-4 rounded border-gray-300 cursor-pointer accent-indigo-600" />
+                    <input 
+                      type="checkbox" 
+                      checked={selectedIds.length === filtered.length && filtered.length > 0} 
+                      onChange={toggleAll} 
+                      title="เลือกทั้งหมด"
+                      className="w-4 h-4 rounded border-gray-300 cursor-pointer accent-indigo-600" 
+                    />
                   </th>
                   <th className="text-left">เลขที่</th>
                   <th className="text-left">ลูกค้า</th>
@@ -261,9 +266,15 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
                     className="group cursor-pointer"
                   >
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                      <input type="checkbox" checked={selectedIds.includes(q.id)} onChange={() => toggleSelect(q.id)} className="w-4 h-4 rounded border-gray-300 cursor-pointer accent-indigo-600" />
+                      <input 
+                        type="checkbox" 
+                        checked={selectedIds.includes(q.id)} 
+                        onChange={() => toggleSelect(q.id)} 
+                        title="เลือกรายการนี้"
+                        className="w-4 h-4 rounded border-gray-300 cursor-pointer accent-indigo-600" 
+                      />
                     </td>
-                    <td className="px-4 py-3.5 text-sm font-bold" style={{ color: '#283583' }}>{q.id}</td>
+                    <td className="px-4 py-3.5 text-sm font-bold text-[#283583]">{q.id}</td>
                     <td className="px-4 py-3.5 text-sm font-medium text-gray-700">{q.customer}</td>
                     <td className="px-4 py-3.5 text-sm text-gray-500 text-center">{q.items}</td>
                     <td className="px-4 py-3.5 text-sm font-bold text-gray-800 text-right">{formatCurrency(q.amount)}</td>
@@ -283,8 +294,11 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
                         {activeStatusEdit === q.id && (
                           <>
                             <div className="fixed inset-0 z-[100]" onClick={() => setActiveStatusEdit(null)} />
-                            <div className="fixed bg-white rounded-2xl shadow-xl border border-gray-100 w-48 py-2 z-[101] animate-scale-in overflow-hidden"
-                              style={{ top: `${dropdownPos.top + 6}px`, left: `${Math.min(dropdownPos.left - 100, typeof window !== 'undefined' ? window.innerWidth - 200 : 0)}px` }}>
+                            <DynamicBox 
+                              className="fixed bg-white rounded-2xl shadow-xl border border-gray-100 w-48 py-2 z-[101] animate-scale-in overflow-hidden"
+                              top={`${dropdownPos.top + 6}px`}
+                              left={`${Math.min(dropdownPos.left - 100, (typeof window !== 'undefined' ? window.innerWidth : 1200) - 200)}px`}
+                            >
                               <div className="px-4 py-2 border-b border-gray-50 mb-1">
                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">เลือกสถานะ</p>
                               </div>
@@ -299,7 +313,7 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
                                   {q.status === status && <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />}
                                 </button>
                               ))}
-                            </div>
+                            </DynamicBox>
                           </>
                         )}
                       </div>
@@ -308,7 +322,7 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
                     <td className="px-4 py-3.5 text-sm text-gray-400 text-right">{q.validUntil}</td>
                     <td className="px-4 py-3.5 text-center">
                       <div className="flex items-center justify-center gap-1.5">
-                        <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ background: 'linear-gradient(135deg,#283583,#6366f1)' }}>
+                        <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white bg-gradient-to-br from-[#283583] to-[#6366f1]">
                           {(q.memberName || q.createdBy || "ส").charAt(0)}
                         </div>
                         <span className="text-xs text-gray-600 font-medium hidden lg:block">{q.memberName || q.createdBy || "สมชาย ใจดี"}</span>
@@ -357,7 +371,7 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
                     <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>กำลังสร้าง...</>
                   ) : "Download PDF"}
                 </button>
-                <button onClick={() => setPreviewPdfId(null)} className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                <button onClick={() => setPreviewPdfId(null)} title="ปิดหน้าต่างตัวอย่าง" className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
@@ -372,7 +386,7 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
       )}
 
       {/* Hidden PDF capture */}
-      <div style={{ position: "absolute", top: "-9999px", left: "-9999px", zIndex: -50, pointerEvents: "none", overflow: "visible" }}>
+      <div className="absolute -top-[9999px] -left-[9999px] -z-50 pointer-events-none overflow-visible">
         <QuotationDocument ref={pdfRef} quotation={quotations.find((q) => q.id === previewPdfId)} />
       </div>
 
@@ -385,4 +399,19 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
       />
     </div>
   );
+}
+
+function DynamicBox({ height, width, backgroundColor, color, className, title, children, top, left }: any) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (ref.current) {
+      if (height) ref.current.style.height = height;
+      if (width) ref.current.style.width = width;
+      if (backgroundColor) ref.current.style.backgroundColor = backgroundColor;
+      if (color) ref.current.style.color = color;
+      if (top) ref.current.style.top = top;
+      if (left) ref.current.style.left = left;
+    }
+  }, [height, width, backgroundColor, color, top, left]);
+  return <div ref={ref} className={className} title={title}>{children}</div>;
 }

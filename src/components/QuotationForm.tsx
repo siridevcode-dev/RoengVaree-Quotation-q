@@ -6,9 +6,10 @@ import { jsPDF } from "jspdf";
 import { useAppContext } from "@/context/AppContext";
 import QuotationDocument from "./QuotationDocument";
 import { compressImage, safeLocalStorageSet } from "@/lib/image-utils";
+import { api } from "@/lib/api-client";
 
 interface LineItem {
-  id: number;
+  id: number | string;
   name: string;
   description: string;
   quantity: number;
@@ -186,7 +187,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
     }
   }, [quotationId, initialItems, initialImages, quotations, boatModels, setCustomerName, setCustomerEmail, setCustomerPhone, setCustomerAddress, setCustomerTaxId, setItems, setNotes, setTerms, setStatus, setGlobalVatEnabled, setSummaryDiscountAmount, setSummaryDiscountPercentage, setBoatModel, setIncludeOptionalEquipment, setFrequency, setCustomImages, users]);
 
-  const updateItem = (id: number, field: keyof LineItem, value: string | number | boolean) => {
+  const updateItem = (id: number | string, field: keyof LineItem, value: string | number | boolean) => {
     setItems((prev) =>
       prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
     );
@@ -200,7 +201,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
     setItems((prev) => [...prev, { ...defaultItem(), category }]);
   };
 
-  const removeItem = (id: number) => {
+  const removeItem = (id: number | string) => {
     if (items.length > 1) {
       setItems((prev) => prev.filter((item) => item.id !== id));
     }
@@ -395,21 +396,11 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
 
 
 
-  const handleSaveAsTemplate = () => {
+  const handleSaveAsTemplate = async () => {
     try {
       const finalName = templateName.trim() || (customerName ? `เทมเพลต - ${customerName}` : `เทมเพลตใหม่ ${new Date().toLocaleDateString("th-TH")}`);
       
-      const saved = localStorage.getItem("qm_templates");
-      let templates = [];
-      try {
-        templates = saved ? JSON.parse(saved) : [];
-        if (!Array.isArray(templates)) templates = [];
-      } catch (e) {
-        templates = [];
-      }
-      
       const newTemplate = {
-        id: Date.now(),
         name: finalName,
         customer: customerName || "เทมเพลตมาตรฐาน",
         items: items.length,
@@ -421,26 +412,10 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
         lineItems: [...items], // Deep copy items
         customImages: customImages.length > 0 ? [...customImages] : undefined
       };
+
+      await api.templates.create(newTemplate);
       
-      templates.push(newTemplate);
-      const jsonStr = JSON.stringify(templates);
-      
-      // Try saving with images first
-      if (!safeLocalStorageSet("qm_templates", jsonStr)) {
-        // Quota exceeded — retry without images on ALL templates
-        const templatesWithoutImages = templates.map((t: any) => {
-          const { customImages: _imgs, ...rest } = t;
-          return rest;
-        });
-        const fallbackJson = JSON.stringify(templatesWithoutImages);
-        if (!safeLocalStorageSet("qm_templates", fallbackJson)) {
-          showToast("พื้นที่จัดเก็บเต็ม กรุณาลบเทมเพลตเก่าที่ไม่ใช้แล้วลองใหม่", "error");
-          return;
-        }
-        showToast(`บันทึกเทมเพลต '${finalName}' สำเร็จ! (ไม่รวมรูปภาพเนื่องจากพื้นที่จัดเก็บจำกัด)`, "info");
-      } else {
-        showToast(`บันทึกเทมเพลต '${finalName}' สำเร็จ!`, "success");
-      }
+      showToast(`บันทึกเทมเพลต '${finalName}' สำเร็จ!`, "success");
       
       if (onNavigate) {
         setTimeout(() => onNavigate("Quotation Templates"), 300);
@@ -736,6 +711,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
           <div className="flex items-center gap-4">
             <button 
               onClick={() => onNavigate && onNavigate(quotationId ? "Quotation View" : "Quotations", quotationId)}
+              title="กลับไปหน้าก่อนหน้า"
               className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -762,6 +738,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
               <input
                 type="date"
                 defaultValue="2026-03-29"
+                title="เลือกวันที่ออกเอกสาร"
                 className="px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all w-[130px]"
               />
             </div>
@@ -770,12 +747,8 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className="px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all appearance-none pr-8 cursor-pointer"
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`,
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 8px center",
-                }}
+                title="เลือกสถานะใบเสนอราคา"
+                className="px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all appearance-none pr-8 cursor-pointer bg-[url('data:image/svg+xml,%3Csvg_xmlns=%22http://www.w3.org/2000/svg%22_width=%2212%22_height=%2212%22_fill=%22%2364748b%22_viewBox=%220_0_24_24%22%3E%3Cpath_d=%22M7_10l5_5_5-5z%22/%3E%3C/svg%3E')] bg-[length:12px_12px] bg-[right_8px_center] bg-no-repeat"
               >
                 <option value="ฉบับร่าง">ฉบับร่าง (Draft)</option>
                 <option value="รอดำเนินการ">รอดำเนินการ (Pending)</option>
@@ -789,12 +762,8 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
               <select
                 value={frequency}
                 onChange={(e) => setFrequency(e.target.value)}
-                className="px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all appearance-none pr-8 cursor-pointer min-w-[120px]"
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`,
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 8px center",
-                }}
+                title="เลือกรอบการเรียกเก็บเงิน"
+                className="px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all appearance-none pr-8 cursor-pointer min-w-[120px] bg-[url('data:image/svg+xml,%3Csvg_xmlns=%22http://www.w3.org/2000/svg%22_width=%2212%22_height=%2212%22_fill=%22%2364748b%22_viewBox=%220_0_24_24%22%3E%3Cpath_d=%22M7_10l5_5_5-5z%22/%3E%3C/svg%3E')] bg-[length:12px_12px] bg-[right_8px_center] bg-no-repeat"
               >
                 <option value="ไม่ระบุ">ไม่ระบุ</option>
                 <option value="รายเดือน">รายเดือน</option>
@@ -988,6 +957,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                                   value={item.quantity}
                                   onChange={(e) => updateItem(item.id, "quantity", Number(e.target.value) || 0)}
                                   min="0"
+                                  title="ระบุจำนวน"
                                   className="w-full px-2.5 py-2 text-sm text-center bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
                                 />
                               </td>
@@ -1015,6 +985,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                                   onChange={(e) => updateItem(item.id, "discount", Number(e.target.value) || 0)}
                                   min="0"
                                   max="100"
+                                  title="ระบุส่วนลดเป็นเปอร์เซ็นต์"
                                   className="w-full px-2.5 py-2 text-sm text-center bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
                                 />
                               </td>
@@ -1027,6 +998,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                               <td className="px-2 py-2">
                                 <button
                                   onClick={() => removeItem(item.id)}
+                                  title="ลบรายการนี้"
                                   className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
                                 >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1153,6 +1125,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                   type="file"
                   accept="image/*"
                   multiple
+                  title="เลือกรูปภาพประกอบ"
                   className="hidden"
                   onChange={async (e) => {
                     const files = e.target.files;
@@ -1303,6 +1276,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                 <select
                   value={templateFrequency}
                   onChange={(e) => setTemplateFrequency(e.target.value)}
+                  title="เลือกรอบเวลาเทมเพลต"
                   className="px-3 py-2 text-sm bg-white border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all cursor-pointer"
                 >
                   <option value="รายเดือน">รายเดือน</option>
@@ -1375,6 +1349,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                         </div>
                         <button
                           onClick={() => setIncludeOptionalEquipment(!includeOptionalEquipment)}
+                          title={includeOptionalEquipment ? "คลิกเพื่อไม่รวมอุปกรณ์เสริมในยอดรวม" : "คลิกเพื่อรวมอุปกรณ์เสริมในยอดรวม"}
                           className={`relative w-11 h-6 rounded-full transition-colors ${includeOptionalEquipment ? "bg-emerald-500" : "bg-orange-400"}`}
                         >
                           <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${includeOptionalEquipment ? "left-6" : "left-1"}`} />
@@ -1478,6 +1453,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                     <span className={`text-sm font-semibold ${globalVatEnabled ? "text-red-600" : "text-gray-500"}`}>VAT {vatRate}%:</span>
                     <button
                       onClick={() => setGlobalVatEnabled(!globalVatEnabled)}
+                      title={globalVatEnabled ? "คลิกเพื่อไม่คิดภาษีมูลค่าเพิ่ม" : "คลิกเพื่อคิดภาษีมูลค่าเพิ่ม"}
                       className={`relative w-11 h-6 rounded-full transition-colors ${globalVatEnabled ? "bg-red-500" : "bg-gray-300"}`}
                     >
                       <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${globalVatEnabled ? "left-6" : "left-1"}`} />
@@ -1505,7 +1481,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
         </div>
       </div>
 
-      <div style={{ position: "absolute", top: "-9999px", left: "-9999px", zIndex: -50, pointerEvents: "none", overflow: "visible" }}>
+      <div className="absolute -top-[9999px] -left-[9999px] -z-50 pointer-events-none overflow-visible">
         <QuotationDocument ref={pdfRef} previewData={getPreviewData()} />
       </div>
 
@@ -1553,7 +1529,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                     )}
                   </button>
                 )}
-                <button onClick={() => setIsPreviewOpen(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                <button onClick={() => setIsPreviewOpen(false)} title="ปิดหน้าต่างตัวอย่าง" className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
@@ -1667,6 +1643,7 @@ function SpecEditItem({ label, field, value, isEditing, onChange }: { label: str
           type="text"
           value={value || ""}
           onChange={(e) => onChange(field, e.target.value)}
+          title={`แก้ไขค่า ${label}`}
           className="text-sm font-semibold text-gray-800 bg-teal-50/50 border border-teal-100 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-teal-500"
         />
       </div>

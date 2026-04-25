@@ -31,10 +31,11 @@ export async function POST(req: NextRequest) {
       return jsonError("บัญชีของคุณถูกระงับการใช้งานชั่วคราว", 403);
     }
 
+    const now = new Date().toLocaleString("th-TH");
     // Update last active
     await db.execute({
       sql: "UPDATE users SET last_active = ? WHERE id = ?",
-      args: [new Date().toLocaleString("th-TH"), user.id]
+      args: [now, user.id]
     });
 
     const token = signToken({
@@ -54,11 +55,11 @@ export async function POST(req: NextRequest) {
         position: user.position,
         role: user.role,
         status: user.status,
-        lastActive: user.last_active,
+        lastActive: now,
       },
     });
   } catch (error: any) {
     console.error("Login error:", error);
-    return jsonError("เกิดข้อผิดพลาดภายในระบบ", 500);
+    return Response.json({ error: "เกิดข้อผิดพลาดภายในระบบ", detail: error?.message || String(error), stack: error?.stack }, { status: 500 });
   }
 }

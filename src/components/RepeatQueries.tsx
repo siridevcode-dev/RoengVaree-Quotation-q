@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useAppContext } from "@/context/AppContext";
-import { safeLocalStorageSet } from "@/lib/image-utils";
+
+import { api } from "@/lib/api-client";
 
 interface Template {
   id: number;
@@ -18,14 +19,7 @@ interface Template {
   customImages?: string[];
 }
 
-const initialTemplates: Template[] = [
-  { id: 1, name: "บริการ Cloud Hosting รายเดือน", customer: "Acme Corporation", items: 3, amount: 15000, frequency: "รายเดือน", lastUsed: "01/03/2026", nextDue: "01/04/2026", isActive: true },
-  { id: 2, name: "แพ็คเกจ SEO รายเดือน", customer: "TechStart Inc.", items: 2, amount: 25000, frequency: "รายเดือน", lastUsed: "15/03/2026", nextDue: "15/04/2026", isActive: true },
-  { id: 3, name: "บำรุงรักษาระบบรายไตรมาส", customer: "Global Solutions Ltd.", items: 5, amount: 45000, frequency: "รายไตรมาส", lastUsed: "01/01/2026", nextDue: "01/04/2026", isActive: true },
-  { id: 4, name: "ต่อสัญญา Domain & SSL", customer: "บริษัท สยามเทค จำกัด", items: 4, amount: 8500, frequency: "รายปี", lastUsed: "15/01/2026", nextDue: "15/01/2027", isActive: true },
-  { id: 5, name: "สัญญาซัพพอร์ตรายปี", customer: "Alpha Digital Co.", items: 1, amount: 120000, frequency: "รายปี", lastUsed: "01/06/2025", nextDue: "01/06/2026", isActive: false },
-  { id: 6, name: "Google Ads Management", customer: "บริษัท พีเอส กรุ๊ป จำกัด", items: 2, amount: 35000, frequency: "รายเดือน", lastUsed: "20/03/2026", nextDue: "20/04/2026", isActive: true },
-];
+
 
 const frequencies = ["ทั้งหมด", "รายเดือน", "รายไตรมาส", "รายปี"];
 
@@ -43,30 +37,36 @@ interface RepeatQueriesProps {
 }
 
 export default function RepeatQueries({ onNavigate }: RepeatQueriesProps) {
-  const [templates, setTemplates] = useState(initialTemplates);
+  const [templates, setTemplates] = useState<Template[]>([]);
   const { showToast } = useAppContext();
-  const [mounted, setMounted] = useState(false);
+
   const [search, setSearch] = useState("");
   const [filterFreq, setFilterFreq] = useState("ทั้งหมด");
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchTemplates = async () => {
+    try {
+      setIsLoading(true);
+      const data = await api.templates.list();
+      setTemplates(data);
+    } catch (err) {
+      console.error(err);
+      showToast("ไม่สามารถโหลดข้อมูลเทมเพลตได้", "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setMounted(true);
-    const saved = localStorage.getItem("qm_templates");
-    if (saved) setTemplates(JSON.parse(saved));
+    fetchTemplates();
+     
   }, []);
 
-  useEffect(() => {
-    if (mounted) {
-      const json = JSON.stringify(templates);
-      if (!safeLocalStorageSet("qm_templates", json)) {
-        const slim = templates.map(({ customImages: _imgs, ...rest }) => rest);
-        safeLocalStorageSet("qm_templates", JSON.stringify(slim));
-      }
-    }
-  }, [templates, mounted]);
+  // Removed localStorage sync effect to prioritize backend source of truth
 
   const filtered = templates.filter((t) => {
-    const matchSearch = t.name.toLowerCase().includes(search.toLowerCase()) || t.customer.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = (t.name || "").toLowerCase().includes(search.toLowerCase()) || 
+                       (t.customer || "").toLowerCase().includes(search.toLowerCase());
     const matchFreq = filterFreq === "ทั้งหมด" || t.frequency === filterFreq;
     return matchSearch && matchFreq;
   });
@@ -78,8 +78,17 @@ export default function RepeatQueries({ onNavigate }: RepeatQueriesProps) {
     return s;
   }, 0);
 
-  const toggleActive = (id: number) =>
-    setTemplates((prev) => prev.map((t) => (t.id === id ? { ...t, isActive: !t.isActive } : t)));
+  const toggleActive = async (id: number) => {
+    const template = templates.find(t => t.id === id);
+    if (!template) return;
+
+    try {
+      await api.templates.update(id, { ...template, isActive: !template.isActive });
+      setTemplates((prev) => prev.map((t) => (t.id === id ? { ...t, isActive: !t.isActive } : t)));
+    } catch {
+      showToast("ไม่สามารถเปลี่ยนสถานะได้", "error");
+    }
+  };
 
   const handleCreateFromTemplate = (t: Template) => {
     const finalItems = t.lineItems && t.lineItems.length > 0
@@ -98,7 +107,17 @@ export default function RepeatQueries({ onNavigate }: RepeatQueriesProps) {
   };
 
   const thirtyDaysFromNow = new Date(Date.now() + 30 * 86400000);
-  const dueSoon = templates.filter((t) => t.isActive && new Date(t.nextDue.split("/").reverse().join("-")) <= thirtyDaysFromNow).length;
+  const dueSoon = templates.filter((t) => {
+    if (!t.isActive || !t.nextDue || t.nextDue === "-") return false;
+    try {
+      const parts = t.nextDue.split("/");
+      if (parts.length !== 3) return false;
+      const dateObj = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+      return !isNaN(dateObj.getTime()) && dateObj <= thirtyDaysFromNow;
+    } catch {
+      return false;
+    }
+  }).length;
 
   return (
     <div className="flex-1 overflow-auto bg-gray-50/40">
@@ -130,7 +149,10 @@ export default function RepeatQueries({ onNavigate }: RepeatQueriesProps) {
           ].map((s) => (
             <div key={s.label} className="stat-card animate-fade-in">
               <p className="text-xs font-medium text-gray-500 mb-1.5">{s.label}</p>
-              <p className="text-2xl font-black tracking-tight" style={{ color: s.color }}>{s.value}</p>
+              <p className={`text-2xl font-black tracking-tight ${
+                s.color === "#283583" ? "text-[#283583]" :
+                s.color === "#0d9488" ? "text-teal-600" : "text-amber-600"
+              }`}>{s.value}</p>
             </div>
           ))}
         </div>
@@ -144,8 +166,8 @@ export default function RepeatQueries({ onNavigate }: RepeatQueriesProps) {
           <div className="flex gap-1.5">
             {frequencies.map((f) => (
               <button key={f} onClick={() => setFilterFreq(f)}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${filterFreq === f ? "text-white shadow-sm" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"}`}
-                style={filterFreq === f ? { background: "linear-gradient(135deg,#283583,#4f46e5)" } : {}}>
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${filterFreq === f ? "text-white shadow-sm bg-gradient-to-br from-[#283583] to-[#4f46e5]" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+              >
                 {f}
               </button>
             ))}
@@ -169,7 +191,16 @@ export default function RepeatQueries({ onNavigate }: RepeatQueriesProps) {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((t) => {
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={8} className="py-20 text-center">
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                        <p className="text-sm text-gray-500 font-medium">กำลังโหลดเทมเพลต...</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : filtered.map((t) => {
                   const freq = frequencyStyle[t.frequency] || { bg: "#f1f5f9", text: "#475569" };
                   return (
                     <tr
@@ -183,7 +214,12 @@ export default function RepeatQueries({ onNavigate }: RepeatQueriesProps) {
                       </td>
                       <td className="px-4 py-3.5 text-sm text-gray-700">{t.customer}</td>
                       <td className="px-4 py-3.5 text-center">
-                        <span className="badge text-xs font-semibold" style={{ backgroundColor: freq.bg, color: freq.text }}>{t.frequency}</span>
+                        <span className={`badge text-xs font-semibold ${
+                          t.frequency === "รายเดือน" ? "bg-blue-50 text-blue-700" :
+                          t.frequency === "รายไตรมาส" ? "bg-purple-50 text-purple-700" :
+                          t.frequency === "รายปี" ? "bg-amber-50 text-amber-700" :
+                          "bg-gray-100 text-gray-600"
+                        }`}>{t.frequency}</span>
                       </td>
                       <td className="px-4 py-3.5 text-sm font-bold text-gray-800 text-right">{formatCurrency(t.amount)}</td>
                       <td className="px-4 py-3.5 text-sm text-gray-500 text-center">{t.lastUsed}</td>
@@ -198,7 +234,18 @@ export default function RepeatQueries({ onNavigate }: RepeatQueriesProps) {
                       </td>
                       <td className="px-4 py-3.5" onClick={(e) => e.stopPropagation()}>
                         <button
-                          onClick={(e) => { e.stopPropagation(); setTemplates((prev) => prev.filter((x) => x.id !== t.id)); }}
+                          onClick={async (e) => { 
+                            e.stopPropagation(); 
+                            if (confirm("ต้องการลบเทมเพลตนี้ใช่หรือไม่?")) {
+                              try {
+                                await api.templates.delete(t.id);
+                                setTemplates((prev) => prev.filter((x) => x.id !== t.id));
+                                showToast("ลบเทมเพลตสำเร็จ");
+                              } catch {
+                                showToast("ไม่สามารถลบเทมเพลตได้", "error");
+                              }
+                            }
+                          }}
                           className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all md:opacity-0 md:group-hover:opacity-100"
                           title="ลบ"
                         >
@@ -210,13 +257,13 @@ export default function RepeatQueries({ onNavigate }: RepeatQueriesProps) {
                 })}
               </tbody>
             </table>
-            {filtered.length === 0 && (
+            {!isLoading && filtered.length === 0 && (
               <div className="empty-state">
                 <div className="empty-state-icon">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                 </div>
                 <p className="text-sm font-medium text-gray-500">ไม่มีเทมเพลตในระบบ</p>
-                <p className="text-xs text-gray-400">สร้างใบเสนอราคาแล้วกด "บันทึกเป็นเทมเพลต"</p>
+                <p className="text-xs text-gray-400">{`สร้างใบเสนอราคาแล้วกด "บันทึกเป็นเทมเพลต"`}</p>
               </div>
             )}
           </div>
