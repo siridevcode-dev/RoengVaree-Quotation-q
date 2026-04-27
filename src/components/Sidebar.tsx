@@ -25,7 +25,7 @@ const navGroups = [
     ]
   },
   {
-    title: "Sales",
+    title: "ฝ่ายขาย",
     items: [
       {
         label: "สร้างใบเสนอราคา",
@@ -52,7 +52,7 @@ const navGroups = [
         ),
       },
       {
-        label: "สินค้า",
+        label: "สินค้า & บริการ",
         icon: (
           <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -80,7 +80,7 @@ const navGroups = [
         ]
       },
       {
-        label: "รูปแบบใบเสนอราคา",
+        label: "รูปแบบเอกสาร",
         icon: (
           <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -92,7 +92,7 @@ const navGroups = [
         ]
       },
       {
-        label: "Settings",
+        label: "ตั้งค่า",
         icon: (
           <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -103,7 +103,7 @@ const navGroups = [
     ]
   },
   {
-    title: "Production Costs",
+    title: "ต้นทุนการผลิต",
     items: [
       {
         label: "แผนการผลิต",
@@ -132,10 +132,10 @@ const navGroups = [
     ]
   },
   {
-    title: "Accounting",
+    title: "บัญชี",
     items: [
       {
-        label: "หน้าหลัก (บัญชี)",
+        label: "แดชบอร์ดบัญชี",
         icon: (
           <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z" />
@@ -195,7 +195,7 @@ const navGroups = [
         ),
       },
       {
-        label: "จัดการสินค้า",
+        label: "สินค้า",
         icon: (
           <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -239,7 +239,7 @@ const navGroups = [
         ),
       },
       {
-        label: "ตั้งค่า",
+        label: "ตั้งค่า (บัญชี)",
         icon: (
           <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -250,7 +250,51 @@ const navGroups = [
     ]
   },
   {
-    title: "System",
+    title: "ฝ่ายบุคคล",
+    items: [
+      {
+        label: "จัดการพนักงาน",
+        icon: (
+          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        ),
+        subItems: [
+          { label: "รายชื่อพนักงาน" },
+          { label: "โครงสร้างองค์กร" },
+          { label: "สัญญาจ้าง" },
+        ]
+      },
+      {
+        label: "สรุปเงินเดือน",
+        icon: (
+          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        ),
+        subItems: [
+          { label: "สรุปเงินเดือน" },
+          { label: "รายการจ่ายเงิน" },
+          { label: "ประกันสังคม/ภาษี" },
+        ]
+      },
+      {
+        label: "บันทึกเวลา",
+        icon: (
+          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        ),
+        subItems: [
+          { label: "บันทึกเวลาเข้างาน" },
+          { label: "จัดการวันลา" },
+          { label: "ตารางเวร/กะ" },
+        ]
+      }
+    ]
+  },
+  {
+    title: "ระบบ",
     items: [
       {
         label: "สมาชิก",
@@ -261,7 +305,7 @@ const navGroups = [
         ),
       },
       {
-        label: "ประวัติใช้งาน",
+        label: "ประวัติการใช้งาน",
         icon: (
           <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -275,10 +319,11 @@ const navGroups = [
 export default function Sidebar({ activePage, onPageChange, mobileOpen, onMobileClose }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    Sales: false,
-    Purchasing: false,
-    Accounting: false,
-    System: false
+    "ฝ่ายขาย": false,
+    "ต้นทุนการผลิต": false,
+    "บัญชี": false,
+    "ฝ่ายบุคคล": false,
+    "ระบบ": false
   });
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [showExtraRevenue, setShowExtraRevenue] = useState(false);
@@ -303,7 +348,7 @@ export default function Sidebar({ activePage, onPageChange, mobileOpen, onMobile
     // Handle layout switching for quotations
     if (label.includes("รูปแบบเก่า")) {
       setActiveLayout("classic");
-    } else if (label.includes("รูปแบบใบเสนอราคา")) {
+    } else if (label.includes("รูปแบบใบเสนอราคา") || label === "รูปแบบเอกสาร") {
       setActiveLayout("premium");
     }
     
@@ -311,8 +356,8 @@ export default function Sidebar({ activePage, onPageChange, mobileOpen, onMobile
     let targetPage = label;
     if (label === "ดูภาพรวม") {
       // Find parent section
-      const revenueSection = navGroups.find(g => g.title === "Accounting")?.items.find(i => i.label === "รายรับ") as any;
-      const expenseSection = navGroups.find(g => g.title === "Accounting")?.items.find(i => i.label === "รายจ่าย") as any;
+      const revenueSection = navGroups.find(g => g.title === "บัญชี")?.items.find(i => i.label === "รายรับ") as any;
+      const expenseSection = navGroups.find(g => g.title === "บัญชี")?.items.find(i => i.label === "รายจ่าย") as any;
       
       if (revenueSection?.subItems?.some((s: any) => s.label === label) && expandedItems["รายรับ"]) {
         targetPage = "Revenue Overview";
@@ -323,7 +368,11 @@ export default function Sidebar({ activePage, onPageChange, mobileOpen, onMobile
       }
     }
 
-    onPageChange(targetPage === "สร้างใบเสนอราคา" ? "Select Products" : targetPage);
+    onPageChange(
+      targetPage === "สร้างใบเสนอราคา" || targetPage === "Create Quotation" 
+        ? "Select Products" 
+        : targetPage
+    );
     if (onMobileClose) onMobileClose();
   };
 
@@ -364,10 +413,10 @@ export default function Sidebar({ activePage, onPageChange, mobileOpen, onMobile
           </div>
           {(!collapsed || mobileOpen) && (
             <div className="flex flex-col min-w-0 leading-none">
-              <span className="text-[15px] font-black tracking-wide truncate text-[#283583]">
+              <span className="text-[15px] font-black truncate text-[#283583]">
                 ROENGVAREE
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400 mt-0.5">
+              <span className="text-[10px] font-bold uppercase text-gray-400 mt-0.5">
                 Speed Boat
               </span>
             </div>
@@ -414,10 +463,13 @@ export default function Sidebar({ activePage, onPageChange, mobileOpen, onMobile
                     isExpanded ? "bg-[#eef2ff] mb-1 mt-1 shadow-sm" : "hover:bg-gray-50 pt-4 pb-2"
                   }`}
                 >
-                  <span className={`text-[15px] font-black uppercase tracking-[0.12em] transition-colors ${
+                   <span className={`text-[15px] font-black transition-colors flex items-center gap-1.5 ${
                     isExpanded ? "text-[#283583]" : "text-[#6A789A] group-hover/head:text-[#283583]"
                   }`}>
                     {group.title}
+                    {(group.title === "ต้นทุนการผลิต" || group.title === "บัญชี" || group.title === "ฝ่ายบุคคล") && (
+                      <span className="text-[10px] text-red-500 font-bold whitespace-nowrap">(กำลังพัฒนา)</span>
+                    )}
                   </span>
                   <svg 
                     className={`w-3 h-3 transition-all duration-300 ${
@@ -460,8 +512,8 @@ export default function Sidebar({ activePage, onPageChange, mobileOpen, onMobile
                               {item.icon}
                             </span>
                             {(!collapsed || mobileOpen) && (
-                              <span className={`whitespace-nowrap tracking-[-0.01em] ${
-                                item.label === "Dashboard" ? "text-[18px] font-bold" : "text-[15px] font-semibold"
+                              <span className={`whitespace-nowrap ${
+                                item.label === "แดชบอร์ด" ? "text-[18px] font-bold" : "text-[15px] font-semibold"
                               }`}>
                                 {item.label}
                               </span>
@@ -575,7 +627,7 @@ export default function Sidebar({ activePage, onPageChange, mobileOpen, onMobile
             </div>
             <div className="min-w-0">
               <p className="text-[12px] font-bold text-indigo-800 leading-none">Enterprise Edition</p>
-              <p className="text-[11px] text-indigo-500 mt-0.5">Active License</p>
+              <p className="text-[11px] text-indigo-500 mt-0.5">ใช้งานได้ปกติ</p>
             </div>
           </div>
         </div>

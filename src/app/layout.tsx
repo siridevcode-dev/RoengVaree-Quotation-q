@@ -10,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "RoengVaree — Online Quotation Management",
-  description: "Enterprise-grade quotation management system for creating, tracking, and managing professional quotations.",
+  title: "RoengVaree — Enterprise Resource Planning (ERP)",
+  description: "Enterprise Resource Planning system for RoengVaree Marine Engineering.",
 };
 
 export default function RootLayout({

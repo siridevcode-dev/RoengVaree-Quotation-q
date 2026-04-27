@@ -16,7 +16,7 @@ const formatCurrency = (val: number) =>
 
 const statCards = [
   {
-    label: "ใบเสนอราคาทั้งหมด",
+    label: "จำนวนใบเสนอราคา",
     key: "total",
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,7 +49,7 @@ const statCards = [
     shadow: "shadow-orange-500/30",
   },
   {
-    label: "รายได้รวม",
+    label: "รายได้ทั้งหมด",
     key: "revenue",
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,7 +60,7 @@ const statCards = [
     shadow: "shadow-fuchsia-500/30",
   },
   {
-    label: "ต้นทุนการผลิตรวม",
+    label: "ต้นทุนการผลิตทั้งหมด",
     key: "cost",
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,7 +71,7 @@ const statCards = [
     shadow: "shadow-orange-500/30",
   },
   {
-    label: "กำไรของเดือน",
+    label: "กำไรเดือนนี้",
     key: "monthlyProfit",
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,7 +82,7 @@ const statCards = [
     shadow: "shadow-rose-500/30",
   },
   {
-    label: "กำไรสุทธิคาดการณ์",
+    label: "กำไรสุทธิโดยประมาณ",
     key: "profit",
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,7 +93,7 @@ const statCards = [
     shadow: "shadow-emerald-500/30",
   },
   {
-    label: "อัตรากำไรเฉลี่ย",
+    label: "มาร์จิ้นเฉลี่ย",
     key: "margin",
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -185,8 +185,8 @@ export default function Dashboard() {
         {/* Page Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="page-title">Dashboard</h1>
-            <p className="page-subtitle mt-1">ภาพรวมระบบจัดการใบเสนอราคา</p>
+            <h1 className="page-title">แดชบอร์ด</h1>
+            <p className="page-subtitle mt-1">ภาพรวมการจัดการใบเสนอราคา</p>
           </div>
           <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs text-gray-500">
             <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -274,8 +274,8 @@ export default function Dashboard() {
           {/* Top Customers */}
           <div className="card overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border-indigo-50/50 flex flex-col">
             <div className="card-header">
-              <h2 className="text-sm font-bold text-gray-800">ลูกค้ายอดนิยม</h2>
-              <span className="text-xs text-gray-400">จากรายได้สูงสุด</span>
+              <h2 className="text-sm font-bold text-gray-800">ลูกค้าชั้นนำ</h2>
+              <span className="text-xs text-gray-400">ตามรายได้</span>
             </div>
             <div className="p-4 space-y-3 flex-1 flex flex-col justify-center">
               {topCustomers.length > 0 ? topCustomers.map((c, i) => (
@@ -315,14 +315,14 @@ export default function Dashboard() {
         {/* Recent Quotations Table */}
         <div className="card overflow-hidden hidden md:block shadow-sm border-indigo-50/50">
           <div className="card-header bg-white">
-            <h2 className="text-sm font-bold text-gray-800">ใบเสนอราคาล่าสุด</h2>
+            <h2 className="text-sm font-bold text-gray-800">ใบเสนอรากาล่าสุด</h2>
             <span className="text-xs text-gray-400">{recentQuotations.length} รายการล่าสุด</span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full data-table">
               <thead>
                 <tr>
-                  <th className="text-left">เลขที่</th>
+                  <th className="text-left">ลำดับ</th>
                   <th className="text-left">ลูกค้า</th>
                   <th className="text-right">จำนวนเงิน</th>
                   <th className="text-center">สถานะ</th>
@@ -380,7 +380,7 @@ export default function Dashboard() {
             left={`${Math.min(dropdownPos.left - 100, typeof window !== 'undefined' ? window.innerWidth - 200 : 0)}px`}
           >
             <div className="px-4 py-2 border-b border-gray-50 mb-1">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">เลือกสถานะ</p>
+              <p className="text-[10px] font-bold text-gray-400">เลือกสถานะ</p>
             </div>
             {["ฉบับร่าง", "ส่งแล้ว", "รอดำเนินการ", "อนุมัติแล้ว", "ปฏิเสธ"].map((status) => {
               const activeQ = quotations.find(q => q.id === activeStatusEdit);

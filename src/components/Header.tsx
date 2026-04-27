@@ -10,19 +10,55 @@ interface HeaderProps {
 }
 
 const pageLabels: Record<string, string> = {
-  "Dashboard": "Dashboard",
+  "Dashboard": "แดชบอร์ด",
+  "แดชบอร์ด": "แดชบอร์ด",
   "Select Products": "สร้างใบเสนอราคา",
+  "สร้างใบเสนอราคา": "สร้างใบเสนอราคา",
   "Quotation Form": "ใบเสนอราคา",
-  "Quotations": "ใบเสนอราคาทั้งหมด",
+  "Quotations": "รายการใบเสนอราคา",
+  "รายการใบเสนอราคา": "รายการใบเสนอราคา",
   "Customers": "ลูกค้า",
+  "ลูกค้า": "ลูกค้า",
   "Products": "สินค้า & บริการ",
+  "สินค้า & บริการ": "สินค้า & บริการ",
   "Production costs": "ต้นทุนการผลิต",
-  "PR / PO": "ขอซื้อ / สั่งซื้อ",
+  "ต้นทุนการผลิต": "ต้นทุนการผลิต",
+  "PR / PO": "ใบขอซื้อ / ใบสั่งซื้อ",
+
+  // Accounting / Sales Sub-items
+  "ดูภาพรวม": "ดูภาพรวม",
+  "ใบเสนอราคา": "ใบเสนอราคา",
+  "ใบแจ้งหนี้ (ใบส่งของ, บันทึกลูกหนี้)": "ใบแจ้งหนี้",
+  "ใบเสร็จรับเงิน": "ใบเสร็จรับเงิน",
+  "ใบกำกับภาษีขาย": "ใบกำกับภาษีขาย",
+  "บันทึกซื้อสินค้า": "บันทึกซื้อสินค้า",
+  "บันทึกค่าใช้จ่าย": "บันทึกค่าใช้จ่าย",
+  "ใบสั่งซื้อสินทรัพย์": "ใบสั่งซื้อสินทรัพย์",
+  "ซื้อสินทรัพย์": "ซื้อสินทรัพย์",
+  "ใบกำกับภาษีซื้อ": "ใบกำกับภาษีซื้อ",
+  "ผังบัญชี": "ผังบัญชี",
+  "รูปแบบใบเสนอราคา": "รูปแบบใบเสนอราคา",
+  "รูปแบบใบเสนอราคา รูปแบบเก่า": "รูปแบบใบเสนอราคา (เก่า)",
+
+  // HR Section
+  "Employee Management": "จัดการพนักงาน",
+  "จัดการพนักงาน": "จัดการพนักงาน",
+  "Payroll": "สรุปเงินเดือน",
+  "สรุปเงินเดือน": "สรุปเงินเดือน",
+  "Attendance": "บันทึกเวลา",
+  "บันทึกเวลา": "บันทึกเวลา",
+  "รายชื่อพนักงาน": "รายชื่อพนักงาน",
+  "บันทึกเวลาเข้างาน": "บันทึกเวลาเข้างาน",
 
   "Reports": "รายงาน",
-  "Quotation Templates": "เทมเพลต",
+  "รายงาน": "รายงาน",
+  "Quotation Templates": "รูปแบบเอกสาร",
+  "รูปแบบเอกสาร": "รูปแบบเอกสาร",
   "Settings": "ตั้งค่า",
+  "ตั้งค่า": "ตั้งค่า",
+  "ตั้งค่า (บัญชี)": "ตั้งค่า (บัญชี)",
   "Members": "สมาชิก",
+  "สมาชิก": "สมาชิก",
 };
 
 export default function Header({ activePage, onNavigate, onMobileMenuToggle }: HeaderProps) {
@@ -113,7 +149,9 @@ export default function Header({ activePage, onNavigate, onMobileMenuToggle }: H
               </div>
               <div className="hidden md:block text-left">
                 <p className="text-[13px] font-semibold text-gray-800 leading-none">{profileName}</p>
-                <p className="text-[10px] text-gray-400 mt-0.5 leading-none">{currentUser?.role || "User"}</p>
+                <p className="text-[10px] text-gray-400 mt-0.5 leading-none">
+                  {currentUser?.role === "Admin" ? "ผู้ดูแลระบบ" : (currentUser?.role || "ผู้ใช้งาน")}
+                </p>
               </div>
               <svg
                 className={`w-3.5 h-3.5 text-gray-400 transition-transform hidden md:block ${profileOpen ? "rotate-180" : ""}`}
@@ -132,7 +170,9 @@ export default function Header({ activePage, onNavigate, onMobileMenuToggle }: H
                   {/* Profile header */}
                   <div className="px-4 py-3 border-b border-gray-100 mb-1">
                     <p className="text-sm font-semibold text-gray-900">{profileName}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{currentUser?.role || "User"}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {currentUser?.role === "Admin" ? "ผู้ดูแลระบบ" : (currentUser?.role || "ผู้ใช้งาน")}
+                    </p>
                   </div>
                   <button
                     onClick={() => handleNavigate("Settings")}

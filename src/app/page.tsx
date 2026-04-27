@@ -116,7 +116,6 @@ export default function Home() {
       case "รูปแบบใบเสนอราคา":
       case "รูปแบบใบเสนอราคา รูปแบบเก่า":
         return <RepeatQueries onNavigate={handleNavigate} />;
-      case "Settings":
       case "Settings (System)":
         return <Settings />;
       case "ประวัติใช้งาน":
@@ -153,6 +152,7 @@ export default function Home() {
       case "ผู้ติดต่อ":
         return <ContactManagement />;
       case "สินค้า":
+      case "สินค้า & บริการ":
       case "รายการสินค้า":
         return <ProductList />;
       case "จัดการสินค้า":
@@ -165,6 +165,8 @@ export default function Home() {
       case "คลังเอกสาร":
         return <DocumentArchive />;
       case "ตั้งค่า":
+        return <Settings />;
+      case "ตั้งค่า (บัญชี)":
         return <AccountingSettings />;
       default:
         return <Dashboard />;
