@@ -55,9 +55,10 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
       showToast(`ลบใบเสนอราคา ${selectedIds.length} รายการเรียบร้อยแล้ว`, "success");
       setSelectedIds([]);
       setIsBulkDeleting(false);
-    } else if (quotationToDelete) {
+    } else if (quotationToDelete !== null) {
       await deleteQuotation(quotationToDelete);
-      showToast(`ลบใบเสนอราคา ${quotationToDelete} สำเร็จ`, "success");
+      const displayId = quotationToDelete || "(ไม่มีเลขที่)";
+      showToast(`ลบใบเสนอราคา ${displayId} สำเร็จ`, "success");
       setQuotationToDelete(null);
     }
   };
@@ -263,18 +264,18 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
                         onNavigate("Quotation View", q.id);
                       }
                     }}
-                    className="group cursor-pointer"
+                    className="group cursor-pointer hover:bg-gray-50/50 transition-colors"
                   >
-                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                    <td className="px-4 py-3" onClick={(e) => { e.stopPropagation(); toggleSelect(q.id); }}>
                       <input 
                         type="checkbox" 
                         checked={selectedIds.includes(q.id)} 
-                        onChange={() => toggleSelect(q.id)} 
+                        onChange={() => {}} 
                         title="เลือกรายการนี้"
                         className="w-4 h-4 rounded border-gray-300 cursor-pointer accent-indigo-600" 
                       />
                     </td>
-                    <td className="px-4 py-3.5 text-sm font-bold text-[#283583]">{q.id}</td>
+                    <td className="px-4 py-3.5 text-sm font-bold text-[#283583]">{q.id || "(ไม่มีเลขที่)"}</td>
                     <td className="px-4 py-3.5 text-sm font-medium text-gray-700">{q.customer}</td>
                     <td className="px-4 py-3.5 text-sm text-gray-500 text-center">{q.items}</td>
                     <td className="px-4 py-3.5 text-sm font-bold text-gray-800 text-right">{formatCurrency(q.amount)}</td>
@@ -366,7 +367,7 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
       </div>
 
       <PasswordModal
-        isOpen={!!quotationToDelete || isBulkDeleting}
+        isOpen={quotationToDelete !== null || isBulkDeleting}
         onClose={() => { setQuotationToDelete(null); setIsBulkDeleting(false); }}
         onSuccess={handleDeleteSuccess}
         title="ยืนยันการลบใบเสนอราคา"

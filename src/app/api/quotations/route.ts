@@ -1,12 +1,14 @@
-import { NextRequest } from "next/server";
-import { getDb } from "@/lib/db";
+import { NextRequest, NextResponse } from "next/server";
+import { getDb, initDb } from "@/lib/db";
 import { authenticateRequest, jsonError } from "@/lib/auth";
+import { logActivity, getClientIp } from "@/lib/logger";
 
 export async function GET(req: NextRequest) {
   const auth = await authenticateRequest(req);
   if ("error" in auth) return jsonError(auth.error, auth.status);
 
   const db = getDb();
+  await initDb();
   const result = await db.execute(`
     SELECT q.*, 
       (SELECT COUNT(*) FROM quotation_items qi WHERE qi.quotation_id = q.id) as items_count
@@ -58,11 +60,12 @@ export async function GET(req: NextRequest) {
         discount: li.discount,
         vatEnabled: !!li.vat_enabled,
         category: li.category,
+        costPrice: li.cost_price || 0,
       })),
     };
   });
 
-  return Response.json(finalResult);
+  return NextResponse.json(finalResult);
 }
 
 export async function POST(req: NextRequest) {
@@ -72,6 +75,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const db = getDb();
+    await initDb();
 
     // Serialize customImages to JSON string for storage
     const customImagesJson = body.customImages && Array.isArray(body.customImages) && body.customImages.length > 0
@@ -88,7 +92,7 @@ export async function POST(req: NextRequest) {
         include_optional_equipment, frequency, created_by, member_name, member_phone, custom_images
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
-        body.id,
+        body.id || "",
         body.customer || body.customerName || "",
         body.customerEmail || "",
         body.customerPhone || "",
@@ -106,20 +110,20 @@ export async function POST(req: NextRequest) {
         body.summaryDiscountPercentage || 0,
         body.includeOptionalEquipment !== false ? 1 : 0,
         body.frequency || "ไม่ระบุ",
-        body.createdBy || auth.user.name,
-        body.memberName || auth.user.name,
-        body.memberPhone || auth.user.phone,
-        customImagesJson
+        body.createdBy || auth.user.name || "System",
+        body.memberName || auth.user.name || "System",
+        body.memberPhone || auth.user.phone || "-",
+        customImagesJson || ""
       ]
     });
 
     if (body.lineItems && Array.isArray(body.lineItems)) {
       body.lineItems.forEach((item: any, index: number) => {
         statements.push({
-          sql: `INSERT INTO quotation_items (quotation_id, name, description, quantity, unit_price, discount, vat_enabled, category, sort_order)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          sql: `INSERT INTO quotation_items (quotation_id, name, description, quantity, unit_price, discount, vat_enabled, category, cost_price, sort_order)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           args: [
-            body.id,
+            body.id || "",
             item.name || "",
             item.description || "",
             item.quantity || 1,
@@ -127,7 +131,52 @@ export async function POST(req: NextRequest) {
             item.discount || 0,
             item.vatEnabled !== false ? 1 : 0,
             item.category || "",
+            item.costPrice || 0,
             index
+          ]
+        });
+
+        // Sync to production_costs
+        const costCat = item.category || "วัสดุทางตรง";
+        const costModel = body.boatModel || "ทุกรุ่น";
+        
+        // 1. Try to update existing cost item (matching name, category, boat_model AND quotation_id)
+        statements.push({
+          sql: `UPDATE production_costs 
+                SET unit_price = ?, selling_price = ?, description = ?, updated_at = CURRENT_TIMESTAMP 
+                WHERE name = ? AND category = ? AND boat_model = ? AND quotation_id = ?`,
+          args: [
+            item.costPrice || 0,
+            item.unitPrice || 0,
+            item.description || "",
+            item.name || "",
+            costCat || "",
+            costModel || "",
+            body.id || ""
+          ]
+        });
+        
+        // 2. Insert if it doesn't exist for THIS quotation
+        statements.push({
+          sql: `INSERT INTO production_costs (name, category, unit_price, selling_price, unit, sku, in_stock, boat_model, quotation_id, description, updated_at)
+                SELECT ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, CURRENT_TIMESTAMP
+                WHERE NOT EXISTS (
+                  SELECT 1 FROM production_costs WHERE name = ? AND category = ? AND boat_model = ? AND quotation_id = ?
+                )`,
+          args: [
+            item.name || "",
+            costCat || "",
+            item.costPrice || 0,
+            item.unitPrice || 0,
+            "หน่วย",
+            `CST-AUTO-${Math.floor(Math.random() * 10000)}`,
+            costModel || "",
+            body.id || "",
+            item.description || "",
+            item.name || "",
+            costCat || "",
+            costModel || "",
+            body.id || ""
           ]
         });
       });
@@ -166,9 +215,44 @@ export async function POST(req: NextRequest) {
 
     await db.batch(statements, "write");
 
-    return Response.json({ success: true, id: body.id }, { status: 201 });
+    // Log the activity
+    await logActivity({
+      userId: auth.user.id,
+      userName: auth.user.name,
+      action: "create_quotation",
+      description: `สร้างใบเสนอราคาใหม่ #${body.id} สำหรับลูกค้า ${body.customer || body.customerName}`,
+      ipAddress: getClientIp(req)
+    });
+
+    return NextResponse.json({ success: true, id: body.id }, { status: 201 });
   } catch (error: any) {
     console.error("Create quotation error:", error);
     return jsonError("ไม่สามารถสร้างใบเสนอราคาได้: " + error.message, 500);
   }
+}
+
+export async function DELETE(req: NextRequest) {
+  const auth = await authenticateRequest(req);
+  if ("error" in auth) return jsonError(auth.error, auth.status);
+
+  const db = getDb();
+  
+  // This handles DELETE /api/quotations/ (which Next.js routes here)
+  // We assume it's an attempt to delete a quotation with an empty ID
+  const result = await db.execute("DELETE FROM quotations WHERE id = ''");
+  
+  if (result.rowsAffected === 0) {
+    return jsonError("ไม่พบใบเสนอราคาที่ไม่มีเลขที่", 404);
+  }
+
+  // Log the activity
+  await logActivity({
+    userId: auth.user.id,
+    userName: auth.user.name,
+    action: "delete_quotation",
+    description: `ลบใบเสนอราคาที่ไม่มีเลขที่`,
+    ipAddress: getClientIp(req)
+  });
+
+  return NextResponse.json({ success: true });
 }

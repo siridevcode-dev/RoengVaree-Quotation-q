@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
 import { authenticateRequest, jsonError } from "@/lib/auth";
+import { logActivity, getClientIp } from "@/lib/logger";
 
 export async function GET(req: NextRequest) {
   const auth = await authenticateRequest(req);
@@ -44,6 +45,17 @@ export async function POST(req: NextRequest) {
       body.lastActivity || new Date().toLocaleDateString("th-TH")
     ]
   });
+  
+  const newId = Number(result.lastInsertRowid);
 
-  return Response.json({ success: true, id: Number(result.lastInsertRowid) }, { status: 201 });
+  // Log the activity
+  await logActivity({
+    userId: auth.user.id,
+    userName: auth.user.name,
+    action: "create_customer",
+    description: `เพิ่มข้อมูลลูกค้าใหม่: ${body.name}`,
+    ipAddress: getClientIp(req)
+  });
+
+  return Response.json({ success: true, id: newId }, { status: 201 });
 }

@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "./db";
 
 const JWT_SECRET = process.env.JWT_SECRET || "roengvaree-secret-key-change-in-production-2026";
@@ -85,5 +85,5 @@ export function requireRole(user: AuthUser, ...roles: string[]): boolean {
 }
 
 export function jsonError(message: string, status: number) {
-  return Response.json({ error: message }, { status });
+  return NextResponse.json({ error: message }, { status });
 }

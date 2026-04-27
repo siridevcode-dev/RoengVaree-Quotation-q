@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
 import { authenticateRequest, requireRole, hashPassword, jsonError } from "@/lib/auth";
+import { logActivity, getClientIp } from "@/lib/logger";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await authenticateRequest(req);
@@ -53,6 +54,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   await db.execute({ sql, args: params_arr });
 
+  await logActivity({
+    userId: auth.user.id,
+    userName: auth.user.name,
+    action: "update_user",
+    description: `แก้ไขข้อมูลสมาชิก: ${body.name || id}`,
+    ipAddress: getClientIp(req)
+  });
+
   return Response.json({ success: true });
 }
 
@@ -71,6 +80,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     args: [id]
   });
   if (result.rowsAffected === 0) return jsonError("ไม่พบสมาชิก", 404);
+
+  await logActivity({
+    userId: auth.user.id,
+    userName: auth.user.name,
+    action: "delete_user",
+    description: `ลบสมาชิก ID: ${id}`,
+    ipAddress: getClientIp(req)
+  });
 
   return Response.json({ success: true });
 }

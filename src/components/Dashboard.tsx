@@ -59,10 +59,54 @@ const statCards = [
     gradient: "from-violet-500 to-fuchsia-600",
     shadow: "shadow-fuchsia-500/30",
   },
+  {
+    label: "ต้นทุนการผลิตรวม",
+    key: "cost",
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+      </svg>
+    ),
+    gradient: "from-orange-500 to-red-600",
+    shadow: "shadow-orange-500/30",
+  },
+  {
+    label: "กำไรของเดือน",
+    key: "monthlyProfit",
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    ),
+    gradient: "from-pink-500 to-rose-600",
+    shadow: "shadow-rose-500/30",
+  },
+  {
+    label: "กำไรสุทธิคาดการณ์",
+    key: "profit",
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+      </svg>
+    ),
+    gradient: "from-emerald-600 to-green-700",
+    shadow: "shadow-emerald-500/30",
+  },
+  {
+    label: "อัตรากำไรเฉลี่ย",
+    key: "margin",
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+      </svg>
+    ),
+    gradient: "from-blue-400 to-indigo-500",
+    shadow: "shadow-blue-500/30",
+  },
 ];
 
 export default function Dashboard() {
-  const { quotations, customers, updateQuotation, showToast } = useAppContext();
+  const { quotations, customers, productionCosts, updateQuotation, showToast } = useAppContext();
   const [activeStatusEdit, setActiveStatusEdit] = useState<string | null>(null);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
 
@@ -86,15 +130,47 @@ export default function Dashboard() {
 
   const maxRevenue = Math.max(...monthlyRevenue, 1);
 
-  const totalAmount = quotations.filter(q => q.status === "อนุมัติแล้ว").reduce((sum, q) => sum + q.amount, 0);
-  const approvedCount = quotations.filter(q => q.status === "อนุมัติแล้ว").length;
+  const approvedQuotations = quotations.filter(q => q.status === "อนุมัติแล้ว");
+  const approvedIds = new Set(approvedQuotations.map(q => q.id));
+  
+  const totalAmount = approvedQuotations.reduce((sum, q) => sum + q.amount, 0);
+  const approvedCount = approvedQuotations.length;
   const pendingCount = quotations.filter(q => q.status === "รอดำเนินการ").length;
+
+  const totalCost = productionCosts
+    .filter(p => p.quotationId && approvedIds.has(p.quotationId))
+    .reduce((sum, p) => sum + p.unitPrice, 0);
+    
+  const totalProfit = totalAmount - totalCost;
+  const avgMargin = totalAmount > 0 ? (totalProfit / totalAmount) * 100 : 0;
+
+  // Current Month Profit
+  const currentMonth = new Date().getMonth() + 1;
+  const monthlyApprovedQuotations = approvedQuotations.filter(q => {
+    const parts = q.date.split("/");
+    if (parts.length < 3) return false;
+    const qMonth = parseInt(parts[1]);
+    const qYear = parseInt(parts[2]);
+    const isMatchYear = qYear === currentYearAD || qYear === currentYearBE;
+    return qMonth === currentMonth && isMatchYear;
+  });
+  
+  const currentMonthlyRevenue = monthlyApprovedQuotations.reduce((sum, q) => sum + q.amount, 0);
+  const monthlyApprovedIds = new Set(monthlyApprovedQuotations.map(q => q.id));
+  const currentMonthlyCost = productionCosts
+    .filter(p => p.quotationId && monthlyApprovedIds.has(p.quotationId))
+    .reduce((sum, p) => sum + p.unitPrice, 0);
+  const currentMonthlyProfit = currentMonthlyRevenue - currentMonthlyCost;
 
   const statValues: Record<string, string> = {
     total: quotations.length.toString(),
     approved: approvedCount.toString(),
     pending: pendingCount.toString(),
     revenue: formatCurrency(totalAmount),
+    profit: formatCurrency(totalProfit),
+    margin: `${avgMargin.toFixed(1)}%`,
+    cost: formatCurrency(totalCost),
+    monthlyProfit: formatCurrency(currentMonthlyProfit),
   };
 
   const recentQuotations = [...quotations]
@@ -105,7 +181,7 @@ export default function Dashboard() {
 
   return (
     <div className="flex-1 overflow-auto bg-gradient-to-br from-indigo-50/50 via-white to-blue-50/50">
-      <div className="max-w-[1400px] mx-auto p-4 md:p-6 space-y-6 md:space-y-8 animate-fade-in">
+      <div className="max-w-[1200px] mx-auto p-4 md:p-6 space-y-6 md:space-y-8 animate-fade-in">
         {/* Page Header */}
         <div className="flex items-center justify-between">
           <div>

@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
 import { authenticateRequest, jsonError } from "@/lib/auth";
+import { logActivity, getClientIp } from "@/lib/logger";
 
 export async function GET(req: NextRequest) {
   const auth = await authenticateRequest(req);
@@ -42,6 +43,14 @@ export async function POST(req: NextRequest) {
         body.recEngine || "-", body.speedDesign || "-", body.passenger || "-",
         JSON.stringify(body.images || [])
       ]
+    });
+
+    await logActivity({
+      userId: auth.user.id,
+      userName: auth.user.name,
+      action: "update_boat_spec",
+      description: `เพิ่มข้อมูลสเปคเรือรุ่น: ${body.model}`,
+      ipAddress: getClientIp(req)
     });
 
     return Response.json({ success: true }, { status: 201 });

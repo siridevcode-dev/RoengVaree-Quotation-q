@@ -15,6 +15,19 @@ import MemberManagement from "@/components/MemberManagement";
 import ProductSelector from "@/components/ProductSelector";
 import QuotationView from "@/components/QuotationView";
 import ProductionCosts from "@/components/ProductionCosts";
+import PurchaseOrders from "@/components/PurchaseOrders";
+import ActivityLogView from "@/components/ActivityLogView";
+import ActivityDrawer from "@/components/ActivityDrawer";
+import AccountingPlaceholder from "@/components/AccountingPlaceholder";
+import AccountingDashboard from "@/components/AccountingDashboard";
+import RevenueOverview from "@/components/RevenueOverview";
+import ExpenseOverview from "@/components/ExpenseOverview";
+import ContactManagement from "@/components/ContactManagement";
+import ProductManagement from "@/components/ProductManagement";
+import FinanceManagement from "@/components/FinanceManagement";
+import ChartOfAccounts from "@/components/ChartOfAccounts";
+import DocumentArchive from "@/components/DocumentArchive";
+import AccountingSettings from "@/components/AccountingSettings";
 import { Product } from "@/context/AppContext";
 
 import { useAppContext } from "@/context/AppContext";
@@ -22,14 +35,16 @@ import Login from "@/components/Login";
 
 export default function Home() {
   const { currentUser, isReady } = useAppContext();
-  const [activePage, setActivePage] = useState("Quotations");
+  const [activePage, setActivePage] = useState("Dashboard");
   const [activeQuotationId, setActiveQuotationId] = useState<string | undefined>(undefined);
+  const [activePurchaseType, setActivePurchaseType] = useState<"PO" | "PR" | undefined>(undefined);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
   const [initialImages, setInitialImages] = useState<string[]>([]);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  const handleNavigate = (page: string, quotationId?: string, items?: Product[], customImages?: string[]) => {
+  const handleNavigate = (page: string, quotationId?: string, items?: Product[], customImages?: string[], purchaseType?: "PO" | "PR") => {
     setActiveQuotationId(quotationId);
+    setActivePurchaseType(purchaseType);
     if (page !== "Quotation Form" && page !== "Quotation View") {
       setSelectedProducts([]);
       setInitialImages([]);
@@ -44,13 +59,16 @@ export default function Home() {
   const renderActivePage = () => {
     switch (activePage) {
       case "Dashboard":
+      case "แดชบอร์ด":
         return <Dashboard />;
       case "Quotations":
+      case "รายการใบเสนอราคา":
         return <QuotationList onNavigate={handleNavigate} />;
       case "Customers":
+      case "ลูกค้า":
         return <CustomerList />;
       case "Quotation View":
-        return activeQuotationId ? (
+        return activeQuotationId !== undefined ? (
           <QuotationView 
             quotationId={activeQuotationId} 
             onNavigate={handleNavigate} 
@@ -59,6 +77,7 @@ export default function Home() {
       case "Quotation Form":
         return <QuotationForm onNavigate={handleNavigate} quotationId={activeQuotationId} initialItems={selectedProducts} initialImages={initialImages} />;
       case "Select Products":
+      case "สร้างใบเสนอราคา":
         return (
           <ProductSelector 
             onConfirm={(products) => {
@@ -71,15 +90,82 @@ export default function Home() {
       case "Products":
         return <ProductList />;
       case "Production costs":
-        return <ProductionCosts />;
+      case "ต้นทุนการผลิต":
+        return <ProductionCosts onNavigate={handleNavigate} />;
+      case "Production Cost Detail":
+        return activeQuotationId !== undefined ? (
+          <ProductionCosts 
+            onNavigate={handleNavigate} 
+            initialQuotationId={activeQuotationId} 
+          />
+        ) : <ProductionCosts onNavigate={handleNavigate} />;
+      case "แผนการผลิต":
+      case "บันทึกการผลิต":
+      case "รายงานการผลิต":
+        return <ProductionCosts onNavigate={handleNavigate} />;
+      case "Purchase Requisition (PR)":
+        return <PurchaseOrders onNavigate={handleNavigate} initialQuotationId={activeQuotationId} initialType="PR" />;
+      case "Purchase Order (PO)":
+        return <PurchaseOrders onNavigate={handleNavigate} initialQuotationId={activeQuotationId} initialType="PO" />;
       case "Reports":
+      case "รายงาน":
         return <Reports />;
+      case "รายงาน ผู้ติดต่อ":
+        return <ContactManagement />;
       case "Quotation Templates":
+      case "รูปแบบใบเสนอราคา":
+      case "รูปแบบใบเสนอราคา รูปแบบเก่า":
         return <RepeatQueries onNavigate={handleNavigate} />;
       case "Settings":
+      case "Settings (System)":
         return <Settings />;
+      case "ประวัติใช้งาน":
+        return <ActivityLogView />;
       case "Members":
+      case "สมาชิก":
         return <MemberManagement />;
+      case "หน้าหลัก (บัญชี)":
+        return <AccountingDashboard />;
+      case "Revenue Overview":
+        return <RevenueOverview />;
+      case "Expense Overview":
+        return <ExpenseOverview />;
+      case "ใบเสนอราคา":
+        return <QuotationList onNavigate={handleNavigate} />;
+      case "ใบสั่งซื้อ":
+        return <PurchaseOrders onNavigate={handleNavigate} initialType="PO" />;
+      case "ใบขอซื้อ":
+        return <PurchaseOrders onNavigate={handleNavigate} initialType="PR" />;
+      case "รายรับ":
+      case "รายจ่าย":
+      case "ดูภาพรวม":
+      case "บันทึกซื้อสินค้า":
+      case "บันทึกค่าใช้จ่าย":
+      case "ใบสั่งซื้อสินทรัพย์":
+      case "ซื้อสินทรัพย์":
+      case "ใบกำกับภาษีซื้อ":
+      case "ใบจ่ายเงินมัดจำ":
+      case "รับใบลดหนี้":
+      case "รับใบเพิ่มหนี้":
+      case "ใบรวมจ่าย":
+      case "นำเข้าเอกสาร":
+        return <AccountingPlaceholder title={activePage} />;
+      case "ผู้ติดต่อ":
+        return <ContactManagement />;
+      case "สินค้า":
+      case "รายการสินค้า":
+        return <ProductList />;
+      case "จัดการสินค้า":
+        return <ProductManagement />;
+      case "การเงิน":
+        return <FinanceManagement />;
+      case "บัญชี":
+      case "Chart of Accounts":
+        return <ChartOfAccounts />;
+      case "คลังเอกสาร":
+        return <DocumentArchive />;
+      case "ตั้งค่า":
+        return <AccountingSettings />;
       default:
         return <Dashboard />;
     }
@@ -113,6 +199,9 @@ export default function Home() {
         {/* Content */}
         {renderActivePage()}
       </div>
+
+      {/* Activity Drawer */}
+      <ActivityDrawer />
     </div>
   );
 }

@@ -12,21 +12,27 @@ interface ProductSelectorProps {
 }
 
 export default function ProductSelector({ onConfirm, onCancel }: ProductSelectorProps) {
-  const { products, categories, boatModels } = useAppContext();
+  const { productionCosts, categories, boatModels } = useAppContext();
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("เรือ");
   const [filterModel, setFilterModel] = useState("ทั้งหมด");
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [showEquipment, setShowEquipment] = useState(false);
+
+  // Master items only
+  const masterItems = productionCosts.filter(p => !p.quotationId);
 
   const allCategories = ["ทั้งหมด", ...categories.filter(c => c !== "มาตรฐาน" && c !== "อุปกรณ์เสริม")];
 
-  const filtered = products.filter((p) => {
-    // Hide standard and optional equipment from selector
+  const filtered = masterItems.filter((p) => {
+    // Optionally hide standard and optional equipment from selector unless toggled
     const cat = (p.category || "").trim().toLowerCase();
-    if (cat === "มาตรฐาน" || cat.includes("standard") || cat.includes("std-") || cat === "มาตรฐาน r52") return false;
-    if (cat === "อุปกรณ์เสริม" || cat.includes("optional") || cat.includes("opt-") || cat === "อุปกรณ์เสริม r52") return false;
+    const isEquip = cat === "มาตรฐาน" || cat.includes("standard") || cat.includes("std-") || cat === "มาตรฐาน r52" || 
+                    cat === "อุปกรณ์เสริม" || cat.includes("optional") || cat.includes("opt-") || cat === "อุปกรณ์เสริม r52";
+    
+    if (isEquip && !showEquipment) return false;
 
-    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || (p.sku && p.sku.toLowerCase().includes(search.toLowerCase()));
     const matchCat = filterCat === "ทั้งหมด" || p.category === filterCat;
     const matchModel = filterModel === "ทั้งหมด" || p.boatModel === filterModel || p.boatModel === "ทุกรุ่น";
     return matchSearch && matchCat && matchModel;
@@ -39,8 +45,10 @@ export default function ProductSelector({ onConfirm, onCancel }: ProductSelector
   };
 
   const handleConfirm = () => {
-    const selected = products.filter(p => selectedIds.includes(p.id));
-    onConfirm(selected);
+    const selected = masterItems.filter(p => selectedIds.includes(p.id));
+    // Convert to Product interface if needed, but AppContext types might need adjustment
+    // For now we'll pass them as is and handle in QuotationForm
+    onConfirm(selected as any);
   };
 
   return (
@@ -86,21 +94,34 @@ export default function ProductSelector({ onConfirm, onCancel }: ProductSelector
             />
           </div>
           <div className="flex flex-wrap gap-2">
-            {allCategories.map((cat) => (
-              <button 
-                key={cat} 
-                onClick={() => setFilterCat(cat)} 
-                className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all ${
-                  filterCat === cat 
-                    ? "bg-teal-600 text-white shadow-sm" 
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+             {allCategories.map((cat) => (
+               <button 
+                 key={cat} 
+                 onClick={() => setFilterCat(cat)} 
+                 className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all ${
+                   filterCat === cat 
+                     ? "bg-teal-600 text-white shadow-sm" 
+                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                 }`}
+               >
+                 {cat}
+               </button>
+             ))}
+             <button 
+                onClick={() => {
+                  setShowEquipment(!showEquipment);
+                  if (!showEquipment) setFilterCat("ทั้งหมด");
+                }}
+                className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all border flex items-center gap-1.5 ${
+                  showEquipment 
+                    ? "bg-blue-600 text-white border-blue-700 shadow-sm" 
+                    : "bg-white text-blue-600 border-blue-200 hover:bg-blue-50"
                 }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
+             >
+               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+               {showEquipment ? "ซ่อนรายการมาตรฐาน" : "แสดงรายการมาตรฐาน / อุปกรณ์เสริม"}
+             </button>
+           </div>
         </div>
 
         {/* Product Grid */}
@@ -132,7 +153,7 @@ export default function ProductSelector({ onConfirm, onCancel }: ProductSelector
                   </div>
                 </div>
                 <div className="text-right flex-shrink-0">
-                  <p className="text-sm font-bold text-gray-900">{formatCurrency(p.unitPrice)}</p>
+                  <p className="text-sm font-bold text-gray-900">{formatCurrency(p.sellingPrice || 0)}</p>
                   <p className="text-[10px] text-gray-400 mt-0.5">ต่อ {p.unit}</p>
                 </div>
               </div>
@@ -168,3 +189,4 @@ export default function ProductSelector({ onConfirm, onCancel }: ProductSelector
     </div>
   );
 }
+

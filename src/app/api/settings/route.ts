@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
 import { authenticateRequest, jsonError } from "@/lib/auth";
+import { logActivity, getClientIp } from "@/lib/logger";
 
 export async function GET(req: NextRequest) {
   const auth = await authenticateRequest(req);
@@ -36,6 +37,14 @@ export async function PUT(req: NextRequest) {
   }));
 
   await db.batch(statements, "write");
+
+  await logActivity({
+    userId: auth.user.id,
+    userName: auth.user.name,
+    action: "update_settings",
+    description: `อัปเดตการตั้งค่าระบบ`,
+    ipAddress: getClientIp(req)
+  });
 
   return Response.json({ success: true });
 }

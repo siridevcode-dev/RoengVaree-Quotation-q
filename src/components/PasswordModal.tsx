@@ -59,6 +59,7 @@ export default function PasswordModal({ isOpen, onClose, onSuccess, title = "ย
           <button 
             onClick={onClose} 
             title="ปิดหน้าต่างยืนยัน"
+            aria-label="ปิดหน้าต่างยืนยัน"
             className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,6 +84,7 @@ export default function PasswordModal({ isOpen, onClose, onSuccess, title = "ย
                 type="password"
                 autoFocus
                 placeholder="Admin Password"
+                aria-label="รหัสผ่าน Admin"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);

@@ -9,12 +9,15 @@ import { api, setToken, clearToken } from "@/lib/api-client";
 export interface LineItem {
   id?: number | string;
   name: string;
+  sku?: string;
   quantity: number;
   unitPrice: number;
   discount?: number;
   description?: string;
   category?: string;
+  unit?: string;
   vatEnabled?: boolean;
+  costPrice?: number;
 }
 
 export interface Quotation {
@@ -92,6 +95,22 @@ export interface Product {
   optionalEquipment?: EquipmentItem[];
 }
 
+export interface ProductionCost {
+  id: number;
+  name: string;
+  category: string;
+  unitPrice: number;
+  sellingPrice?: number;
+  unit: string;
+  description: string;
+  sku: string;
+  inStock: boolean;
+  boatModel?: string;
+  quotationId?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface SettingsType {
   profile: {
     name: string;
@@ -146,6 +165,43 @@ export interface User {
 // ---------------------------------------------------------
 // Context Definition
 // ---------------------------------------------------------
+export interface PurchaseOrderItem {
+  id?: number | string;
+  name: string;
+  description?: string;
+  quantity: number;
+  unit: string;
+  unitPrice: number;
+  totalPrice: number;
+}
+
+export interface PurchaseOrder {
+  id: string;
+  type: "PO" | "PR";
+  title: string;
+  supplierName: string;
+  supplierContact?: string;
+  supplierPhone?: string;
+  supplierEmail?: string;
+  supplierAddress?: string;
+  supplierTaxId?: string;
+  quotationId?: string;
+  status: string;
+  priority: string;
+  totalAmount: number;
+  notes?: string;
+  requestedBy: string;
+  approvedBy?: string;
+  date: string;
+  deliveryDate?: string;
+  paymentTerms?: string;
+  lineItems?: PurchaseOrderItem[];
+  itemsCount?: number;
+}
+
+// ---------------------------------------------------------
+// Context Definition
+// ---------------------------------------------------------
 interface AppContextProps {
   // State
   quotations: Quotation[];
@@ -154,6 +210,8 @@ interface AppContextProps {
   setCustomers: React.Dispatch<React.SetStateAction<Customer[]>>;
   products: Product[];
   setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
+  productionCosts: ProductionCost[];
+  setProductionCosts: React.Dispatch<React.SetStateAction<ProductionCost[]>>;
   categories: string[];
   setCategories: React.Dispatch<React.SetStateAction<string[]>>;
   boatModels: string[];
@@ -166,16 +224,23 @@ interface AppContextProps {
   setUsers: React.Dispatch<React.SetStateAction<User[]>>;
   currentUser: User | null;
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
+  purchaseOrders: PurchaseOrder[];
+  setPurchaseOrders: React.Dispatch<React.SetStateAction<PurchaseOrder[]>>;
   
   // Helpers
   addQuotation: (q: Quotation) => void;
   updateQuotation: (q: Quotation) => void;
-  deleteQuotation: (id: string) => void;
+  deleteQuotation: (id: string) => Promise<void>;
   
   // Products
   addProduct: (p: Omit<Product, "id">) => Promise<void>;
   updateProduct: (id: number, p: Partial<Product>) => Promise<void>;
   deleteProduct: (id: number) => Promise<void>;
+  
+  // Production Costs
+  addProductionCost: (p: Omit<ProductionCost, "id">) => Promise<void>;
+  updateProductionCost: (id: number, p: Partial<ProductionCost>) => Promise<void>;
+  deleteProductionCost: (id: number) => Promise<void>;
   
   // Customers
   addCustomer: (c: Omit<Customer, "id" | "totalQuotations" | "totalRevenue" | "lastActivity">) => Promise<void>;
@@ -186,6 +251,11 @@ interface AppContextProps {
   addUser: (u: Omit<User, "id" | "lastActive">) => Promise<void>;
   updateUser: (id: string, u: Partial<User>) => Promise<void>;
   deleteUser: (id: string) => Promise<void>;
+  
+  // Purchase Orders
+  addPurchaseOrder: (po: PurchaseOrder) => Promise<void>;
+  updatePurchaseOrder: (id: string, po: Partial<PurchaseOrder>) => Promise<void>;
+  deletePurchaseOrder: (id: string) => Promise<void>;
   
   // Settings
   updateSettings: (newSettings: Partial<SettingsType> & { categories?: string[], boatModels?: string[] }) => Promise<void>;
@@ -200,6 +270,10 @@ interface AppContextProps {
   generateNextId: (type: "Q") => string;
   refreshData: () => Promise<void>;
   isReady: boolean;
+  isActivityDrawerOpen: boolean;
+  setActivityDrawerOpen: (open: boolean) => void;
+  activeLayout: "premium" | "classic";
+  setActiveLayout: (layout: "premium" | "classic") => void;
 }
 
 const defaultSettings: SettingsType = {
@@ -215,13 +289,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [quotations, setQuotations] = useState<Quotation[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [productionCosts, setProductionCosts] = useState<ProductionCost[]>([]);
   const [categories, setCategories] = useState<string[]>(["เรือ", "ซ่อมเรือ", "เครื่องยนต์", "มาตรฐาน", "อุปกรณ์เสริม"]);
   const [boatModels, setBoatModels] = useState<string[]>(["R52", "R33"]);
   const [settings, setSettings] = useState<SettingsType>(defaultSettings);
   const [boatSpecifications, setBoatSpecifications] = useState<Record<string, BoatSpecification>>({});
   const [users, setUsers] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>([]);
   const [isReady, setIsReady] = useState(false);
+  const [isActivityDrawerOpen, setActivityDrawerOpen] = useState(false);
+  const [activeLayout, setActiveLayout] = useState<"premium" | "classic">("premium");
 
   const [toasts, setToasts] = useState<{ id: number; message: string; type: string }[]>([]);
 
@@ -236,19 +314,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // ----- Load all data from API -----
   const refreshData = useCallback(async () => {
     try {
-      const [quotationsData, customersData, productsData, usersData, settingsData, boatSpecsData] = await Promise.all([
+      const [quotationsData, customersData, productsData, usersData, settingsData, boatSpecsData, productionCostsData, purchaseOrdersData] = await Promise.all([
         api.quotations.list(),
         api.customers.list(),
         api.products.list(),
         api.users.list(),
         api.settings.get(),
         api.boatSpecs.list(),
+        api.productionCosts.list(),
+        api.purchaseOrders.list(),
       ]);
 
       setQuotations(quotationsData);
       setCustomers(customersData);
       setProducts(productsData);
       setUsers(usersData.map((u: any) => ({ ...u, lastActive: u.lastActive || u.last_active })));
+      setProductionCosts(productionCostsData || []);
+      setPurchaseOrders(purchaseOrdersData || []);
       
       // Merge settings
       if (settingsData) {
@@ -338,31 +420,95 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // ----- Quotation CRUD -----
+  const syncProductionCosts = useCallback(async (q: Quotation) => {
+    if (!q.lineItems) return;
+    
+    // Use fresh production costs from current state or re-fetch?
+    // Using current state is fine for optimistic sync
+    const currentCosts = await api.productionCosts.list(); 
+    
+    for (const item of q.lineItems) {
+      if (!item.name || item.name.trim() === "") continue;
+
+      // 1. Find if this item already exists for this quotation (Project Cost)
+      const existing = currentCosts.find(pc => pc.quotationId === q.id && pc.name === item.name);
+      
+      // 2. If not found, look for a Master Cost (default) to get the initial Cost Price
+      const masterDefault = !existing ? currentCosts.find(pc => !pc.quotationId && pc.name === item.name) : null;
+      
+      const costData = {
+        name: item.name,
+        category: item.category || masterDefault?.category || "อื่นๆ",
+        unitPrice: existing ? existing.unitPrice : (masterDefault ? masterDefault.unitPrice : 0), 
+        sellingPrice: item.unitPrice, // Update selling price from quotation
+        unit: item.unit || masterDefault?.unit || "ชุด", 
+        description: item.description || masterDefault?.description || "",
+        sku: existing?.sku || masterDefault?.sku || `QT-SYNC-${q.id.slice(-4)}-${Math.floor(Math.random()*1000)}`,
+        inStock: true,
+        boatModel: q.boatModel || masterDefault?.boatModel || "ทุกรุ่น",
+        quotationId: q.id
+      };
+
+      try {
+        if (existing) {
+          await api.productionCosts.update(existing.id, costData);
+        } else {
+          await api.productionCosts.create(costData);
+        }
+      } catch (err) {
+        console.error("Sync Production Cost failed for item:", item.name, err);
+      }
+    }
+    
+    // Refresh production costs state
+    const updatedCosts = await api.productionCosts.list();
+    setProductionCosts(updatedCosts);
+  }, []);
+
   const addQuotation = useCallback((q: Quotation) => {
     // Optimistic update
     setQuotations((prev) => [q, ...prev]);
     
     // Save to API
-    api.quotations.create(q).catch((err) => {
-      console.error("Failed to save quotation:", err);
-      showToast("บันทึกใบเสนอราคาไม่สำเร็จ กรุณาลองใหม่", "error");
-    });
-  }, [showToast]);
+    api.quotations.create(q)
+      .then(() => {
+        // Sync items to production costs
+        syncProductionCosts(q);
+      })
+      .catch((err) => {
+        console.error("Failed to save quotation:", err);
+        showToast("บันทึกใบเสนอราคาไม่สำเร็จ กรุณาลองใหม่", "error");
+      });
+  }, [showToast, syncProductionCosts]);
 
   const updateQuotation = useCallback((updatedQ: Quotation) => {
     // Optimistic update
     setQuotations((prev) => prev.map((q) => (q.id === updatedQ.id ? updatedQ : q)));
     
     // Save to API
-    api.quotations.update(updatedQ.id, updatedQ).catch((err) => {
-      console.error("Failed to update quotation:", err);
-      showToast("อัปเดตใบเสนอราคาไม่สำเร็จ", "error");
-    });
-  }, [showToast]);
+    api.quotations.update(updatedQ.id, updatedQ)
+      .then(() => {
+        // Sync items to production costs
+        syncProductionCosts(updatedQ);
+      })
+      .catch((err) => {
+        console.error("Failed to update quotation:", err);
+        showToast("อัปเดตใบเสนอราคาไม่สำเร็จ", "error");
+      });
+  }, [showToast, syncProductionCosts]);
 
-  const deleteQuotation = useCallback((id: string) => {
+  const deleteQuotation = useCallback(async (id: string) => {
+    if (id === undefined || id === null) {
+      console.warn("Attempted to delete quotation with null/undefined ID");
+      return;
+    }
     setQuotations((prev) => prev.filter((q) => q.id !== id));
-    api.quotations.delete(id).catch(console.error);
+    try {
+      await api.quotations.delete(id);
+    } catch (err) {
+      console.error("Failed to delete quotation:", err);
+      // Rollback or show toast if needed, but AppContext usually handles toasts via showToast
+    }
   }, []);
 
   // ----- Product Actions -----
@@ -396,6 +542,41 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       console.error("Failed to delete product:", err);
       showToast("ลบสินค้าไม่สำเร็จ", "error");
+      throw err;
+    }
+  }, [showToast]);
+
+  // ----- Production Cost Actions -----
+  const addProductionCost = useCallback(async (p: Omit<ProductionCost, "id">) => {
+    try {
+      const res = await api.productionCosts.create(p);
+      const newCost = { ...p, id: res.id };
+      setProductionCosts(prev => [newCost as ProductionCost, ...prev]);
+    } catch (err) {
+      console.error("Failed to add production cost:", err);
+      showToast("เพิ่มต้นทุนไม่สำเร็จ", "error");
+      throw err;
+    }
+  }, [showToast]);
+
+  const updateProductionCost = useCallback(async (id: number, p: Partial<ProductionCost>) => {
+    try {
+      await api.productionCosts.update(id, p);
+      setProductionCosts(prev => prev.map(item => item.id === id ? { ...item, ...p } : item));
+    } catch (err) {
+      console.error("Failed to update production cost:", err);
+      showToast("อัปเดตข้อมูลต้นทุนไม่สำเร็จ", "error");
+      throw err;
+    }
+  }, [showToast]);
+
+  const deleteProductionCost = useCallback(async (id: number) => {
+    try {
+      await api.productionCosts.delete(id);
+      setProductionCosts(prev => prev.filter(item => item.id !== id));
+    } catch (err) {
+      console.error("Failed to delete production cost:", err);
+      showToast("ลบข้อมูลต้นทุนไม่สำเร็จ", "error");
       throw err;
     }
   }, [showToast]);
@@ -444,7 +625,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // ----- User Actions -----
   const addUser = useCallback(async (u: Omit<User, "id" | "lastActive">) => {
     try {
-        // Handle password hashing or other transformations if needed
       const res = await api.users.create(u);
       const newUser: User = { 
         ...u, 
@@ -481,6 +661,44 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       console.error("Failed to delete user:", err);
       showToast("ลบสมาชิกไม่สำเร็จ", "error");
+      throw err;
+    }
+  }, [showToast]);
+
+  // ----- Purchase Orders Actions -----
+  const addPurchaseOrder = useCallback(async (po: PurchaseOrder) => {
+    try {
+      const res = await api.purchaseOrders.create(po);
+      const newPO: PurchaseOrder = { ...po, id: res.id };
+      setPurchaseOrders(prev => [newPO, ...prev]);
+      showToast("สร้างเอกสารสำเร็จ", "success");
+    } catch (err) {
+      console.error("Failed to create PO:", err);
+      showToast("สร้างเอกสารไม่สำเร็จ", "error");
+      throw err;
+    }
+  }, [showToast]);
+
+  const updatePurchaseOrder = useCallback(async (id: string, po: Partial<PurchaseOrder>) => {
+    try {
+      await api.purchaseOrders.update(id, po);
+      setPurchaseOrders(prev => prev.map(item => item.id === id ? { ...item, ...po } as PurchaseOrder : item));
+      showToast("อัปเดตเอกสารสำเร็จ", "success");
+    } catch (err) {
+      console.error("Failed to update PO:", err);
+      showToast("อัปเดตเอกสารไม่สำเร็จ", "error");
+      throw err;
+    }
+  }, [showToast]);
+
+  const deletePurchaseOrder = useCallback(async (id: string) => {
+    try {
+      await api.purchaseOrders.delete(id);
+      setPurchaseOrders(prev => prev.filter(item => item.id !== id));
+      showToast("ลบเอกสารสำเร็จ", "success");
+    } catch (err) {
+      console.error("Failed to delete PO:", err);
+      showToast("ลบเอกสารไม่สำเร็จ", "error");
       throw err;
     }
   }, [showToast]);
@@ -577,22 +795,29 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       dateStr = `${yy}${mm}`;
     }
     
+    // Escape prefix for regex
+    const escapedPrefix = prefix.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    
     // Pattern to find the last index. 
-    // We try to match the prefix followed by the dateStr, then a dash or just the sequence.
-    const pattern = new RegExp(`^${prefix}${dateStr}-?(\\d{4})$`);
+    // Matches prefix, optional separator, dateStr, optional separator, then 3-4 digits.
+    const pattern = new RegExp(`^${escapedPrefix}[-/_]?${dateStr}[-/_]?(\\d{3,4})$`);
     let maxIndex = 0;
+    let digitLength = 4; // Default to 4 digits
     
     quotations.forEach(q => {
       const match = q.id.match(pattern);
       if (match) {
         const index = parseInt(match[1], 10);
-        if (index > maxIndex) maxIndex = index;
+        if (index > maxIndex) {
+          maxIndex = index;
+          digitLength = match[1].length;
+        }
       }
     });
     
-    const nextIndex = String(maxIndex + 1).padStart(4, '0');
+    const nextIndex = String(maxIndex + 1).padStart(digitLength, '0');
     
-    // Build the final ID. If prefix ends with a dash or numbers, be smart about separators.
+    // Build the final ID. Try to preserve the format of the last found ID if possible.
     const separator = (prefix.endsWith("-") || dateStr === "") ? "" : "-";
     return `${prefix}${dateStr}${separator}${nextIndex}`;
   }, [settings, quotations]);
@@ -630,18 +855,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setUsers,
         currentUser,
         setCurrentUser,
+        purchaseOrders,
+        setPurchaseOrders,
         addQuotation,
         updateQuotation,
         deleteQuotation,
         addProduct,
         updateProduct,
         deleteProduct,
+        productionCosts,
+        setProductionCosts,
+        addProductionCost,
+        updateProductionCost,
+        deleteProductionCost,
         addCustomer,
         updateCustomer,
         deleteCustomer,
         addUser,
         updateUser,
         deleteUser,
+        addPurchaseOrder,
+        updatePurchaseOrder,
+        deletePurchaseOrder,
         updateSettings,
         updateBoatSpecification,
         logout,
@@ -651,6 +886,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         showToast,
         refreshData,
         isReady,
+        isActivityDrawerOpen,
+        setActivityDrawerOpen,
+        activeLayout,
+        setActiveLayout,
       }}
     >
       {children}

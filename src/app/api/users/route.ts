@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
 import { authenticateRequest, requireRole, hashPassword, jsonError } from "@/lib/auth";
+import { logActivity, getClientIp } from "@/lib/logger";
 
 export async function GET(req: NextRequest) {
   const auth = await authenticateRequest(req);
@@ -52,6 +53,14 @@ export async function POST(req: NextRequest) {
         hashPassword(body.password || "password123"),
         "ไม่เคยเข้าใช้งาน"
       ]
+    });
+
+    await logActivity({
+      userId: auth.user.id,
+      userName: auth.user.name,
+      action: "create_user",
+      description: `เพิ่มสมาชิกใหม่: ${body.name} (${body.role})`,
+      ipAddress: getClientIp(req)
     });
 
     return Response.json({ success: true, id: newId }, { status: 201 });

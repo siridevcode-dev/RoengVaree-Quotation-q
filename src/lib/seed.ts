@@ -149,5 +149,16 @@ export async function seedDatabase(db: Client) {
     args: ["R33", "-", "-", "-", "-", "-", "-", "-", "-", "-", "[]"]
   });
 
+  // ----- Production Costs (Master Data) -----
+  // We mirror the products data here as the system uses production_costs for master data in v3
+  await db.batch(
+    productsData.map(p => ({
+      sql: `INSERT INTO production_costs (name, category, unit_price, unit, description, sku, in_stock, boat_model)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: p
+    })),
+    "write"
+  );
+
   console.log("✅ Database seeded successfully!");
 }

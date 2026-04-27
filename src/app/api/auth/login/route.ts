@@ -38,6 +38,15 @@ export async function POST(req: NextRequest) {
       args: [now, user.id]
     });
 
+    // Log the login activity
+    const forwarded = req.headers.get("x-forwarded-for");
+    const ip = forwarded ? forwarded.split(",")[0].trim() : req.headers.get("x-real-ip") || "-";
+    await db.execute({
+      sql: `INSERT INTO activity_logs (user_id, user_name, action, description, ip_address)
+            VALUES (?, ?, ?, ?, ?)`,
+      args: [user.id, user.name, "login", "เข้าสู่ระบบสำเร็จ", ip || "-"]
+    });
+
     const token = signToken({
       userId: user.id,
       username: user.username,

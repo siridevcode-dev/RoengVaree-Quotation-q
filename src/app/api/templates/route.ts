@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
 import { authenticateRequest, jsonError } from "@/lib/auth";
+import { logActivity, getClientIp } from "@/lib/logger";
 
 export async function GET(req: NextRequest) {
   const auth = await authenticateRequest(req);
@@ -36,6 +37,14 @@ export async function POST(req: NextRequest) {
       body.isActive !== false ? 1 : 0,
       JSON.stringify(body.lineItems || [])
     ]
+  });
+
+  await logActivity({
+    userId: auth.user.id,
+    userName: auth.user.name,
+    action: "other",
+    description: `สร้างเทมเพลตใหม่: ${body.name}`,
+    ipAddress: getClientIp(req)
   });
 
   return Response.json({ success: true, id: Number(result.lastInsertRowid) }, { status: 201 });

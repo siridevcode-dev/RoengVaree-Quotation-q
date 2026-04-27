@@ -3,13 +3,23 @@
 import { useState, useRef } from "react";
 import * as XLSX from "xlsx";
 
-import { useAppContext, Product } from "@/context/AppContext";
+import { useAppContext, Product, ProductionCost } from "@/context/AppContext";
 
 const formatCurrency = (val: number) =>
   val.toLocaleString("th-TH", { style: "currency", currency: "THB", minimumFractionDigits: 0 });
 
 export default function ProductList() {
-  const { products, addProduct, updateProduct, deleteProduct, categories, boatModels, updateSettings, showToast } = useAppContext();
+  const { 
+    productionCosts, 
+    addProductionCost, 
+    updateProductionCost, 
+    deleteProductionCost, 
+    categories, 
+    boatModels, 
+    updateSettings, 
+    showToast 
+  } = useAppContext();
+  
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("เรือ");
   const [filterModel, setFilterModel] = useState("ทั้งหมด");
@@ -21,23 +31,23 @@ export default function ProductList() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+  
   const [formData, setFormData] = useState({ 
     name: "", 
     category: "เรือ", 
     unitPrice: 0, 
+    sellingPrice: 0,
     unit: "", 
     description: "", 
     sku: "",
     boatModel: "ทุกรุ่น"
   });
 
-  // Initializing formData category is now handled in openAddForm and openEditForm
+  // Master products are those without a quotationId
+  const masterProducts = productionCosts.filter(p => !p.quotationId);
 
-  // กรองหมวดหมู่ที่อาจจะหลุดมาจากสถานะ Tabs ให้แสดงเฉพาะหมวดหมู่สินค้าจริง
-  const allCategories = ["ทั้งหมด", ...categories];
-
-  const filtered = products.filter((p) => {
-    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase());
+  const filtered = masterProducts.filter((p) => {
+    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || (p.sku && p.sku.toLowerCase().includes(search.toLowerCase()));
     const matchCat = filterCat === "ทั้งหมด" || p.category === filterCat;
     const matchModel = filterModel === "ทั้งหมด" || p.boatModel === filterModel || p.boatModel === "ทุกรุ่น";
     return matchSearch && matchCat && matchModel;
@@ -51,6 +61,7 @@ export default function ProductList() {
       name: "", 
       category: defaultCat, 
       unitPrice: 0, 
+      sellingPrice: 0,
       unit: "", 
       description: "", 
       sku: "",
@@ -60,11 +71,12 @@ export default function ProductList() {
     setShowForm(true);
   };
 
-  const openEditForm = (p: Product) => {
+  const openEditForm = (p: ProductionCost) => {
     setFormData({ 
       name: p.name, 
       category: p.category, 
       unitPrice: p.unitPrice, 
+      sellingPrice: p.sellingPrice || 0,
       unit: p.unit, 
       description: p.description, 
       sku: p.sku,
@@ -81,10 +93,10 @@ export default function ProductList() {
     }
     try {
       if (editingId) {
-        await updateProduct(editingId, formData);
+        await updateProductionCost(editingId, formData);
         showToast("อัปเดตข้อมูลสินค้าสำเร็จ", "success");
       } else {
-        await addProduct({ ...formData, inStock: true });
+        await addProductionCost({ ...formData, inStock: true });
         showToast("เพิ่มสินค้าใหม่เรียบร้อยแล้ว", "success");
       }
       setShowForm(false);
@@ -106,7 +118,7 @@ export default function ProductList() {
   };
 
   const removeCategory = async (cat: string) => {
-    const isUsed = products.some(p => p.category === cat);
+    const isUsed = masterProducts.some(p => p.category === cat);
     if (isUsed) {
       showToast("ไม่สามารถลบได้เนื่องจากมีสินค้าในหมวดหมู่นี้", "error");
       return;
@@ -129,20 +141,15 @@ export default function ProductList() {
     setNewModelName("");
     showToast(`เพิ่มรุ่นเรือ ${newModelName} เรียบร้อย`, "success");
     
-    // Scroll to bottom of model list
     setTimeout(() => {
       modelListRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }, 100);
   };
 
   const removeBoatModel = async (model: string) => {
-    const isUsed = products.some(p => p.boatModel === model);
+    const isUsed = masterProducts.some(p => p.boatModel === model);
     if (isUsed) {
-      if (confirm(`รุ่นเรือ "${model}" ถูกใช้งานอยู่โดยสินค้าบางรายการ คุณแน่ใจหรือไม่ว่าต้องการลบ? (สินค้าจะถูกเปลี่ยนเป็น "ทุกรุ่น")`)) {
-        // We might want to update all products, but for now let's just update locally and the models list
-        // Updating products one by one via API would be slow here. 
-        // A better API would handle this but for now let's just update the list.
-      } else {
+      if (!confirm(`รุ่นเรือ "${model}" ถูกใช้งานอยู่โดยสินค้าบางรายการ คุณแน่ใจหรือไม่ว่าต้องการลบ? (สินค้าจะถูกเปลี่ยนเป็น "ทุกรุ่น")`)) {
         return;
       }
     }
@@ -169,7 +176,7 @@ export default function ProductList() {
           return;
         }
 
-        const newProducts: Product[] = [];
+        const newProducts: Omit<ProductionCost, "id">[] = [];
         const foundCategories = new Set<string>();
         const foundModels = new Set<string>();
 
@@ -185,11 +192,11 @@ export default function ProductList() {
           if (boatModel !== "ทุกรุ่น") foundModels.add(boatModel);
 
           newProducts.push({
-            id: Date.now() + index,
             name: String(name),
             category: String(category),
             boatModel: String(boatModel),
-            unitPrice: Number(row["ราคา"] || row["Price"] || row["price"] || 0),
+            unitPrice: Number(row["ราคาทุน"] || row["Cost"] || 0),
+            sellingPrice: Number(row["ราคาขาย"] || row["Price"] || 0),
             unit: String(row["หน่วย"] || row["Unit"] || row["unit"] || "ชิ้น"),
             description: String(row["รายละเอียด"] || row["Description"] || row["description"] || ""),
             sku: String(sku),
@@ -202,26 +209,22 @@ export default function ProductList() {
           return;
         }
 
-        // Add missing categories
         const missingCats = Array.from(foundCategories).filter(c => !categories.includes(c));
         if (missingCats.length > 0) {
           await updateSettings({ categories: [...categories, ...missingCats] });
         }
 
-        // Add missing models
         const missingModels = Array.from(foundModels).filter(m => !boatModels.includes(m));
         if (missingModels.length > 0) {
           await updateSettings({ boatModels: [...boatModels, ...missingModels] });
         }
 
-        // Import products one by one
         for (const p of newProducts) {
-          await addProduct(p);
+          await addProductionCost(p);
         }
         showToast(`นำเข้าสินค้าสำเร็จ ${newProducts.length} รายการ`, "success");
         setShowForm(false);
         
-        // Reset file input
         if (fileInputRef.current) fileInputRef.current.value = "";
       } catch (err) {
         console.error("Excel Import Error:", err);
@@ -231,14 +234,17 @@ export default function ProductList() {
     reader.readAsBinaryString(file);
   };
 
+  const formatCurrencyValue = (val: number | undefined) =>
+    (val || 0).toLocaleString("th-TH", { style: "currency", currency: "THB", minimumFractionDigits: 0 });
+
   return (
     <div className="flex-1 overflow-auto">
       <div className="max-w-[1400px] mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-xl md:text-2xl font-bold text-gray-900">สินค้า / บริการ</h1>
-            <p className="text-xs md:text-sm text-gray-500 mt-0.5 md:mt-1">จัดการรายการสินค้าและบริการ ({products.length} รายการ)</p>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">สินค้า / บริการ (ข้อมูลหลัก)</h1>
+            <p className="text-xs md:text-sm text-gray-500 mt-0.5 md:mt-1">ดึงข้อมูลต้นทุนและราคาขายจากระบบบริหารต้นทุน ({masterProducts.length} รายการ)</p>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             <input 
@@ -246,8 +252,9 @@ export default function ProductList() {
               ref={fileInputRef} 
               onChange={handleExcelImport} 
               accept=".xlsx, .xls" 
+              id="excel-import"
               className="hidden" 
-              title="เลือกไฟล์ Excel สำหรับนำเข้าข้อมูลสินค้า"
+              aria-label="เลือกไฟล์ Excel สำหรับนำเข้าข้อมูลสินค้า"
             />
             <button 
               onClick={() => fileInputRef.current?.click()} 
@@ -271,11 +278,18 @@ export default function ProductList() {
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-4">
           <div className="relative flex-1 min-w-[200px] max-w-md">
-            <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            <input type="text" placeholder="ค้นหาชื่อ หรือ SKU..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all" />
+            <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            <input 
+              type="text" 
+              placeholder="ค้นหาชื่อ หรือ SKU..." 
+              value={search} 
+              onChange={(e) => setSearch(e.target.value)} 
+              className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all" 
+              aria-label="ค้นหาสินค้า"
+            />
           </div>
           <div className="flex flex-wrap gap-2 overflow-x-auto pb-1">
-            {allCategories.map((cat) => (
+            {["ทั้งหมด", ...categories].map((cat) => (
               <button 
                 key={cat} 
                 onClick={() => {
@@ -317,39 +331,28 @@ export default function ProductList() {
         {showForm && (
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={() => setShowForm(false)}>
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
-              {/* Fixed Header */}
               <div className="px-6 py-4 bg-gradient-to-r from-teal-600 to-teal-700 flex-shrink-0 flex items-center justify-between">
                 <h3 className="text-lg font-bold text-white">{editingId ? "แก้ไขสินค้า/บริการ" : "เพิ่มสินค้า/บริการใหม่"}</h3>
-                {!editingId && (
-                  <button 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg transition-all"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                    นำเข้า Excel
-                  </button>
-                )}
               </div>
               
-              {/* Scrollable Body */}
               <div className="p-6 space-y-6 overflow-y-auto max-h-[75vh]">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
-                      <label className="text-xs font-medium text-gray-500 mb-1.5 block">ชื่อสินค้า/บริการ *</label>
+                      <label htmlFor="product-name" className="text-xs font-medium text-gray-500 mb-1.5 block">ชื่อสินค้า/บริการ *</label>
                       <input 
+                        id="product-name"
                         type="text" 
                         value={formData.name || ""} 
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
                         className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" 
-                        title="กรอกชื่อสินค้าหรือบริการ"
                       />
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <label className="text-xs font-medium text-gray-500 mb-1.5 block">หมวดหมู่</label>
+                        <label htmlFor="product-category" className="text-xs font-medium text-gray-500 mb-1.5 block">หมวดหมู่</label>
                         <select 
-                          title="เลือกหมวดหมู่"
+                          id="product-category"
                           value={formData.category} 
                           onChange={(e) => setFormData({ ...formData, category: e.target.value })} 
                           className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
@@ -360,9 +363,9 @@ export default function ProductList() {
                         </select>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-gray-500 mb-1.5 block">รุ่นเรือ</label>
+                        <label htmlFor="product-model" className="text-xs font-medium text-gray-500 mb-1.5 block">รุ่นเรือ</label>
                         <select 
-                          title="เลือกรุ่นเรือ"
+                          id="product-model"
                           value={formData.boatModel} 
                           onChange={(e) => setFormData({ ...formData, boatModel: e.target.value })} 
                           className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
@@ -374,13 +377,13 @@ export default function ProductList() {
                         </select>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-gray-500 mb-1.5 block">SKU</label>
+                        <label htmlFor="product-sku" className="text-xs font-medium text-gray-500 mb-1.5 block">SKU</label>
                         <input 
+                          id="product-sku"
                           type="text" 
                           value={formData.sku || ""} 
                           onChange={(e) => setFormData({ ...formData, sku: e.target.value })} 
                           className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" 
-                          title="ระบุรหัสสินค้า (SKU)"
                         />
                       </div>
                     </div>
@@ -389,7 +392,7 @@ export default function ProductList() {
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-xs font-medium text-gray-500 mb-1.5 block">ราคาต่อหน่วย (฿)</label>
+                        <label className="text-xs font-medium text-gray-500 mb-1.5 block">ราคาทุน (Cost Price ฿)</label>
                         <input 
                           type="text"
                           inputMode="decimal"
@@ -401,38 +404,52 @@ export default function ProductList() {
                           }} 
                           onFocus={(e) => e.target.select()}
                           placeholder="0"
-                          className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" 
-                          title="ราคาต่อหน่วย"
+                          className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 font-bold text-teal-700" 
                         />
                       </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 mb-1.5 block">ราคาขาย (Selling Price ฿)</label>
+                        <input 
+                          type="text"
+                          inputMode="decimal"
+                          value={formData.sellingPrice ? formData.sellingPrice.toLocaleString("en-US") : ""} 
+                          onChange={(e) => {
+                            const raw = e.target.value.replace(/,/g, "");
+                            const num = parseFloat(raw);
+                            setFormData({ ...formData, sellingPrice: isNaN(num) ? 0 : num });
+                          }} 
+                          onFocus={(e) => e.target.select()}
+                          placeholder="0"
+                          className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 font-bold text-blue-700" 
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="text-xs font-medium text-gray-500 mb-1.5 block">หน่วย</label>
                         <input 
                           type="text" 
                           value={formData.unit || ""} 
                           onChange={(e) => setFormData({ ...formData, unit: e.target.value })} 
-                          placeholder="ชิ้น, เดือน, ระบบ" 
+                          placeholder="ชุด, ชิ้น, ระบบ" 
                           className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500" 
-                          title="หน่วยนับของสินค้า"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500 mb-1.5 block">รายละเอียด</label>
+                      <label htmlFor="product-description" className="text-xs font-medium text-gray-500 mb-1.5 block">รายละเอียด</label>
                       <textarea 
+                        id="product-description"
                         value={formData.description || ""} 
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
                         rows={2} 
                         className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 resize-none" 
-                        title="กรอกรายละเอียดสินค้า"
                       />
                     </div>
                   </div>
                 </div>
               </div>
 
-              
-              {/* Fixed Footer */}
               <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-3 flex-shrink-0">
                 <button onClick={() => setShowForm(false)} className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">ยกเลิก</button>
                 <button onClick={saveProduct} className="px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg hover:from-teal-700 hover:to-teal-800 shadow-sm active:scale-95 transition-all">บันทึกสินค้า</button>
@@ -449,13 +466,12 @@ export default function ProductList() {
                 <h3 className="font-bold">จัดการระบบ</h3>
                 <button 
                   onClick={() => setShowCategoryManager(false)}
-                  title="ปิดหน้าต่างจัดการ"
+                  aria-label="ปิดหน้าต่างจัดการระบบ"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
               
-              {/* Tab Toggle */}
               <div className="flex border-b border-gray-100">
                 <button 
                   onClick={() => setActiveManagerTab('categories')}
@@ -486,9 +502,7 @@ export default function ProductList() {
                         onChange={(e) => setNewCategoryName(e.target.value)}
                         className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30"
                       />
-                      <button onClick={addCategory} className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-semibold hover:bg-teal-700 transition-all">
-                        เพิ่ม
-                      </button>
+                      <button onClick={addCategory} className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-semibold hover:bg-teal-700 transition-all">เพิ่ม</button>
                     </div>
                     <div className="space-y-2 max-h-[300px] overflow-auto">
                       {categories.map(cat => (
@@ -496,8 +510,8 @@ export default function ProductList() {
                           <span className="text-sm font-medium text-gray-700">{cat}</span>
                           <button 
                             onClick={() => removeCategory(cat)} 
-                            title="ลบหมวดหมู่"
                             className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                            aria-label={`ลบหมวดหมู่ ${cat}`}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                           </button>
@@ -510,35 +524,26 @@ export default function ProductList() {
                     <div className="flex gap-2">
                       <input 
                         type="text" 
-                        placeholder="ชื่อรุ่นเรือใหม่... (เช่น R44)" 
+                        placeholder="ชื่อรุ่นเรือใหม่..." 
                         value={newModelName} 
                         onChange={(e) => setNewModelName(e.target.value)}
                         className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30"
                       />
-                      <button onClick={addBoatModel} className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-semibold hover:bg-teal-700 transition-all">
-                        เพิ่ม
-                      </button>
+                      <button onClick={addBoatModel} className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-semibold hover:bg-teal-700 transition-all">เพิ่ม</button>
                     </div>
                     <div className="space-y-2 max-h-[300px] overflow-auto">
-                      <div className="p-2 bg-teal-50/50 rounded-lg border border-teal-100 mb-2">
-                        <span className="text-[10px] font-bold text-teal-700 uppercase">System Models (ถาวร)</span>
-                        <div className="flex items-center justify-between mt-1 px-1">
-                          <span className="text-xs font-semibold text-gray-600">ทุกรุ่น</span>
-                        </div>
-                      </div>
                       {boatModels.map(m => (
                         <div key={m} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg group">
                           <span className="text-sm font-medium text-gray-700">{m}</span>
                           <button 
                             onClick={() => removeBoatModel(m)} 
-                            title="ลบรุ่นเรือ"
                             className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                            aria-label={`ลบรุ่นเรือ ${m}`}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                           </button>
                         </div>
                       ))}
-                      <div ref={modelListRef} />
                     </div>
                   </>
                 )}
@@ -556,9 +561,9 @@ export default function ProductList() {
                   <th className="text-left text-xs font-semibold text-gray-600 px-5 py-3">SKU</th>
                   <th className="text-left text-xs font-semibold text-gray-600 px-5 py-3">ชื่อสินค้า/บริการ</th>
                   <th className="text-left text-xs font-semibold text-gray-600 px-5 py-3">หมวดหมู่ / รุ่น</th>
-                  <th className="text-right text-xs font-semibold text-gray-600 px-5 py-3">ราคา</th>
+                  <th className="text-right text-xs font-semibold text-gray-600 px-5 py-3">ราคาทุน</th>
+                  <th className="text-right text-xs font-semibold text-gray-600 px-5 py-3">ราคาขาย</th>
                   <th className="text-center text-xs font-semibold text-gray-600 px-5 py-3">หน่วย</th>
-                  <th className="text-center text-xs font-semibold text-gray-600 px-5 py-3">สถานะ</th>
                   <th className="w-[80px] px-4 py-3"></th>
                 </tr>
               </thead>
@@ -582,43 +587,35 @@ export default function ProductList() {
                         )}
                       </div>
                     </td>
-                    <td className="px-5 py-3.5 text-sm font-semibold text-gray-800 text-right">{formatCurrency(p.unitPrice)}</td>
+                    <td className="px-5 py-3.5 text-sm font-semibold text-teal-700 text-right">{formatCurrencyValue(p.unitPrice)}</td>
+                    <td className="px-5 py-3.5 text-sm font-semibold text-blue-700 text-right">{formatCurrencyValue(p.sellingPrice)}</td>
                     <td className="px-5 py-3.5 text-sm text-gray-500 text-center">{p.unit}</td>
-                    <td className="px-5 py-3.5 text-center">
-                      <button onClick={() => updateProduct(p.id, { inStock: !p.inStock })} className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-all ${p.inStock ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"}`}>
-                        {p.inStock ? "พร้อมขาย" : "ไม่พร้อม"}
-                      </button>
-                    </td>
                     <td className="px-4 py-3.5">
                       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity justify-end">
                         <button 
                           onClick={() => openEditForm(p)} 
                           className="w-9 h-9 rounded-lg flex items-center justify-center text-gray-400 hover:text-teal-600 hover:bg-teal-50 transition-all"
-                          title="แก้ไข"
+                          aria-label={`แก้ไขข้อมูล ${p.name}`}
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002-2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </button>
                         
                         {confirmDeleteId === p.id ? (
                           <button 
                             onClick={async () => {
-                              await deleteProduct(p.id);
+                              await deleteProductionCost(p.id);
                               showToast(`ลบสินค้า ${p.name} สำเร็จ`, "success");
                               setConfirmDeleteId(null);
                             }} 
-                            className="h-9 px-3 rounded-lg flex items-center justify-center text-white bg-red-600 hover:bg-red-700 transition-all animate-pulse text-xs font-bold"
-                            title="ยืนยันการลบ"
+                            className="h-9 px-3 rounded-lg text-white bg-red-600 hover:bg-red-700 text-xs font-bold"
                           >
                             ลบ?
                           </button>
                         ) : (
                           <button 
-                            onClick={() => {
-                              setConfirmDeleteId(p.id);
-                              setTimeout(() => setConfirmDeleteId(prev => prev === p.id ? null : prev), 3000);
-                            }} 
+                            onClick={() => setConfirmDeleteId(p.id)} 
                             className="w-9 h-9 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
-                            title="ลบ"
+                            aria-label={`ยืนยันเพื่อลบ ${p.name}`}
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                           </button>
@@ -635,3 +632,4 @@ export default function ProductList() {
     </div>
   );
 }
+

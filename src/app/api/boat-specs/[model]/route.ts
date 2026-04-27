@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
 import { authenticateRequest, jsonError } from "@/lib/auth";
+import { logActivity, getClientIp } from "@/lib/logger";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ model: string }> }) {
   const auth = await authenticateRequest(req);
@@ -66,6 +67,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ mode
     });
   }
 
+  await logActivity({
+    userId: auth.user.id,
+    userName: auth.user.name,
+    action: "update_boat_spec",
+    description: `แก้ไขข้อมูลสเปคเรือรุ่น: ${body.newModel || decodedModel}`,
+    ipAddress: getClientIp(req)
+  });
+
   return Response.json({ success: true });
 }
 
@@ -79,6 +88,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ m
   await db.execute({
     sql: "DELETE FROM boat_specs WHERE model = ?",
     args: [decodedModel]
+  });
+
+  await logActivity({
+    userId: auth.user.id,
+    userName: auth.user.name,
+    action: "update_boat_spec",
+    description: `ลบข้อมูลสเปคเรือรุ่น: ${decodedModel}`,
+    ipAddress: getClientIp(req)
   });
 
   return Response.json({ success: true });

@@ -2,6 +2,17 @@
 
 import { useState } from "react";
 import { useAppContext, User, UserRole } from "@/context/AppContext";
+import { api } from "@/lib/api-client";
+
+interface ActivityLog {
+  id: number;
+  userId: string;
+  userName: string;
+  action: string;
+  description: string;
+  ipAddress: string;
+  createdAt: string;
+}
 
 export default function MemberManagement() {
   const { users, addUser, updateUser, deleteUser, showToast, currentUser } = useAppContext();
@@ -11,6 +22,55 @@ export default function MemberManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Activity Log State
+  const [isLogModalOpen, setIsLogModalOpen] = useState(false);
+  const [logUser, setLogUser] = useState<User | null>(null);
+  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
+  const [loadingLogs, setLoadingLogs] = useState(false);
+
+  const handleViewLogs = async (user: User) => {
+    setLogUser(user);
+    setIsLogModalOpen(true);
+    setLoadingLogs(true);
+    try {
+      const logs = await api.activityLogs.list(user.id, 100);
+      setActivityLogs(logs);
+    } catch {
+      showToast("ไม่สามารถโหลดประวัติได้", "error");
+    } finally {
+      setLoadingLogs(false);
+    }
+  };
+
+  const getActionLabel = (action: string) => {
+    const map: Record<string, string> = {
+      login: "เข้าสู่ระบบ",
+      logout: "ออกจากระบบ",
+      create_quotation: "สร้างใบเสนอราคา",
+      update_quotation: "แก้ไขใบเสนอราคา",
+      delete_quotation: "ลบใบเสนอราคา",
+      create_customer: "เพิ่มข้อมูลลูกค้า",
+      create_product: "เพิ่มสินค้า",
+      create_po: "สร้าง PR/PO",
+      other: "อื่นๆ",
+    };
+    return map[action] || action;
+  };
+
+  const getActionColor = (action: string) => {
+    const map: Record<string, string> = {
+      login: "bg-emerald-100 text-emerald-700 border-emerald-200",
+      logout: "bg-orange-100 text-orange-700 border-orange-200",
+      create_quotation: "bg-blue-100 text-blue-700 border-blue-200",
+      update_quotation: "bg-amber-100 text-amber-700 border-amber-200",
+      delete_quotation: "bg-red-100 text-red-700 border-red-200",
+      create_customer: "bg-purple-100 text-purple-700 border-purple-200",
+      create_product: "bg-teal-100 text-teal-700 border-teal-200",
+      create_po: "bg-indigo-100 text-indigo-700 border-indigo-200",
+    };
+    return map[action] || "bg-gray-100 text-gray-700 border-gray-200";
+  };
 
   // Form State
   const [formData, setFormData] = useState<Omit<User, "id" | "lastActive">>({
@@ -192,6 +252,15 @@ export default function MemberManagement() {
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
+                            onClick={() => handleViewLogs(user)}
+                            title="ดูประวัติการใช้งาน"
+                            className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </button>
+                          <button
                             onClick={() => handleOpenModal(user)}
                             title="แก้ไขข้อมูลสมาชิก"
                             className="p-2 text-gray-400 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-all"
@@ -372,6 +441,80 @@ export default function MemberManagement() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Activity Log Modal */}
+      {isLogModalOpen && logUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setIsLogModalOpen(false)} />
+          <div className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 max-h-[80vh] flex flex-col">
+            {/* Header */}
+            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-50 to-indigo-100 flex items-center justify-center text-indigo-700 font-bold border border-indigo-200">
+                  {logUser.name.charAt(0)}
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-gray-900">ประวัติการใช้งาน</h2>
+                  <p className="text-xs text-gray-500">{logUser.name} — {logUser.role}</p>
+                </div>
+              </div>
+              <button onClick={() => setIsLogModalOpen(false)} title="ปิด" className="text-gray-400 hover:text-gray-600 p-1">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="overflow-y-auto flex-1 p-6">
+              {loadingLogs ? (
+                <div className="flex flex-col items-center justify-center py-12 gap-3">
+                  <div className="w-8 h-8 border-3 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+                  <p className="text-sm text-gray-500">กำลังโหลดประวัติ...</p>
+                </div>
+              ) : activityLogs.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-500 text-sm">ยังไม่มีประวัติการใช้งาน</p>
+                </div>
+              ) : (
+                <div className="relative">
+                  {/* Timeline line */}
+                  <div className="absolute left-[15px] top-2 bottom-2 w-0.5 bg-gradient-to-b from-indigo-200 via-gray-200 to-transparent" />
+
+                  <div className="space-y-4">
+                    {activityLogs.map((log) => (
+                      <div key={log.id} className="relative flex gap-4 group">
+                        {/* Dot */}
+                        <div className="relative z-10 mt-1 shrink-0">
+                          <div className={`w-[10px] h-[10px] rounded-full border-2 ${log.action === "login" ? "border-emerald-500 bg-emerald-100" : "border-gray-400 bg-gray-100"} ring-4 ring-white`} />
+                        </div>
+                        {/* Content */}
+                        <div className="flex-1 bg-gray-50 group-hover:bg-white rounded-xl p-3 border border-gray-100 group-hover:border-gray-200 transition-all group-hover:shadow-sm">
+                          <div className="flex items-center justify-between gap-2 mb-1">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getActionColor(log.action)}`}>
+                              {getActionLabel(log.action)}
+                            </span>
+                            <span className="text-[10px] text-gray-400 shrink-0">{log.createdAt}</span>
+                          </div>
+                          <p className="text-xs text-gray-600">{log.description}</p>
+                          {log.ipAddress && log.ipAddress !== "-" && (
+                            <p className="text-[10px] text-gray-400 mt-1">IP: {log.ipAddress}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

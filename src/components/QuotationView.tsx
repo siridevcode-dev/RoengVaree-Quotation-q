@@ -8,11 +8,11 @@ import { jsPDF } from "jspdf";
 
 interface QuotationViewProps {
   quotationId: string;
-  onNavigate: (page: string, id?: string) => void;
+  onNavigate: (page: string, id?: string, items?: any[], images?: string[], purchaseType?: "PO" | "PR") => void;
 }
 
 export default function QuotationView({ quotationId, onNavigate }: QuotationViewProps) {
-  const { quotations, showToast } = useAppContext();
+  const { quotations, showToast, activeLayout } = useAppContext();
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
 
@@ -194,27 +194,47 @@ export default function QuotationView({ quotationId, onNavigate }: QuotationView
             </button>
             <button
               onClick={() => onNavigate("Quotation Form", quotationId)}
-              className="btn-primary py-2 px-6 flex items-center gap-2 bg-gradient-to-br from-[#283583] to-[#4f46e5]"
+              className="px-5 py-2 text-sm font-bold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
-              Edit Quotation
+              แก้ไข (Edit)
+            </button>
+            <button
+              onClick={() => onNavigate("Purchase Requisition (PR)", quotationId, undefined, undefined, "PR")}
+              className="px-5 py-2 text-sm font-bold text-white bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl hover:shadow-lg transition-all flex items-center gap-2 shadow-md shadow-purple-500/20"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+              สร้าง PR
+            </button>
+
+
+
+            <button
+              onClick={() => onNavigate("Production Cost Detail", quotationId)}
+              className="btn-primary py-2 px-6 flex items-center gap-2 bg-gradient-to-br from-teal-600 to-emerald-700 shadow-md shadow-teal-600/20"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              จัดการต้นทุน (Manage Costs)
             </button>
           </div>
         </div>
 
-        {/* Document View */}
         <div className="flex justify-center">
           <div className="origin-top scale-[0.5] min-[420px]:scale-[0.6] sm:scale-75 md:scale-90 lg:scale-100 transition-transform duration-300 shadow-2xl">
-            <QuotationDocument quotation={quotation} />
+            <QuotationDocument quotation={quotation} isClassic={activeLayout === "classic"} />
           </div>
         </div>
       </div>
 
       {/* Hidden for PDF */}
       <div className="absolute -top-[9999px] -left-[9999px] -z-50 pointer-events-none">
-        <QuotationDocument ref={pdfRef} quotation={quotation} />
+        <QuotationDocument ref={pdfRef} quotation={quotation} isClassic={activeLayout === "classic"} />
       </div>
     </div>
   );

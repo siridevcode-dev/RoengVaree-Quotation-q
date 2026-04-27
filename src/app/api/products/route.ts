@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
 import { authenticateRequest, jsonError } from "@/lib/auth";
+import { logActivity, getClientIp } from "@/lib/logger";
 
 export async function GET(req: NextRequest) {
   const auth = await authenticateRequest(req);
@@ -34,8 +35,19 @@ export async function POST(req: NextRequest) {
         body.inStock !== false ? 1 : 0, body.boatModel || ""
       ]
     });
+    
+    const newId = Number(result.lastInsertRowid);
 
-    return Response.json({ success: true, id: Number(result.lastInsertRowid) }, { status: 201 });
+    // Log the activity
+    await logActivity({
+      userId: auth.user.id,
+      userName: auth.user.name,
+      action: "create_product",
+      description: `เพิ่มสินค้าใหม่: ${body.name}${body.sku ? ` (SKU: ${body.sku})` : ""}`,
+      ipAddress: getClientIp(req)
+    });
+
+    return Response.json({ success: true, id: newId }, { status: 201 });
   } catch (error: any) {
     if (error.message?.includes("UNIQUE")) {
       return jsonError("SKU ซ้ำในระบบ", 409);

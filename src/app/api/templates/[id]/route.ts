@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
 import { authenticateRequest, jsonError } from "@/lib/auth";
+import { logActivity, getClientIp } from "@/lib/logger";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await authenticateRequest(req);
@@ -24,6 +25,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     ]
   });
 
+  await logActivity({
+    userId: auth.user.id,
+    userName: auth.user.name,
+    action: "other",
+    description: `แก้ไขเทมเพลต: ${body.name || id}`,
+    ipAddress: getClientIp(req)
+  });
+
   return Response.json({ success: true });
 }
 
@@ -36,6 +45,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   await db.execute({
     sql: "DELETE FROM templates WHERE id = ?",
     args: [id]
+  });
+
+  await logActivity({
+    userId: auth.user.id,
+    userName: auth.user.name,
+    action: "other",
+    description: `ลบเทมเพลต ID: ${id}`,
+    ipAddress: getClientIp(req)
   });
 
   return Response.json({ success: true });

@@ -5,6 +5,7 @@ import { useAppContext, Quotation, LineItem } from "@/context/AppContext";
 
 interface QuotationDocumentProps {
   quotation?: Quotation;
+  isClassic?: boolean;
   // Overrides for live preview from the form
   previewData?: {
     id: string;
@@ -31,7 +32,7 @@ interface QuotationDocumentProps {
 }
 
 const QuotationDocument = forwardRef<HTMLDivElement, QuotationDocumentProps>(
-  ({ quotation, previewData }, ref) => {
+  ({ quotation, previewData, isClassic }, ref) => {
     const { settings, boatSpecifications } = useAppContext();
     const company = settings?.companySettings || {};
 
@@ -193,6 +194,7 @@ const QuotationDocument = forwardRef<HTMLDivElement, QuotationDocumentProps>(
       <div
         ref={ref}
         data-pdf-safe="true"
+        lang="th"
         className="bg-white p-10 mx-auto flex flex-col shadow-2xl print:block print:shadow-none print:p-8 print:m-0 w-[210mm] min-h-[296mm] relative [print-color-adjust:exact] text-[12.5px] text-[#1e293b] font-sans"
       >
         <style dangerouslySetInnerHTML={{
@@ -227,164 +229,137 @@ const QuotationDocument = forwardRef<HTMLDivElement, QuotationDocumentProps>(
           }
         `}} />
         {/* Background Watermark (Logo based) */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-[0.035]">
-          <img src="/logo.png" alt="" className="w-[120mm] h-[120mm] object-contain grayscale brightness-50" />
-        </div>
+        {!isClassic && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-[0.035]">
+            <img src="/logo.png" alt="" className="w-[120mm] h-[120mm] object-contain grayscale brightness-50" />
+          </div>
+        )}
 
         <div className="relative z-10 flex-1 flex flex-col print:block">
-          {/* Header */}
-          <div className="flex justify-between items-start mb-4 pb-4 border-b-2 border-[#283583]">
-            <div className="flex items-center gap-6 flex-1">
+          {/* Top Header (Logo & Title) */}
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex items-center gap-6">
               {/* Logo */}
-              <div className="w-20 h-20 flex-none flex items-center justify-center">
-                <img src="/logo.png" alt="Company Logo" className="w-full h-full object-contain" />
-              </div>
-
-              {/* Company Info */}
-              <div className="flex-1 pr-4">
-                <h1 className="text-[27px] font-extrabold tracking-tight leading-tight uppercase mb-1 text-[#283583]">
-                  {company.name || "COMPANY NAME CO., LTD."}
-                </h1>
-                <p className="text-[13px] font-medium leading-relaxed text-[#64748b]">{company.address || "123 Business Road, City 10100"}</p>
-                <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-1.5 text-[11.5px] font-bold text-[#64748b]">
-                  <span>Tax ID: {company.taxId || "0100000000000"}</span>
-                  <span className="opacity-30">|</span>
-                  <span>Tel: {company.phone || "02-XXX-XXXX"}</span>
-                </div>
-                <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-0.5 text-[11.5px] font-bold text-[#64748b]">
-                  <span>Email: {company.email || "info@example.com"}</span>
-                  {company.website && (
-                    <>
-                      <span className="opacity-30">|</span>
-                      <span>Web: {company.website}</span>
-                    </>
-                  )}
-                </div>
+              <div className="w-32 h-16 flex-none flex items-center justify-start">
+                <img src="/logo.png" alt="Company Logo" className="w-full h-full object-contain object-left" />
               </div>
             </div>
-            <div className="text-right pl-4 max-w-[320px] ml-auto">
-              <div className="flex flex-col items-end">
-                <h2 className="text-[22px] font-black uppercase tracking-[0.1em] text-[#0f172a] leading-none">
-                  QUOTATION
-                </h2>
-                {displayModelName && (
-                  <div className="text-[16px] font-black uppercase mt-1 mb-2 tracking-tight text-right text-[#283583] leading-[1.2]">
-                    {displayModelName}
-                  </div>
-                )}
-                
+            <div className="text-right">
+              <p className="text-[14px] font-bold text-[#1e293b] mb-1">(ต้นฉบับ)</p>
+              <h2 className={`text-[38px] font-medium leading-none tracking-tight ${isClassic ? "text-gray-800" : "text-[#7a73e6]"}`}>
+                ใบเสนอราคา
+              </h2>
+            </div>
+          </div>
 
+          {/* Seller and Document Info */}
+          <div className="flex justify-between mb-4 border-b pb-4 border-gray-300 gap-6 items-start">
+            {/* Left: Seller Info (Grid Layout) */}
+            <div className="flex-1 grid grid-cols-[75px_15px_1fr_150px] gap-y-2 text-[13px] text-[#1e293b] pr-2">
+              {/* Row 1 */}
+              <div className="text-gray-500 font-bold whitespace-nowrap text-right">ผู้ขาย</div>
+              <div className="text-gray-500 font-bold text-center">:</div>
+              <div className="font-bold min-w-0 break-words">{company.name || "COMPANY NAME CO., LTD."}</div>
+              <div className="flex items-center gap-2 min-w-0"><svg className="w-4 h-4 text-gray-700 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg> <span className="truncate">{company.phone || "02-XXX-XXXX"}</span></div>
+
+              {/* Row 2 */}
+              <div className="text-gray-500 font-bold whitespace-nowrap text-right">ที่อยู่</div>
+              <div className="text-gray-500 font-bold text-center">:</div>
+              <div className="leading-snug whitespace-pre-wrap min-w-0 break-words [word-break:normal]">{company.address || "123 Business Road, City 10100"}</div>
+              <div className="space-y-1 min-w-0">
+                 <div className="flex items-center gap-2 text-[12px]"><svg className="w-4 h-4 text-gray-700 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path></svg> <span className="truncate">{company.email || "info@example.com"}</span></div>
+                 {company.website && <div className="flex items-center gap-2 text-[12px]"><svg className="w-4 h-4 text-gray-700 shrink-0 relative -top-[1px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg> <span className="truncate">{company.website}</span></div>}
               </div>
 
-              <div className="flex flex-col gap-0.5 text-[11px] font-bold text-right uppercase tracking-wider mt-2 pt-2 border-t border-[#283583]/30">
-                <div className="flex justify-between gap-4">
-                  <span className="text-[#475569] font-black">No:</span>
-                  <span className="text-[#283583] font-black">{id}</span>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <span className="text-[#475569] font-black">Date:</span>
-                  <span className="text-[#1e293b] font-black">{date}</span>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <span className="text-[#475569] font-black">Valid Until:</span>
-                  <span className="text-[#1e293b] font-black">{validUntil}</span>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <span className="text-[#475569] font-black">SALES NAME:</span>
-                  <span className="text-[#283583] font-black">{memberName}</span>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <span className="text-[#475569] font-black">Phone:</span>
-                  <span className="text-[#1e293b] font-black">{memberPhone}</span>
-                </div>
-                {frequency !== "ไม่ระบุ" && (
-                <div className="flex justify-between gap-4 mt-1 pt-1 border-t border-[#283583]/10">
-                  <span className="text-[#475569] font-black">รอบเรียกเก็บ:</span>
-                  <span className="text-[#283583] font-black">{frequency}</span>
-                </div>
-                )}
+              {/* Row 3 */}
+              <div className="text-gray-500 font-bold whitespace-nowrap text-right">เลขที่ภาษี</div>
+              <div className="text-gray-500 font-bold text-center">:</div>
+              <div className="col-span-2 min-w-0 break-words">
+                {company.taxId || "0100000000000"} <span className="text-gray-600">(สำนักงานใหญ่)</span>
+              </div>
+            </div>
+
+            {/* Right: Document Info Box (Extra Compact) */}
+            <div className="w-fit min-w-[180px] bg-[#f0f1ff] rounded-md p-3 text-[12.5px] shrink-0 self-start">
+              <div className="grid grid-cols-[88px_1fr] gap-y-1">
+                <div className="text-gray-600">เลขที่เอกสาร :</div>
+                <div className="font-semibold text-[#1e293b]">{id}</div>
+
+                <div className="text-gray-600">วันที่ออก :</div>
+                <div className="font-semibold text-[#1e293b]">{date}</div>
+
+                <div className="text-gray-600">วันที่ตอบรับ :</div>
+                <div className="font-semibold text-[#1e293b]">-</div>
+
+                <div className="text-gray-600">ใช้ได้ถึง :</div>
+                <div className="font-semibold text-[#1e293b]">{validUntil}</div>
+
+                <div className="text-gray-600">อ้างอิง :</div>
+                <div className="font-semibold text-[#1e293b]">-</div>
               </div>
             </div>
           </div>
 
+          {/* Customer and Contact Info */}
+          <div className="flex justify-between mb-8 gap-6 items-start">
+            {/* Left: Customer Info (Grid Layout) */}
+            {/* Left: Customer Info (Grid Layout) */}
+            <div className="flex-1 grid grid-cols-[75px_15px_1fr_150px] gap-y-2 text-[13px] text-[#1e293b] pr-2">
+              {/* Row 1: Attention (เรียน) */}
+              <div className="font-bold text-gray-500 whitespace-nowrap text-right">เรียน</div>
+              <div className="text-gray-500 font-bold text-center">:</div>
+              <div className="col-span-2 min-w-0 break-words">-</div>
 
+              {/* Row 2: Customer (ลูกค้า) */}
+              <div className="text-gray-500 font-bold whitespace-nowrap text-right">ลูกค้า</div>
+              <div className="text-gray-500 font-bold text-center">:</div>
+              <div className="font-bold min-w-0 break-words">{customerName}</div>
+              <div className="flex items-center gap-2 min-w-0"><svg className="w-4 h-4 text-gray-700 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg> <span className="truncate">{customerPhone && customerPhone !== "-" ? customerPhone : "-"}</span></div>
 
-          {/* Info Blocks */}
-          <div className="flex justify-between mb-4 gap-10">
-            {/* Customer */}
-            <div className="flex-1 flex flex-col justify-between">
-              <div>
-                <h3 className="text-[11px] font-black uppercase tracking-widest pb-1.5 mb-2 border-b-[1.5px] border-[#283583] text-[#334155]">เรียน (Prepared For)</h3>
-                <p className="font-extrabold text-xl mb-0.5 text-[#0f172a]">{customerName}</p>
-                <p className="leading-relaxed font-bold mb-0.5 text-[#1e293b]">{customerAddress}</p>
-                {customerPhone && <p className="font-bold text-[#1e293b]">โทร (Tel): {customerPhone}</p>}
-                {customerEmail && <p className="font-bold text-[#1e293b]">อีเมล (Email): {customerEmail}</p>}
-                {customerTaxId && <p className="font-bold text-[#1e293b]">เลขประจำตัวผู้เสียภาษี (Tax ID): {customerTaxId}</p>}
+              {/* Row 3: Address (ที่อยู่) */}
+              <div className="text-gray-500 font-bold whitespace-nowrap text-right">ที่อยู่</div>
+              <div className="text-gray-500 font-bold text-center">:</div>
+              <div className="leading-snug whitespace-pre-wrap min-w-0 break-words [word-break:normal]">{customerAddress}</div>
+              <div className="flex items-start gap-2 pt-0.5 min-w-0"><svg className="w-4 h-4 text-gray-700 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path></svg> <span className="break-words [word-break:normal] text-[12.5px]">{customerEmail && customerEmail !== "-" ? customerEmail : "-"}</span></div>
+
+              {/* Row 4: Tax ID (เลขที่ภาษี) */}
+              <div className="text-gray-500 font-bold whitespace-nowrap text-right">เลขที่ภาษี</div>
+              <div className="text-gray-500 font-bold text-center">:</div>
+              <div className="min-w-0 break-words">
+                {customerTaxId && customerTaxId !== "-" ? customerTaxId : "-"} <span className="text-gray-600">(สำนักงานใหญ่)</span>
               </div>
 
-              {/* Grand Total Quick Box */}
-              <div className="mt-4 flex justify-start animate-in fade-in slide-in-from-left-6 duration-700">
-                <div 
-                  className="px-5 py-2.5 rounded-2xl flex items-center gap-5 shadow-sm border border-slate-100 bg-[#f8fafc]/90"
-                >
-                  <div>
-                    <p className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-500 mb-0.5">จำนวนเงินรวมทั้งสิ้น</p>
-                    <p className="text-[11px] font-black uppercase tracking-tight text-[#283583]">Grand Total</p>
-                  </div>
-                  <div className="h-7 w-px bg-slate-300/50"></div>
-                  <p className="text-[20px] font-black text-[#283583] border-b-2 border-double border-[#283583]">
-                    {formatCurrency(calc.grandTotal)}
-                  </p>
-                </div>
-              </div>
             </div>
 
-            {/* Payment Terms replacing Doc Info */}
-            <div className="w-[300px]">
-              <h3 className="text-[11px] font-black uppercase tracking-widest pb-1.5 mb-2 border-b-[1.5px] border-[#283583] text-[#334155]">เงื่อนไขการชำระเงิน (Payment Terms)</h3>
-              <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-100 min-h-[100px] flex flex-col justify-between">
-                <div>
-                  {terms ? (
-                    <p className="text-[12px] font-bold leading-relaxed whitespace-pre-wrap text-[#1e293b]">{terms}</p>
-                  ) : (
-                    <p className="text-[11px] italic font-bold text-gray-400">ไม่ได้ระบุเงื่อนไข</p>
-                  )}
+            {/* Right: Contact Back (Aligned with Left Grid) */}
+            <div className="w-[230px] shrink-0 text-[12.5px] self-start">
+              <div className="grid grid-cols-1 gap-y-2">
+                {/* Row 1: Header aligned with "เรียน :" */}
+                <div className="font-bold text-[#1e293b] h-[19.5px] flex items-center">ติดต่อกลับที่ :</div>
+                
+                {/* Row 2: Member Name aligned with "ลูกค้า :" */}
+                <div className="flex items-center gap-3 text-[#1e293b] h-[19.5px]">
+                  <svg className="w-4 h-4 text-gray-700 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"></path></svg>
+                  <span className="truncate">{memberName}</span>
                 </div>
 
-                {/* Dynamic VAT Status */}
-                <div className="mt-4 pt-3 border-t border-gray-200/60 space-y-3">
-                  <div className={`space-y-0.5 ${(calc?.vat || 0) > 0 ? "text-indigo-600" : "text-slate-400"}`}>
-                    <p className="text-[14px] font-black tracking-tight flex items-center gap-2">
-                      <span>{(calc?.vat || 0) > 0 ? "●" : "○"}</span>
-                      <span>{(calc?.vat || 0) > 0 ? "รวมภาษีมูลค่าเพิ่ม 7% แล้ว" : "ราคายังไม่รวมภาษีมูลค่าเพิ่ม 7%"}</span>
-                    </p>
-                    <p className="text-[11.5px] font-bold tracking-tight pl-5 italic opacity-80">
-                      {(calc?.vat || 0) > 0 ? "(VAT Included 7%)" : "(Price excludes 7% VAT)"}
-                    </p>
-                  </div>
+                {/* Row 3: Member Phone aligned with "ที่อยู่ :" */}
+                <div className="flex items-center gap-3 text-[#1e293b] h-[19.5px]">
+                  <svg className="w-4 h-4 text-gray-700 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
+                  <span className="truncate">{memberPhone}</span>
+                </div>
 
-                  {/* Optional Equipment Status */}
-                  {items.some(item => {
-                    const c = (item.category || "").trim().toLowerCase();
-                    return c === "อุปกรณ์เสริม" || c.includes("optional") || c === "อุปกรณ์เสริม r52";
-                  }) && (
-                      <div className={`space-y-0.5 ${includeOptionalEquipment ? "text-indigo-600" : "text-orange-500"}`}>
-                        <p className="text-[14px] font-black tracking-tight flex items-center gap-2">
-                          <span>{includeOptionalEquipment ? "●" : "○"}</span>
-                          <span>{includeOptionalEquipment ? "ราคารวมอุปกรณ์เสริมแล้ว" : "ราคาไม่รวมอุปกรณ์เสริม"}</span>
-                        </p>
-                        <p className="text-[11.5px] font-bold tracking-tight pl-5 italic opacity-80">
-                          {includeOptionalEquipment ? "(Includes Optional Equipment)" : "(Excludes Optional Equipment)"}
-                        </p>
-                      </div>
-                    )}
+                {/* Row 4: Member Email aligned with "เลขที่ภาษี :" */}
+                <div className="flex items-center gap-3 text-[#1e293b] h-[19.5px]">
+                  <svg className="w-4 h-4 text-gray-700 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path></svg>
+                  <span className="truncate text-[12px]">{settings?.profile?.email || company.email || "info@example.com"}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Technical Specifications Section (Unified Premium Case) */}
-          {effectiveBoatModel && boatSpecifications[effectiveBoatModel] && (
+          {effectiveBoatModel && boatSpecifications[effectiveBoatModel] && !isClassic && (
             <div className="mb-4">
               <div className="flex items-center gap-3 mb-2">
                 <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-[#283583] px-3 py-1 border border-[#283583]/20 rounded-full bg-blue-50/50">
@@ -421,7 +396,7 @@ const QuotationDocument = forwardRef<HTMLDivElement, QuotationDocumentProps>(
           <div className="mb-4">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-[#283583] text-white">
+                <tr className={`${isClassic ? "bg-gray-800" : "bg-[#283583]"} text-white`}>
                   <th className="py-1 px-4 text-center w-12 font-black text-[12px]">#</th>
                   <th className="py-1 px-4 text-left font-black text-[12px]">รายการ (Description)</th>
                   <th className="py-1 px-4 text-center w-24 font-black text-[12px]">จำนวน (Qty)</th>
@@ -429,7 +404,7 @@ const QuotationDocument = forwardRef<HTMLDivElement, QuotationDocumentProps>(
                   <th className="py-1 px-4 text-right w-36 font-black text-[12px]">จำนวนเงิน (Amount)</th>
                 </tr>
               </thead>
-              <tbody className="border-b-2 border-[#283583]">
+              <tbody className={`border-b-2 ${isClassic ? "border-gray-800" : "border-[#283583]"}`}>
                 {Object.entries(groupedItems).map(([category, categoryItems]) => {
                   if (categoryItems.length === 0) return null;
 
@@ -439,8 +414,9 @@ const QuotationDocument = forwardRef<HTMLDivElement, QuotationDocumentProps>(
                       <tr className="bg-[#f8fafc]">
                         <td colSpan={5} className="py-0.5 px-4 text-left">
                           <span className={`text-[11px] font-black uppercase tracking-wider ${
-                            category === "สินค้าหลัก" ? "text-indigo-800" :
-                            category === "มาตรฐาน" ? "text-sky-700" : (category === "อุปกรณ์เสริม" ? "text-emerald-600" : "text-slate-500")
+                            isClassic ? "text-gray-600" :
+                            (category === "สินค้าหลัก" ? "text-indigo-800" :
+                            category === "มาตรฐาน" ? "text-sky-700" : (category === "อุปกรณ์เสริม" ? "text-emerald-600" : "text-slate-500"))
                           }`}>
                             {category === "สินค้าหลัก" ? "● MAIN PRODUCT (สินค้าหลัก)" :
                               category === "มาตรฐาน" ? "● STANDARD EQUIPMENT (รายการมาตรฐาน)" :
@@ -483,6 +459,49 @@ const QuotationDocument = forwardRef<HTMLDivElement, QuotationDocumentProps>(
           {/* Totals */}
           <div className="flex justify-between items-start mb-6 page-break-avoid break-inside-avoid">
             <div className="flex-1 pr-16 space-y-6">
+              {/* Payment Terms replacing Doc Info */}
+              <div>
+                <h3 className={`text-[11px] font-black uppercase tracking-widest pb-1.5 mb-2 border-b-[1.5px] ${isClassic ? "border-gray-800 text-gray-800" : "border-[#283583] text-[#334155]"} `}>เงื่อนไขการชำระเงิน (Payment Terms)</h3>
+                <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-100 flex flex-col justify-between">
+                  <div>
+                    {terms ? (
+                      <p className="text-[12px] font-bold leading-relaxed whitespace-pre-wrap text-[#1e293b]">{terms}</p>
+                    ) : (
+                      <p className="text-[11px] italic font-bold text-gray-400">ไม่ได้ระบุเงื่อนไข</p>
+                    )}
+                  </div>
+
+                  {/* Dynamic VAT Status */}
+                  <div className="mt-4 pt-3 border-t border-gray-200/60 space-y-3">
+                    <div className={`space-y-0.5 ${(calc?.vat || 0) > 0 ? "text-indigo-600" : "text-slate-400"}`}>
+                      <p className="text-[14px] font-black tracking-tight flex items-center gap-2">
+                        <span>{(calc?.vat || 0) > 0 ? "●" : "○"}</span>
+                        <span>{(calc?.vat || 0) > 0 ? "รวมภาษีมูลค่าเพิ่ม 7% แล้ว" : "ราคายังไม่รวมภาษีมูลค่าเพิ่ม 7%"}</span>
+                      </p>
+                      <p className="text-[11.5px] font-bold tracking-tight pl-5 italic opacity-80">
+                        {(calc?.vat || 0) > 0 ? "(VAT Included 7%)" : "(Price excludes 7% VAT)"}
+                      </p>
+                    </div>
+
+                    {/* Optional Equipment Status */}
+                    {items.some(item => {
+                      const c = (item.category || "").trim().toLowerCase();
+                      return c === "อุปกรณ์เสริม" || c.includes("optional") || c === "อุปกรณ์เสริม r52";
+                    }) && (
+                        <div className={`space-y-0.5 ${includeOptionalEquipment ? "text-indigo-600" : "text-orange-500"}`}>
+                          <p className="text-[14px] font-black tracking-tight flex items-center gap-2">
+                            <span>{includeOptionalEquipment ? "●" : "○"}</span>
+                            <span>{includeOptionalEquipment ? "ราคารวมอุปกรณ์เสริมแล้ว" : "ราคาไม่รวมอุปกรณ์เสริม"}</span>
+                          </p>
+                          <p className="text-[11.5px] font-bold tracking-tight pl-5 italic opacity-80">
+                            {includeOptionalEquipment ? "(Includes Optional Equipment)" : "(Excludes Optional Equipment)"}
+                          </p>
+                        </div>
+                      )}
+                  </div>
+                </div>
+              </div>
+
               {notes && (
                 <div>
                   <h4 className="font-bold text-[12px] uppercase mb-2 text-[#1e293b]">หมายเหตุ (Remarks):</h4>
@@ -533,8 +552,8 @@ const QuotationDocument = forwardRef<HTMLDivElement, QuotationDocumentProps>(
                     </tr>
                   )}
                   <tr>
-                    <td className="pt-2 pb-1 font-black text-[14px] text-[#283583]">จำนวนเงินรวมทั้งสิ้น (Grand Total):</td>
-                    <td className="pt-2 pb-1 font-black text-right text-[20px] text-[#283583] border-b-[3px] border-double border-[#283583]">{formatCurrency(calc.grandTotal)}</td>
+                    <td className={`pt-2 pb-1 font-black text-[14px] ${isClassic ? "text-gray-900" : "text-[#283583]"}`}>จำนวนเงินรวมทั้งสิ้น (Grand Total):</td>
+                    <td className={`pt-2 pb-1 font-black text-right text-[20px] ${isClassic ? "text-gray-900 border-gray-900" : "text-[#283583] border-[#283583]"} border-b-[3px] border-double`}>{formatCurrency(calc.grandTotal)}</td>
                   </tr>
                 </tbody>
               </table>
@@ -545,7 +564,7 @@ const QuotationDocument = forwardRef<HTMLDivElement, QuotationDocumentProps>(
           <div className="mt-auto print:mt-10 pt-4 pb-10 break-inside-avoid-page page-break-avoid break-inside-avoid">
             <div className="flex justify-between px-8 text-center">
               <div className="w-[260px]">
-                <div className="mb-3 h-20 w-full flex items-end justify-center border-b-2 border-[#283583]"></div>
+                <div className={`mb-3 h-20 w-full flex items-end justify-center border-b-2 ${isClassic ? "border-gray-800" : "border-[#283583]"}`}></div>
                 <p className="font-bold mt-3 text-[#1e293b]">( _________________________ )</p>
                 <p className="mt-1 flex flex-col gap-0.5 text-[#475569]">
                   <span>ผู้อนุมัติสั่งซื้อ</span>
@@ -555,7 +574,7 @@ const QuotationDocument = forwardRef<HTMLDivElement, QuotationDocumentProps>(
               </div>
 
               <div className="w-[260px]">
-                <div className="mb-3 h-20 w-full flex items-end justify-center border-b-2 border-[#283583]"></div>
+                <div className={`mb-3 h-20 w-full flex items-end justify-center border-b-2 ${isClassic ? "border-gray-800" : "border-[#283583]"}`}></div>
                 <p className="font-bold mt-3 text-[#1e293b]">{memberName !== "-" ? memberName : "( _________________________ )"}</p>
                 <p className="mt-1 flex flex-col gap-0.5 text-[#475569]">
                   <span>ผู้เสนอราคา</span>
@@ -569,6 +588,7 @@ const QuotationDocument = forwardRef<HTMLDivElement, QuotationDocumentProps>(
 
           {/* Boat Images Gallery - shows ALL images in groups of 5 (1 hero + 4 grid) */}
           {(() => {
+            if (isClassic) return null;
             const boatSpecs = effectiveBoatModel ? boatSpecifications[effectiveBoatModel] : null;
             const boatImages = boatSpecs?.images || [];
             const customImgs = previewData?.customImages || quotation?.customImages || [];

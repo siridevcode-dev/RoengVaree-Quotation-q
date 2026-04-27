@@ -9,7 +9,7 @@ import { compressImage, safeLocalStorageSet } from "@/lib/image-utils";
 import { api } from "@/lib/api-client";
 
 const defaultItem = (): LineItem => ({
-  id: Date.now(),
+  id: Date.now() + Math.random(),
   name: "",
   description: "",
   quantity: 1,
@@ -19,14 +19,16 @@ const defaultItem = (): LineItem => ({
 });
 
 export default function QuotationForm({ onNavigate, quotationId, initialItems, initialImages }: { onNavigate?: (page: string, id?: string) => void, quotationId?: string, initialItems?: any[], initialImages?: string[] }) {
-  const { addQuotation, updateQuotation, quotations, settings, customers, setCustomers, showToast, products, boatModels, currentUser, generateNextId, users, addCustomer, updateCustomer } = useAppContext();
+  const { addQuotation, updateQuotation, quotations, settings, customers, setCustomers, showToast, products, productionCosts, boatModels, currentUser, generateNextId, users, addCustomer, updateCustomer } = useAppContext();
   const formRef = useRef<HTMLDivElement>(null);
   const pdfRef = useRef<HTMLDivElement>(null);
   const hasHydrated = useRef(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [showDownloadBtn, setShowDownloadBtn] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [currentId, setCurrentId] = useState(() => quotationId || generateNextId("Q"));
+  const [isEditMode, setIsEditMode] = useState(!!quotationId);
   
   const [items, setItems] = useState<LineItem[]>([
     {
@@ -68,141 +70,9 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
   const [includeOptionalEquipment, setIncludeOptionalEquipment] = useState(true);
   const [selectedMemberId, setSelectedMemberId] = useState(currentUser?.id || "");
   const [customImages, setCustomImages] = useState<string[]>([]);
+  const [lastAddedId, setLastAddedId] = useState<number | string | null | undefined>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-
-  // Automatic boat model detection (NEW)
-  const detectedBoatModel = useMemo(() => {
-    // If no boat model is manually selected, check items for known models
-    for (const model of boatModels) {
-      if (items.some(item => item.name.toUpperCase().includes(model.toUpperCase()))) {
-        return model;
-      }
-    }
-    return "";
-  }, [items, boatModels]);
-
-  const effectiveBoatModel = boatModel || detectedBoatModel;
-
-  const filteredCustomers = useMemo(() => {
-    if (!customerName.trim() || !showSuggestions) return [];
-    return customers.filter(c => 
-      c.name.toLowerCase().includes(customerName.toLowerCase()) ||
-      (c.email && c.email.toLowerCase().includes(customerName.toLowerCase()))
-    ).slice(0, 5);
-  }, [customerName, customers, showSuggestions]);
-
-  const handleSelectCustomer = (c: any) => {
-    setCustomerName(c.name);
-    setCustomerEmail(c.email || "");
-    setCustomerPhone(c.phone || "");
-    setCustomerAddress(c.address || "");
-    setCustomerTaxId(c.taxId || "");
-    setShowSuggestions(false);
-  };
-
-  // Hydrate data if editing an existing quotation or starting with selected items
-  useEffect(() => {
-    // Only hydrate once on mount or when quotationId changes
-    if (hasHydrated.current && !quotationId) return;
-    
-    if (quotationId) {
-      const existing = quotations.find((q) => q.id === quotationId);
-      if (existing) {
-        setCustomerName(existing.customer);
-        setCustomerEmail(existing.customerEmail || "");
-        setCustomerPhone(existing.customerPhone || "");
-        setCustomerAddress(existing.customerAddress || "");
-        setCustomerTaxId(existing.customerTaxId || "");
-        if (existing.lineItems && existing.lineItems.length > 0) {
-          setItems(existing.lineItems);
-        }
-        setNotes(existing.notes || "");
-        setTerms(existing.terms || "");
-        setStatus(existing.status);
-        if (existing.globalVatEnabled !== undefined) {
-          setGlobalVatEnabled(existing.globalVatEnabled);
-        }
-        setSummaryDiscountAmount(existing.summaryDiscountAmount || 0);
-        setSummaryDiscountPercentage(existing.summaryDiscountPercentage || 0);
-        setBoatModel(existing.boatModel || "");
-        if (existing.includeOptionalEquipment !== undefined) {
-          setIncludeOptionalEquipment(existing.includeOptionalEquipment);
-        }
-        if (existing.frequency !== undefined) {
-          setFrequency(existing.frequency);
-        }
-        if (existing.customImages) {
-          setCustomImages(existing.customImages);
-        }
-        if (existing.memberName) {
-          const found = users.find(u => u.name === existing.memberName);
-          if (found) setSelectedMemberId(found.id);
-        }
-        hasHydrated.current = true;
-      }
-    } else if (initialItems && initialItems.length > 0) {
-      // New quotation started with selected products
-      const mappedItems: LineItem[] = initialItems.map((p, index) => ({
-        id: Date.now() + index,
-        name: p.name,
-        description: p.description,
-        quantity: 1,
-        unitPrice: p.unitPrice,
-        discount: 0,
-        vatEnabled: true,
-        category: p.category,
-      }));
-      setItems(mappedItems);
-
-      // Auto-detect boat model from selected products
-      const productWithModel = initialItems.find((p: any) => p.boatModel && p.boatModel !== "ทุกรุ่น" && p.boatModel !== "");
-      if (productWithModel) {
-        setBoatModel(productWithModel.boatModel);
-      } else {
-        // Fallback: detect from product names
-        for (const model of boatModels) {
-          if (initialItems.some((p: any) => (p.name || "").toUpperCase().includes(model.toUpperCase()))) {
-            setBoatModel(model);
-            break;
-          }
-        }
-      }
-      // Restore custom images from template
-      if (initialImages && initialImages.length > 0) {
-        setCustomImages(initialImages);
-      }
-      hasHydrated.current = true;
-    }
-  }, [quotationId, initialItems, initialImages, quotations, boatModels, setCustomerName, setCustomerEmail, setCustomerPhone, setCustomerAddress, setCustomerTaxId, setItems, setNotes, setTerms, setStatus, setGlobalVatEnabled, setSummaryDiscountAmount, setSummaryDiscountPercentage, setBoatModel, setIncludeOptionalEquipment, setFrequency, setCustomImages, users]);
-
-  const updateItem = (id: number | string | undefined, field: keyof LineItem, value: string | number | boolean) => {
-    if (id === undefined) return;
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
-    );
-  };
-
-  const addItem = () => {
-    setItems((prev) => [...prev, defaultItem()]);
-  };
-
-  const addCategorizedItem = (category: string) => {
-    setItems((prev) => [...prev, { ...defaultItem(), category }]);
-  };
-
-  const removeItem = (id: number | string | undefined) => {
-    if (id === undefined) return;
-    if (items.length > 1) {
-      setItems((prev) => prev.filter((item) => item.id !== id));
-    }
-  };
-
-  const getRowTotal = (item: LineItem) => {
-    const base = item.quantity * item.unitPrice;
-    const discountAmount = base * ((item.discount || 0) / 100);
-    return base - discountAmount;
-  };
 
   const calculations = useMemo(() => {
     // Separate optional equipment items
@@ -300,6 +170,178 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
     return groups;
   }, [items]);
 
+  // Automatic boat model detection (NEW)
+  const detectedBoatModel = useMemo(() => {
+    // If no boat model is manually selected, check items for known models
+    for (const model of boatModels) {
+      if (items.some(item => item.name.toUpperCase().includes(model.toUpperCase()))) {
+        return model;
+      }
+    }
+    return "";
+  }, [items, boatModels]);
+
+  const effectiveBoatModel = boatModel || detectedBoatModel;
+
+  // Track group lengths for auto-pull logic to ensure dependency stability
+  const standardItemsCount = groupedItems["มาตรฐาน"]?.length || 0;
+  const optionalItemsCount = groupedItems["อุปกรณ์เสริม"]?.length || 0;
+
+  // Auto-pull equipment when boat model is detected or selected
+  useEffect(() => {
+    if (effectiveBoatModel) {
+      // Auto-pull standard equipment
+      if (standardItemsCount === 0) {
+        const timer = setTimeout(() => {
+          addBoatEquipment("มาตรฐาน");
+        }, 500);
+        return () => clearTimeout(timer);
+      }
+      
+      // Auto-pull optional equipment (NEW)
+      if (optionalItemsCount === 0) {
+        const timer = setTimeout(() => {
+          addBoatEquipment("อุปกรณ์เสริม");
+        }, 800); // Slightly staggered to avoid race conditions with standard items
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [effectiveBoatModel, standardItemsCount, optionalItemsCount]);
+
+  const filteredCustomers = useMemo(() => {
+    if (!customerName.trim() || !showSuggestions) return [];
+    return customers.filter(c => 
+      c.name.toLowerCase().includes(customerName.toLowerCase()) ||
+      (c.email && c.email.toLowerCase().includes(customerName.toLowerCase()))
+    ).slice(0, 5);
+  }, [customerName, customers, showSuggestions]);
+
+  const handleSelectCustomer = (c: any) => {
+    setCustomerName(c.name);
+    setCustomerEmail(c.email || "");
+    setCustomerPhone(c.phone || "");
+    setCustomerAddress(c.address || "");
+    setCustomerTaxId(c.taxId || "");
+    setShowSuggestions(false);
+  };
+
+  // Hydrate data if editing an existing quotation or starting with selected items
+  useEffect(() => {
+    // Only hydrate once on mount or when quotationId changes
+    if (hasHydrated.current && !quotationId) return;
+    
+    if (quotationId) {
+      const existing = quotations.find((q) => q.id === quotationId);
+      if (existing) {
+        setCustomerName(existing.customer || "");
+        setCustomerEmail(existing.customerEmail || "");
+        setCustomerPhone(existing.customerPhone || "");
+        setCustomerAddress(existing.customerAddress || "");
+        setCustomerTaxId(existing.customerTaxId || "");
+        if (existing.lineItems && existing.lineItems.length > 0) {
+          setItems(existing.lineItems.map(item => ({
+            ...item,
+            name: item.name || "",
+            description: item.description || "",
+            quantity: item.quantity ?? 1,
+            unitPrice: item.unitPrice ?? 0,
+            discount: item.discount ?? 0,
+            vatEnabled: item.vatEnabled ?? true
+          })));
+        }
+        setNotes(existing.notes || "");
+        setTerms(existing.terms || "");
+        setStatus(existing.status || "ฉบับร่าง");
+        if (existing.globalVatEnabled !== undefined) {
+          setGlobalVatEnabled(existing.globalVatEnabled);
+        }
+        setSummaryDiscountAmount(existing.summaryDiscountAmount || 0);
+        setSummaryDiscountPercentage(existing.summaryDiscountPercentage || 0);
+        setBoatModel(existing.boatModel || "");
+        if (existing.includeOptionalEquipment !== undefined) {
+          setIncludeOptionalEquipment(existing.includeOptionalEquipment);
+        }
+        setFrequency(existing.frequency || "ไม่ระบุ");
+        if (existing.customImages) {
+          setCustomImages(existing.customImages);
+        }
+        if (existing.memberName) {
+          const found = users.find(u => u.name === existing.memberName);
+          if (found) setSelectedMemberId(found.id);
+        }
+        hasHydrated.current = true;
+      }
+    }
+    // New quotation started with selected products
+    if (initialItems && initialItems.length > 0) {
+      const mappedItems: LineItem[] = initialItems.map((p: any, index) => ({
+        id: Date.now() + index,
+        name: p.name,
+        description: p.description,
+        quantity: 1,
+        // Use sellingPrice from ProductionCost, or unitPrice if it's an old Product object
+        unitPrice: p.sellingPrice !== undefined ? p.sellingPrice : p.unitPrice,
+        discount: 0,
+        vatEnabled: true,
+        category: p.category,
+        unit: p.unit,
+        sku: p.sku,
+      }));
+      setItems(mappedItems);
+
+      // Auto-detect boat model from selected products
+      const productWithModel = initialItems.find((p: any) => p.boatModel && p.boatModel !== "ทุกรุ่น" && p.boatModel !== "");
+      if (productWithModel) {
+        setBoatModel(productWithModel.boatModel);
+      } else {
+        // Fallback: detect from product names
+        for (const model of boatModels) {
+          if (initialItems.some((p: any) => (p.name || "").toUpperCase().includes(model.toUpperCase()))) {
+            setBoatModel(model);
+            break;
+          }
+        }
+      }
+      // Restore custom images from template
+      if (initialImages && initialImages.length > 0) {
+        setCustomImages(initialImages);
+      }
+      hasHydrated.current = true;
+    }
+  }, [quotationId, initialItems, initialImages, quotations, boatModels, setCustomerName, setCustomerEmail, setCustomerPhone, setCustomerAddress, setCustomerTaxId, setItems, setNotes, setTerms, setStatus, setGlobalVatEnabled, setSummaryDiscountAmount, setSummaryDiscountPercentage, setBoatModel, setIncludeOptionalEquipment, setFrequency, setCustomImages, users]);
+
+  const updateItem = (id: number | string | undefined, field: keyof LineItem, value: string | number | boolean) => {
+    if (id === undefined) return;
+    setItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+    );
+  };
+
+  const addItem = () => {
+    const newItem = defaultItem();
+    setLastAddedId(newItem.id!);
+    setItems((prev) => [...prev, newItem]);
+  };
+
+  const addCategorizedItem = (category: string) => {
+    const newItem = { ...defaultItem(), category };
+    setLastAddedId(newItem.id!);
+    setItems((prev) => [...prev, newItem]);
+  };
+
+  const removeItem = (id: number | string | undefined) => {
+    if (id === undefined) return;
+    if (items.length > 1) {
+      setItems((prev) => prev.filter((item) => item.id !== id));
+    }
+  };
+
+  const getRowTotal = (item: LineItem) => {
+    const base = item.quantity * item.unitPrice;
+    const discountAmount = base * ((item.discount || 0) / 100);
+    return base - discountAmount;
+  };
+
   const formatCurrency = (val: number) =>
     val.toLocaleString("th-TH", {
       style: "currency",
@@ -307,82 +349,115 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
       minimumFractionDigits: 2,
     });
 
-  const handleSave = (saveStatus: string, skipNavigate = false) => {
+  const handleSave = async (saveStatus: string, skipNavigate = false) => {
+    if (isSaving) return null;
+    
+    // Filter out empty items
+    const filteredItems = items.filter(item => item.name && item.name.trim() !== "");
+
     if (!customerName.trim()) {
       showToast("กรุณากรอกชื่อบริษัท / ลูกค้า", "error");
       return null;
     }
 
-    if (items.length === 0 || items.every(item => !item.name.trim())) {
+    if (filteredItems.length === 0) {
       showToast("กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ", "error");
       return null;
     }
 
-    if (items.some(item => item.quantity <= 0 || item.unitPrice < 0)) {
+    if (filteredItems.some(item => item.quantity <= 0 || item.unitPrice < 0)) {
       showToast("จำนวนสินค้าและราคาต้องไม่เป็นค่าว่างหรือติดลบ", "error");
       return null;
     }
 
-    // Save to customers context
-    // Save/Update to customers context using centralized actions
-    const existingCust = customers.find(c => c.name.toLowerCase() === customerName.toLowerCase());
-    if (!existingCust) {
-      const newCustomerData = {
-        name: customerName,
-        email: customerEmail,
-        phone: customerPhone,
-        address: customerAddress,
-        taxId: customerTaxId,
+    const finalId = (!currentId || !currentId.trim()) ? generateNextId("Q") : currentId;
+    if (finalId !== currentId) setCurrentId(finalId);
+
+    setIsSaving(true);
+    try {
+      const existingCust = customers.find(c => c.name.toLowerCase() === customerName.toLowerCase());
+      
+      if (!existingCust) {
+        // New Customer
+        const newCustomerData = {
+          name: customerName,
+          email: customerEmail,
+          phone: customerPhone,
+          address: customerAddress,
+          taxId: customerTaxId,
+          totalQuotations: 1,
+          totalRevenue: calculations.grandTotal,
+          lastActivity: new Date().toLocaleDateString("th-TH")
+        };
+        await addCustomer(newCustomerData);
+      } else {
+        // Existing Customer
+        let revenueAdjustment = calculations.grandTotal;
+        const quotationCountAdjustment = isEditMode ? 0 : 1;
+
+        if (isEditMode) {
+          const oldQuotation = quotations.find(q => q.id === finalId);
+          if (oldQuotation) {
+            revenueAdjustment = calculations.grandTotal - (oldQuotation.amount || 0);
+          }
+        }
+
+        await updateCustomer(existingCust.id, {
+          totalQuotations: existingCust.totalQuotations + quotationCountAdjustment,
+          totalRevenue: existingCust.totalRevenue + revenueAdjustment,
+          lastActivity: new Date().toLocaleDateString("th-TH")
+        });
+      }
+
+      const savedQuotation = {
+        id: finalId,
+        customer: customerName,
+        amount: calculations.grandTotal,
+        status: saveStatus,
+        date: new Date().toLocaleDateString("th-TH"),
+        items: filteredItems.length,
+        validUntil: new Date(Date.now() + (settings?.quotationSettings?.validDays || 30) * 86400000).toLocaleDateString("th-TH"),
+        customerEmail,
+        customerPhone,
+        customerAddress,
+        customerTaxId,
+        lineItems: filteredItems,
+        notes,
+        terms,
+        globalVatEnabled,
+        summaryDiscountAmount,
+        summaryDiscountPercentage,
+        boatModel: effectiveBoatModel,
+        includeOptionalEquipment,
+        frequency,
+        createdBy: currentUser?.name || "System",
+        memberName: users.find(u => u.id === selectedMemberId)?.name || currentUser?.name || "System",
+        memberPhone: users.find(u => u.id === selectedMemberId)?.phone || currentUser?.phone || "-",
+        customImages: customImages.length > 0 ? customImages : undefined
       };
-      addCustomer(newCustomerData);
-    } else {
-      updateCustomer(existingCust.id, {
-        totalQuotations: existingCust.totalQuotations + 1,
-        totalRevenue: existingCust.totalRevenue + calculations.grandTotal,
-        lastActivity: new Date().toLocaleDateString("th-TH")
-      });
-    }
 
-    const savedQuotation = {
-      id: currentId,
-      customer: customerName,
-      amount: calculations.grandTotal,
-      status: saveStatus,
-      date: new Date().toLocaleDateString("th-TH"),
-      items: items.length,
-      validUntil: new Date(Date.now() + (settings?.quotationSettings?.validDays || 30) * 86400000).toLocaleDateString("th-TH"),
-      customerEmail,
-      customerPhone,
-      customerAddress,
-      customerTaxId,
-      lineItems: items,
-      notes,
-      terms,
-      globalVatEnabled,
-      summaryDiscountAmount,
-      summaryDiscountPercentage,
-      boatModel: effectiveBoatModel,
-      includeOptionalEquipment,
-      frequency,
-      createdBy: currentUser?.name || "System",
-      memberName: users.find(u => u.id === selectedMemberId)?.name || currentUser?.name || "System",
-      memberPhone: users.find(u => u.id === selectedMemberId)?.phone || currentUser?.phone || "-",
-      customImages: customImages.length > 0 ? customImages : undefined
-    };
+      if (isEditMode) {
+        await updateQuotation(savedQuotation);
+        showToast(`อัปเดต ${savedQuotation.id} สำเร็จ!`);
+      } else {
+        await addQuotation(savedQuotation);
+        setIsEditMode(true); // Now in edit mode for subsequent saves
+        showToast(`สร้าง ${savedQuotation.id} สำเร็จ!`);
+      }
 
-    if (quotationId) {
-      updateQuotation(savedQuotation);
-      showToast(`อัปเดต ${savedQuotation.id} สำเร็จ!`);
-    } else {
-      addQuotation(savedQuotation);
-      showToast(`สร้าง ${savedQuotation.id} สำเร็จ!`);
+      if (onNavigate && !skipNavigate) {
+        setTimeout(() => onNavigate("Quotations"), 500);
+      }
+      
+      return savedQuotation;
+    } catch (err) {
+      console.error("Save error:", err);
+      // If it's a unique constraint error, maybe suggest a new ID?
+      // For now just show error.
+      return null;
+    } finally {
+      setIsSaving(false);
     }
-
-    if (onNavigate && !skipNavigate) {
-      setTimeout(() => onNavigate("Quotations"), 500);
-    }
-    
-    return savedQuotation;
   };
 
 
@@ -390,17 +465,23 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
   const handleSaveAsTemplate = async () => {
     try {
       const finalName = templateName.trim() || (customerName ? `เทมเพลต - ${customerName}` : `เทมเพลตใหม่ ${new Date().toLocaleDateString("th-TH")}`);
+      const filteredItems = items.filter(item => item.name && item.name.trim() !== "");
+
+      if (filteredItems.length === 0) {
+        showToast("กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ", "error");
+        return;
+      }
       
       const newTemplate = {
         name: finalName,
         customer: customerName || "เทมเพลตมาตรฐาน",
-        items: items.length,
+        items: filteredItems.length,
         amount: calculations.grandTotal,
         frequency: templateFrequency,
         lastUsed: "-",
         nextDue: "-",
         isActive: true,
-        lineItems: [...items], // Deep copy items
+        lineItems: filteredItems,
         customImages: customImages.length > 0 ? [...customImages] : undefined
       };
 
@@ -418,7 +499,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
   };
 
   const handleSaveAndPDF = async (saveStatus: string) => {
-    const saved = handleSave(saveStatus, true);
+    const saved = await handleSave(saveStatus, true);
     if (!saved) return;
 
     setCurrentId(saved.id);
@@ -450,6 +531,29 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
     memberPhone: users.find(u => u.id === selectedMemberId)?.phone || currentUser?.phone || "-",
     customImages: customImages.length > 0 ? customImages : undefined
   });
+
+  // Effect to scroll to newly added item
+  useEffect(() => {
+    if (lastAddedId) {
+      // Small timeout to ensure DOM has rendered the new row
+      const timer = setTimeout(() => {
+        const element = document.getElementById(`item-row-${lastAddedId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+          // Highlight effect
+          element.classList.add("bg-teal-50");
+          setTimeout(() => element.classList.remove("bg-teal-50"), 2000);
+          
+          // Focus the first input in the new row
+          const input = element.querySelector("input");
+          if (input) input.focus();
+        }
+        // Reset lastAddedId so it doesn't trigger again on other state changes
+        setLastAddedId(null);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [lastAddedId]);
 
   const generatePDF = async () => {
     if (!pdfRef.current || isGeneratingPdf) return;
@@ -658,7 +762,9 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
     const targetCat = category.trim().toLowerCase();
     const finalModelUpper = (finalModel || "").trim().toUpperCase();
     
-    const equipment = products.filter(p => {
+    const equipment = productionCosts.filter(p => {
+      if (p.quotationId) return false; // Only master items
+      
       const pCat = (p.category || "").trim().toLowerCase();
       const pModel = (p.boatModel || "").trim().toUpperCase();
       
@@ -679,11 +785,17 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
       name: p.name,
       description: p.description,
       quantity: 1,
-      unitPrice: p.unitPrice,
+      unitPrice: p.sellingPrice || p.unitPrice,
       discount: 0,
       vatEnabled: true,
       category: p.category,
+      unit: p.unit,
+      sku: p.sku,
     }));
+
+    if (newItems.length > 0) {
+      setLastAddedId(newItems[0].id!);
+    }
 
     setItems(prev => {
       // Clean up empty default rows if they exist
@@ -692,6 +804,22 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
     });
     
     showToast(`เพิ่มรายการ${category}สำหรับรุ่น ${finalModel} จำนวน ${equipment.length} รายการ`, "success");
+  };
+
+  const refreshItemPrice = (item: LineItem) => {
+    if (!item.sku) return;
+    const master = productionCosts.find(p => !p.quotationId && p.sku === item.sku);
+    if (master) {
+      const newPrice = master.sellingPrice || master.unitPrice;
+      if (newPrice !== item.unitPrice) {
+        updateItem(item.id, "unitPrice", newPrice);
+        showToast(`อัปเดตราคา '${item.name}' เป็น ${formatCurrency(newPrice)}`, "info");
+      } else {
+        showToast("ราคานี้เป็นราคาล่าสุดแล้ว", "info");
+      }
+    } else {
+      showToast("ไม่พบข้อมูลสินค้าหลักในระบบ", "error");
+    }
   };
 
   return (
@@ -710,12 +838,37 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
               </svg>
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{quotationId ? "Edit Quotation" : "Create New Quotation"}</h1>
+              <div className="flex items-center gap-4">
+                <h1 className="text-2xl font-bold text-gray-900">{quotationId ? "Edit Quotation" : "Create New Quotation"}</h1>
+                <div className="flex items-center gap-2 print:hidden">
+                  <button 
+                    onClick={() => handleSaveAndPDF("ฉบับร่าง")} 
+                    disabled={isSaving}
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-md shadow-teal-600/20 hover:shadow-lg active:scale-[0.98] disabled:opacity-50"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    {isSaving ? "Saving..." : (quotationId ? "Update & Save PDF" : "Save as PDF")}
+                  </button>
+                  <button 
+                    onClick={handlePreview} 
+                    disabled={isSaving}
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all active:scale-[0.98] disabled:opacity-50"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    Preview
+                  </button>
+                </div>
+              </div>
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-sm text-gray-500">Quotation number:</span>
                 <input
                   type="text"
-                  value={currentId}
+                  value={currentId || ""}
                   onChange={(e) => setCurrentId(e.target.value)}
                   className="font-semibold text-teal-700 bg-transparent border-b border-dashed border-teal-200 focus:border-teal-500 focus:outline-none px-1 py-0"
                   title="คลิกเพื่อแก้ไขเลขที่ใบเสนอราคา"
@@ -736,7 +889,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
             <div className="flex flex-col">
               <label className="text-xs font-medium text-gray-500 mb-1">Status (สถานะ)</label>
               <select
-                value={status}
+                value={status || "ฉบับร่าง"}
                 onChange={(e) => setStatus(e.target.value)}
                 title="เลือกสถานะใบเสนอราคา"
                 className="px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all appearance-none pr-8 cursor-pointer bg-[url('data:image/svg+xml,%3Csvg_xmlns=%22http://www.w3.org/2000/svg%22_width=%2212%22_height=%2212%22_fill=%22%2364748b%22_viewBox=%220_0_24_24%22%3E%3Cpath_d=%22M7_10l5_5_5-5z%22/%3E%3C/svg%3E')] bg-[length:12px_12px] bg-[right_8px_center] bg-no-repeat"
@@ -751,7 +904,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
             <div className="flex flex-col">
               <label className="text-xs font-medium text-gray-500 mb-1">รอบการเรียกเก็บ</label>
               <select
-                value={frequency}
+                value={frequency || "ไม่ระบุ"}
                 onChange={(e) => setFrequency(e.target.value)}
                 title="เลือกรอบการเรียกเก็บเงิน"
                 className="px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all appearance-none pr-8 cursor-pointer min-w-[120px] bg-[url('data:image/svg+xml,%3Csvg_xmlns=%22http://www.w3.org/2000/svg%22_width=%2212%22_height=%2212%22_fill=%22%2364748b%22_viewBox=%220_0_24_24%22%3E%3Cpath_d=%22M7_10l5_5_5-5z%22/%3E%3C/svg%3E')] bg-[length:12px_12px] bg-[right_8px_center] bg-no-repeat"
@@ -760,6 +913,21 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                 <option value="รายเดือน">รายเดือน</option>
                 <option value="รายไตรมาส">รายไตรมาส</option>
                 <option value="รายปี">รายปี</option>
+              </select>
+            </div>
+            
+            <div className="flex flex-col">
+              <label className="text-xs font-medium text-gray-500 mb-1">รุ่นเรือ (Boat Model)</label>
+              <select
+                value={boatModel || ""}
+                onChange={(e) => setBoatModel(e.target.value)}
+                title="เลือกรุ่นเรือเพื่อดึงรายการมาตรฐาน/อุปกรณ์เสริม"
+                className="px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all appearance-none pr-8 cursor-pointer min-w-[130px] bg-[url('data:image/svg+xml,%3Csvg_xmlns=%22http://www.w3.org/2000/svg%22_width=%2212%22_height=%2212%22_fill=%22%2364748b%22_viewBox=%220_0_24_24%22%3E%3Cpath_d=%22M7_10l5_5_5-5z%22/%3E%3C/svg%3E')] bg-[length:12px_12px] bg-[right_8px_center] bg-no-repeat"
+              >
+                <option value="">{detectedBoatModel ? `ตรวจพบอัตโนมัติ (${detectedBoatModel})` : "-- เลือกรุ่นเรือ --"}</option>
+                {boatModels.map(model => (
+                  <option key={model} value={model}>{model}</option>
+                ))}
               </select>
             </div>
             
@@ -782,8 +950,9 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
               <div className="p-5">
                 <div className="space-y-4">
                   <div className="relative">
-                    <label className="text-xs font-medium text-gray-500 mb-1.5 block">ชื่อบริษัท / ลูกค้า *</label>
+                    <label htmlFor="customer-name" className="text-xs font-medium text-gray-500 mb-1.5 block">ชื่อบริษัท / ลูกค้า *</label>
                     <input
+                      id="customer-name"
                       type="text"
                       value={customerName || ""}
                       onChange={(e) => {
@@ -813,8 +982,9 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-medium text-gray-500 mb-1.5 block">อีเมล</label>
+                      <label htmlFor="customer-email" className="text-xs font-medium text-gray-500 mb-1.5 block">อีเมล</label>
                       <input
+                        id="customer-email"
                         type="email"
                         value={customerEmail || ""}
                         onChange={(e) => setCustomerEmail(e.target.value)}
@@ -823,8 +993,9 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500 mb-1.5 block">เบอร์โทร</label>
+                      <label htmlFor="customer-phone" className="text-xs font-medium text-gray-500 mb-1.5 block">เบอร์โทร</label>
                       <input
+                        id="customer-phone"
                         type="text"
                         value={customerPhone || ""}
                         onChange={(e) => setCustomerPhone(e.target.value)}
@@ -834,8 +1005,9 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-gray-500 mb-1.5 block">ที่อยู่</label>
+                    <label htmlFor="customer-address" className="text-xs font-medium text-gray-500 mb-1.5 block">ที่อยู่</label>
                     <input
+                      id="customer-address"
                       type="text"
                       value={customerAddress || ""}
                       onChange={(e) => setCustomerAddress(e.target.value)}
@@ -844,8 +1016,9 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-gray-500 mb-1.5 block">เลขประจำตัวผู้เสียภาษี</label>
+                    <label htmlFor="customer-taxid" className="text-xs font-medium text-gray-500 mb-1.5 block">เลขประจำตัวผู้เสียภาษี</label>
                     <input
+                      id="customer-taxid"
                       type="text"
                       value={customerTaxId || ""}
                       onChange={(e) => setCustomerTaxId(e.target.value)}
@@ -872,11 +1045,13 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                   <input
+                    id="search-products"
                     type="text"
                     placeholder="Search products..."
                     value={searchProduct || ""}
                     onChange={(e) => setSearchProduct(e.target.value)}
                     className="pl-10 pr-4 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all w-56 placeholder:text-gray-400"
+                    aria-label="Search products"
                   />
                 </div>
               </div>
@@ -885,13 +1060,14 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                 <table className="w-full">
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-200">
-                      <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3 min-w-[160px]">Item/Service</th>
-                      <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3 min-w-[160px]">Description</th>
-                      <th className="text-center text-xs font-semibold text-gray-600 px-4 py-3 w-[90px]">Quantity</th>
-                      <th className="text-center text-xs font-semibold text-gray-600 px-4 py-3 w-[110px]">Unit Price</th>
-                      <th className="text-center text-xs font-semibold text-gray-600 px-4 py-3 w-[100px]">Discount (%)</th>
-
-                      <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 w-[100px]">Total</th>
+                      <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3 min-w-[160px]">รายการ (Item/Service)</th>
+                      <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3 min-w-[160px]">รายละเอียด (Description)</th>
+                      <th className="text-center text-xs font-semibold text-gray-600 px-4 py-3 w-[80px]">จำนวน (Qty)</th>
+                      <th className="text-center text-xs font-semibold text-gray-600 px-4 py-3 w-[110px]">ราคาทุน (Cost)</th>
+                      <th className="text-center text-xs font-semibold text-gray-600 px-4 py-3 w-[110px]">ราคาขาย (Price)</th>
+                      <th className="text-center text-xs font-semibold text-gray-600 px-4 py-3 w-[80px]">ส่วนลด (%)</th>
+                      <th className="text-center text-xs font-semibold text-gray-600 px-4 py-3 w-[60px]">VAT</th>
+                      <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 w-[100px]">ยอดรวม (Total)</th>
                       <th className="w-[50px] px-2"></th>
                     </tr>
                   </thead>
@@ -923,15 +1099,37 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                           </tr>
                           
                           {categoryItems.map((item) => (
-                            <tr key={item.id} className="group hover:bg-teal-50/30 transition-colors">
+                            <tr 
+                              key={item.id} 
+                              id={`item-row-${item.id}`}
+                              className="group hover:bg-teal-50/30 transition-colors"
+                            >
                               <td className="px-4 py-2">
-                                <input
-                                  type="text"
-                                  value={item.name || ""}
-                                  onChange={(e) => updateItem(item.id, "name", e.target.value)}
-                                  placeholder="Item name"
-                                  className="w-full px-2.5 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all placeholder:text-gray-400"
-                                />
+                                <div className="space-y-1">
+                                  <input
+                                    type="text"
+                                    value={item.name || ""}
+                                    onChange={(e) => updateItem(item.id, "name", e.target.value)}
+                                    placeholder="Item name"
+                                    className="w-full px-2.5 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all placeholder:text-gray-400"
+                                  />
+                                  {item.sku && (
+                                    <div className="flex items-center gap-1.5 ml-1 animate-in fade-in slide-in-from-left-1 duration-300">
+                                      <span className="text-[9px] font-mono font-bold text-teal-600 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-100 uppercase tracking-tighter shadow-sm flex items-center gap-1">
+                                        <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                                        Linked: {item.sku}
+                                      </span>
+                                      <button 
+                                        onClick={() => refreshItemPrice(item)}
+                                        title="อัปเดตราคาจากข้อมูลหลัก (Refresh from Master Data)"
+                                        className="text-[9px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-0.5 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 transition-colors"
+                                      >
+                                        <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                        SYNC PRICE
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
                               </td>
                               <td className="px-4 py-2">
                                 <input
@@ -945,7 +1143,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                               <td className="px-4 py-2">
                                 <input
                                   type="number"
-                                  value={item.quantity}
+                                  value={item.quantity ?? 1}
                                   onChange={(e) => updateItem(item.id, "quantity", Number(e.target.value) || 0)}
                                   min="0"
                                   title="ระบุจำนวน"
@@ -954,31 +1152,65 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                               </td>
                               <td className="px-4 py-2">
                                 <div className="relative">
-                                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400">฿</span>
+                                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-400">฿</span>
                                   <input
                                     type="text"
                                     inputMode="decimal"
-                                    value={item.unitPrice ? item.unitPrice.toLocaleString("en-US") : ""}
+                                    value={(item.costPrice ?? 0).toLocaleString("en-US")}
+                                    onChange={(e) => {
+                                      const raw = e.target.value.replace(/,/g, "");
+                                      const num = parseFloat(raw);
+                                      updateItem(item.id, "costPrice", isNaN(num) ? 0 : num);
+                                    }}
+                                    placeholder="0"
+                                    className="w-full pl-6 pr-2 py-2 text-[13px] text-center bg-gray-50/50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all font-medium text-amber-900"
+                                  />
+                                </div>
+                              </td>
+                              <td className="px-4 py-2">
+                                <div className="relative">
+                                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-400">฿</span>
+                                  <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={(item.unitPrice ?? 0).toLocaleString("en-US")}
                                     onChange={(e) => {
                                       const raw = e.target.value.replace(/,/g, "");
                                       const num = parseFloat(raw);
                                       updateItem(item.id, "unitPrice", isNaN(num) ? 0 : num);
                                     }}
                                     placeholder="0"
-                                    className="w-full pl-6 pr-2.5 py-2 text-sm text-center bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
+                                    className="w-full pl-6 pr-2 py-2 text-[13px] text-center bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all font-semibold"
                                   />
                                 </div>
                               </td>
                               <td className="px-4 py-2">
                                 <input
                                   type="number"
-                                  value={item.discount}
+                                  value={item.discount ?? 0}
                                   onChange={(e) => updateItem(item.id, "discount", Number(e.target.value) || 0)}
                                   min="0"
                                   max="100"
                                   title="ระบุส่วนลดเป็นเปอร์เซ็นต์"
-                                  className="w-full px-2.5 py-2 text-sm text-center bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
+                                  className="w-full px-2 py-2 text-[13px] text-center bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
                                 />
+                              </td>
+                              <td className="px-4 py-2 text-center">
+                                <button
+                                  onClick={() => updateItem(item.id, "vatEnabled", !item.vatEnabled)}
+                                  className={`w-6 h-6 rounded flex items-center justify-center transition-all ${
+                                    item.vatEnabled 
+                                      ? "bg-blue-500 text-white shadow-sm" 
+                                      : "bg-gray-100 text-gray-300 hover:bg-gray-200"
+                                  }`}
+                                  title={item.vatEnabled ? "คิดภาษีมูลค่าเพิ่ม (VAT 7%)" : "ไม่คิดภาษีมูลค่าเพิ่ม"}
+                                >
+                                  {item.vatEnabled && (
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  )}
+                                </button>
                               </td>
 
                               <td className="px-4 py-3 text-right">
@@ -991,6 +1223,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                                   onClick={() => removeItem(item.id)}
                                   title="ลบรายการนี้"
                                   className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
+                                  aria-label={`Remove item ${item.name || ''}`}
                                 >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1018,47 +1251,49 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                     Add row
                   </button>
                   
-                  {groupedItems["มาตรฐาน"].length === 0 ? (
+                   {groupedItems["มาตรฐาน"].length === 0 ? (
                     <button
                       onClick={() => addBoatEquipment("มาตรฐาน")}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-all"
+                      title={`ดึงรายการมาตรฐานสำหรับรุ่น ${effectiveBoatModel || "ที่เลือก"}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-black uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-all shadow-sm active:scale-95"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                       </svg>
-                      มาตรฐาน
+                      ดึงรายการมาตรฐาน
                     </button>
                   ) : (
                     <button
                       onClick={() => addCategorizedItem("มาตรฐาน")}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-all"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-all"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                       </svg>
-                      Add row มาตรฐาน
+                      เพิ่มรายการมาตรฐาน
                     </button>
                   )}
                   
                   {groupedItems["อุปกรณ์เสริม"].length === 0 ? (
                     <button
                       onClick={() => addBoatEquipment("อุปกรณ์เสริม")}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-all"
+                      title={`ดึงรายการอุปกรณ์เสริมสำหรับรุ่น ${effectiveBoatModel || "ที่เลือก"}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-all shadow-sm active:scale-95"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                       </svg>
-                      อุปกรณ์เสริม
+                      ดึงอุปกรณ์เสริม
                     </button>
                   ) : (
                     <button
                       onClick={() => addCategorizedItem("อุปกรณ์เสริม")}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-all"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-all"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                       </svg>
-                      Add row อุปกรณ์เสริม
+                      เพิ่มอุปกรณ์เสริม
                     </button>
                   )}
                 </div>
@@ -1265,7 +1500,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                   className="flex-1 px-3 py-2 text-sm bg-white border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
                 />
                 <select
-                  value={templateFrequency}
+                  value={templateFrequency || "รายเดือน"}
                   onChange={(e) => setTemplateFrequency(e.target.value)}
                   title="เลือกรอบเวลาเทมเพลต"
                   className="px-3 py-2 text-sm bg-white border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all cursor-pointer"
@@ -1288,13 +1523,21 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
             </div>
 
             <div className="flex flex-wrap items-center gap-3 print:hidden">
-              <button onClick={() => handleSaveAndPDF("ฉบับร่าง")} className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-md shadow-teal-600/20 hover:shadow-lg hover:shadow-teal-600/30 active:scale-[0.98]">
+              <button 
+                onClick={() => handleSaveAndPDF("ฉบับร่าง")} 
+                disabled={isSaving}
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-md shadow-teal-600/20 hover:shadow-lg hover:shadow-teal-600/30 active:scale-[0.98] disabled:opacity-50"
+              >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                {quotationId ? "Update & Save PDF" : "Save as PDF"}
+                {isSaving ? "Saving..." : (quotationId ? "Update & Save PDF" : "Save as PDF")}
               </button>
-              <button onClick={handlePreview} className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all active:scale-[0.98]">
+              <button 
+                onClick={handlePreview} 
+                disabled={isSaving}
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all active:scale-[0.98] disabled:opacity-50"
+              >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />

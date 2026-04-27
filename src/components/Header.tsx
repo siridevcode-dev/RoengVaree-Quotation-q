@@ -16,6 +16,9 @@ const pageLabels: Record<string, string> = {
   "Quotations": "ใบเสนอราคาทั้งหมด",
   "Customers": "ลูกค้า",
   "Products": "สินค้า & บริการ",
+  "Production costs": "ต้นทุนการผลิต",
+  "PR / PO": "ขอซื้อ / สั่งซื้อ",
+
   "Reports": "รายงาน",
   "Quotation Templates": "เทมเพลต",
   "Settings": "ตั้งค่า",
@@ -24,7 +27,7 @@ const pageLabels: Record<string, string> = {
 
 export default function Header({ activePage, onNavigate, onMobileMenuToggle }: HeaderProps) {
   const [profileOpen, setProfileOpen] = useState(false);
-  const { settings, logout, currentUser } = useAppContext();
+  const { settings, logout, currentUser, setActivityDrawerOpen } = useAppContext();
   const profileName = currentUser?.name || settings?.profile?.name || "User";
   const profileInitial = profileName.charAt(0).toUpperCase();
   const displayPage = pageLabels[activePage] || activePage;
@@ -71,6 +74,17 @@ export default function Header({ activePage, onNavigate, onMobileMenuToggle }: H
 
         {/* Right actions */}
         <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
+          {/* History button */}
+          <button 
+            onClick={() => setActivityDrawerOpen(true)}
+            title="ประวัติการใช้งาน"
+            className="w-9 h-9 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-indigo-600 transition-all active:scale-95"
+          >
+            <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </button>
+
           {/* Notification bell */}
           <button 
             title="การแจ้งเตือน"

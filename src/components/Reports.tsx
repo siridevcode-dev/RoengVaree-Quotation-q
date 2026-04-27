@@ -20,6 +20,27 @@ export default function Reports() {
 
   const currentYear = new Date().getFullYear() + 543;
   const months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+  const fullMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+
+  const filteredQuotations = quotations.filter((q) => {
+    const parts = q.date.split("/");
+    if (parts.length !== 3) return false;
+    const month = parseInt(parts[1]);
+    const year = parseInt(parts[2]);
+
+    if (year !== currentYear) return false;
+
+    if (period === "yearly") return true;
+    if (period === "q1") return month >= 1 && month <= 3;
+    if (period === "q2") return month >= 4 && month <= 6;
+    if (period === "q3") return month >= 7 && month <= 9;
+    if (period === "q4") return month >= 10 && month <= 12;
+    if (period.startsWith("m")) {
+      const targetMonth = parseInt(period.substring(1));
+      return month === targetMonth;
+    }
+    return true;
+  });
 
   const monthlyData = months.map((m, i) => {
     const monthlyQuotes = quotations.filter((q) => {
@@ -35,7 +56,7 @@ export default function Reports() {
   });
 
   const productMap: Record<string, { count: number; revenue: number }> = {};
-  quotations.forEach((q) => {
+  filteredQuotations.forEach((q) => {
     if (q.lineItems) {
       q.lineItems.forEach((item) => {
         if (!productMap[item.name]) productMap[item.name] = { count: 0, revenue: 0 };
@@ -49,16 +70,28 @@ export default function Reports() {
     .sort((a, b) => b.revenue - a.revenue)
     .slice(0, 5);
 
-  const totalQuotations = quotations.length;
-  const totalApproved = quotations.filter((q) => q.status === "อนุมัติแล้ว").length;
-  const totalRevenue = quotations.filter((q) => q.status === "อนุมัติแล้ว").reduce((s, q) => s + q.amount, 0);
+  const totalQuotations = filteredQuotations.length;
+  const totalApproved = filteredQuotations.filter((q) => q.status === "อนุมัติแล้ว").length;
+  const totalRevenue = filteredQuotations.filter((q) => q.status === "อนุมัติแล้ว").reduce((s, q) => s + q.amount, 0);
   const approvalRate = totalQuotations > 0 ? ((totalApproved / totalQuotations) * 100).toFixed(1) : "0.0";
 
   const maxRevenue = Math.max(...monthlyData.map((d) => d.revenue), 1);
   const maxQuotations = Math.max(...monthlyData.map((d) => d.quotations), 1);
 
+  const getPeriodLabel = () => {
+    if (period === "yearly") return "ทั้งปี";
+    if (period === "q1") return "ไตรมาส 1";
+    if (period === "q2") return "ไตรมาส 2";
+    if (period === "q3") return "ไตรมาส 3";
+    if (period === "q4") return "ไตรมาส 4";
+    if (period.startsWith("m")) {
+      return fullMonths[parseInt(period.substring(1)) - 1];
+    }
+    return "";
+  };
+
   const summaryCards = [
-    { label: "รายได้รวมทั้งปี", value: formatCurrency(totalRevenue), color: "#283583", bg: "#eef2ff" },
+    { label: `รายได้รวม (${getPeriodLabel()})`, value: formatCurrency(totalRevenue), color: "#283583", bg: "#eef2ff" },
     { label: "ใบเสนอราคาทั้งหมด", value: totalQuotations.toString(), color: "#0d9488", bg: "#f0fdf9" },
     { label: "อนุมัติแล้ว", value: totalApproved.toString(), color: "#059669", bg: "#ecfdf5" },
     { label: "อัตราอนุมัติ", value: `${approvalRate}%`, color: "#d97706", bg: "#fffbeb" },
@@ -71,7 +104,7 @@ export default function Reports() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h1 className="page-title">รายงาน</h1>
-            <p className="page-subtitle mt-1">วิเคราะห์ผลการดำเนินงาน</p>
+            <p className="page-subtitle mt-1">วิเคราะห์ผลการดำเนินงาน {getPeriodLabel() !== "ทั้งปี" ? `เฉพาะ${getPeriodLabel()}` : ""}</p>
           </div>
           <div className="flex items-center gap-2">
             <select 
@@ -80,15 +113,24 @@ export default function Reports() {
               title="เลือกช่วงเวลาของรายงาน"
               className="input-modern py-2 text-sm cursor-pointer w-auto pr-8"
             >
-              <option value="yearly">รายปี {currentYear}</option>
-              <option value="q1">ไตรมาส 1</option>
-              <option value="q2">ไตรมาส 2</option>
-              <option value="q3">ไตรมาส 3</option>
-              <option value="q4">ไตรมาส 4</option>
+              <optgroup label={`รายปี ${currentYear}`}>
+                <option value="yearly">รายปี {currentYear}</option>
+              </optgroup>
+              <optgroup label="ไตรมาส">
+                <option value="q1">ไตรมาส 1</option>
+                <option value="q2">ไตรมาส 2</option>
+                <option value="q3">ไตรมาส 3</option>
+                <option value="q4">ไตรมาส 4</option>
+              </optgroup>
+              <optgroup label="รายเดือน">
+                {fullMonths.map((m, i) => (
+                  <option key={i} value={`m${i + 1}`}>{m}</option>
+                ))}
+              </optgroup>
             </select>
             <button
               onClick={() => {
-                const csvData = quotations.map((q) => `${q.id},${q.customer},${q.amount},${q.status},${q.date}`).join("\n");
+                const csvData = filteredQuotations.map((q) => `${q.id},${q.customer},${q.amount},${q.status},${q.date}`).join("\n");
                 const blob = new Blob(["ID,Customer,Amount,Status,Date\n" + csvData], { type: "text/csv" });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
@@ -153,7 +195,7 @@ export default function Reports() {
             <div className="p-5 space-y-4">
               <div className="flex items-center h-3 rounded-full overflow-hidden bg-gray-100 gap-px">
                 {statusBreakdownTemplate.map((s) => {
-                  const count = quotations.filter((q) => q.status === s.status).length;
+                  const count = filteredQuotations.filter((q) => q.status === s.status).length;
                   const pct = totalQuotations > 0 ? (count / totalQuotations) * 100 : 0;
                   return pct > 0 ? (
                     <DynamicBox 
@@ -168,7 +210,7 @@ export default function Reports() {
               </div>
               <div className="space-y-2.5 mt-2">
                 {statusBreakdownTemplate.map((s) => {
-                  const count = quotations.filter((q) => q.status === s.status).length;
+                  const count = filteredQuotations.filter((q) => q.status === s.status).length;
                   const pct = totalQuotations > 0 ? ((count / totalQuotations) * 100).toFixed(1) : "0";
                   return (
                     <div key={s.status} className="flex items-center justify-between">

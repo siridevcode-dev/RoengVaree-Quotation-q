@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
 import { authenticateRequest, jsonError } from "@/lib/auth";
+import { logActivity, getClientIp } from "@/lib/logger";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await authenticateRequest(req);
@@ -41,6 +42,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     ]
   });
 
+  await logActivity({
+    userId: auth.user.id,
+    userName: auth.user.name,
+    action: "update_product",
+    description: `แก้ไขข้อมูลสินค้า: ${body.name || id}`,
+    ipAddress: getClientIp(req)
+  });
+
   return Response.json({ success: true });
 }
 
@@ -55,6 +64,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     args: [id]
   });
   if (result.rowsAffected === 0) return jsonError("ไม่พบสินค้า", 404);
+
+  await logActivity({
+    userId: auth.user.id,
+    userName: auth.user.name,
+    action: "delete_product",
+    description: `ลบสินค้า ID: ${id}`,
+    ipAddress: getClientIp(req)
+  });
 
   return Response.json({ success: true });
 }
