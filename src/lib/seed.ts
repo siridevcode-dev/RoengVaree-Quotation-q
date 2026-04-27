@@ -2,49 +2,52 @@ import { Client } from "@libsql/client";
 import { hashPassword } from "./auth";
 
 export async function seedDatabase(db: Client) {
-  // Check if already seeded
-  const result = await db.execute("SELECT COUNT(*) as count FROM users");
-  const userCount = result.rows[0].count as number;
-  if (userCount > 0) return;
+  console.log("🌱 Checking database seeding status...");
 
-  console.log("🌱 Seeding database with initial data...");
+  // ----- Users (Seed only if empty) -----
+  const userResult = await db.execute("SELECT COUNT(*) as count FROM users");
+  if ((userResult.rows[0].count as number) === 0) {
+    console.log("👤 Seeding initial users...");
+    const usersData = [
+      ["U001", "สมชาย ใจดี", "somchai", "081-234-5678", "somchai@roengvaree.com", "ผู้จัดการฝ่ายขาย", "Admin", "Active", hashPassword("password123"), "30/03/2026 07:05"],
+      ["U002", "วิภาดา สายลม", "wiphada", "082-345-6789", "", "", "Manager", "Active", hashPassword("password123"), "30/03/2026 06:12"],
+      ["U003", "กิตติพงษ์ มั่นคง", "kittipong", "083-456-7890", "", "", "Editor", "Active", hashPassword("password123"), "29/03/2026 18:45"],
+      ["U004", "นารี รัตนา", "naree", "084-567-8901", "", "", "Viewer", "Inactive", hashPassword("password123"), "25/03/2026 10:20"],
+      ["U005", "Admin", "admin", "", "", "Admin", "Admin", "Active", hashPassword("Admin1230"), ""],
+    ];
 
-  // ----- Users -----
-  const usersData = [
-    ["U001", "สมชาย ใจดี", "somchai", "081-234-5678", "somchai@roengvaree.com", "ผู้จัดการฝ่ายขาย", "Admin", "Active", hashPassword("password123"), "30/03/2026 07:05"],
-    ["U002", "วิภาดา สายลม", "wiphada", "082-345-6789", "", "", "Manager", "Active", hashPassword("password123"), "30/03/2026 06:12"],
-    ["U003", "กิตติพงษ์ มั่นคง", "kittipong", "083-456-7890", "", "", "Editor", "Active", hashPassword("password123"), "29/03/2026 18:45"],
-    ["U004", "นารี รัตนา", "naree", "084-567-8901", "", "", "Viewer", "Inactive", hashPassword("password123"), "25/03/2026 10:20"],
-    ["U005", "Admin", "admin", "", "", "Admin", "Admin", "Active", hashPassword("Admin1230"), ""],
-  ];
+    await db.batch(
+      usersData.map(u => ({
+        sql: `INSERT INTO users (id, name, username, phone, email, position, role, status, password_hash, last_active)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        args: u
+      })),
+      "write"
+    );
+  }
 
-  await db.batch(
-    usersData.map(u => ({
-      sql: `INSERT INTO users (id, name, username, phone, email, position, role, status, password_hash, last_active)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      args: u
-    })),
-    "write"
-  );
+  // ----- Customers (Seed only if empty) -----
+  const customerResult = await db.execute("SELECT COUNT(*) as count FROM customers");
+  if ((customerResult.rows[0].count as number) === 0) {
+    console.log("👥 Seeding initial customers...");
+    const customersData = [
+      ["Acme Corporation", "contact@acme.com", "02-123-4567", "เลขที่ 123 ถ.สุขุมวิท กรุงเทพฯ", "0105-5XX-XXXX", 24, 1520000, "29/03/2026"],
+      ["TechStart Inc.", "info@techstart.co.th", "02-234-5678", "เลขที่ 456 ถ.พหลโยธิน กรุงเทพฯ", "0105-6XX-XXXX", 12, 620000, "28/03/2026"],
+      ["Global Solutions Ltd.", "sales@globalsol.com", "02-345-6789", "เลขที่ 789 ถ.รัชดา กรุงเทพฯ", "0105-7XX-XXXX", 18, 980000, "27/03/2026"],
+      ["บริษัท สยามเทค จำกัด", "info@siamtech.co.th", "02-456-7890", "เลขที่ 321 ถ.เพชรบุรี กรุงเทพฯ", "0105-8XX-XXXX", 15, 750000, "26/03/2026"],
+    ];
 
-  // ----- Customers -----
-  const customersData = [
-    ["Acme Corporation", "contact@acme.com", "02-123-4567", "เลขที่ 123 ถ.สุขุมวิท กรุงเทพฯ", "0105-5XX-XXXX", 24, 1520000, "29/03/2026"],
-    ["TechStart Inc.", "info@techstart.co.th", "02-234-5678", "เลขที่ 456 ถ.พหลโยธิน กรุงเทพฯ", "0105-6XX-XXXX", 12, 620000, "28/03/2026"],
-    ["Global Solutions Ltd.", "sales@globalsol.com", "02-345-6789", "เลขที่ 789 ถ.รัชดา กรุงเทพฯ", "0105-7XX-XXXX", 18, 980000, "27/03/2026"],
-    ["บริษัท สยามเทค จำกัด", "info@siamtech.co.th", "02-456-7890", "เลขที่ 321 ถ.เพชรบุรี กรุงเทพฯ", "0105-8XX-XXXX", 15, 750000, "26/03/2026"],
-  ];
+    await db.batch(
+      customersData.map(c => ({
+        sql: `INSERT INTO customers (name, email, phone, address, tax_id, total_quotations, total_revenue, last_activity)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        args: c
+      })),
+      "write"
+    );
+  }
 
-  await db.batch(
-    customersData.map(c => ({
-      sql: `INSERT INTO customers (name, email, phone, address, tax_id, total_quotations, total_revenue, last_activity)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      args: c
-    })),
-    "write"
-  );
-
-  // ----- Products -----
+  // ----- Products & Production Costs (Always sync master data) -----
   const productsData = [
     // Boats
     ["Speed Boat R52", "เรือ", 5350000, "ลำ", "เรือสปีดโบ๊ท รุ่น R52", "BOAT-R52", 1, "R52"],
@@ -105,70 +108,23 @@ export async function seedDatabase(db: Client) {
     ["เครื่องเสียงบลูทูธ + ลำโพง 4 ตัว", "อุปกรณ์เสริม", 30000, "ชุด", "Marine boat audio system", "OPT-010", 1, "R52"],
   ];
 
-  await db.batch(
-    productsData.map(p => ({
-      sql: `INSERT INTO products (name, category, unit_price, unit, description, sku, in_stock, boat_model)
+  // Sync products (using name/sku as key)
+  console.log("📦 Syncing master products...");
+  for (const p of productsData) {
+    await db.execute({
+      sql: `INSERT OR REPLACE INTO products (name, category, unit_price, unit, description, sku, in_stock, boat_model)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       args: p
-    })),
-    "write"
-  );
-
-  // ----- Quotations (sample) -----
-  const quotationsData = [
-    ["Q-2603-001", "Acme Corporation", 125000, "อนุมัติแล้ว", "29/03/2026", "28/04/2026"],
-    ["Q-2603-002", "TechStart Inc.", 89500, "รอดำเนินการ", "28/03/2026", "27/04/2026"],
-    ["Q-2603-003", "Global Solutions Ltd.", 245000, "ส่งแล้ว", "27/03/2026", "26/04/2026"],
-    ["Q-2603-004", "บริษัท สยามเทค จำกัด", 67800, "ฉบับร่าง", "26/03/2026", "25/04/2026"],
-  ];
-
-  await db.batch(
-    quotationsData.map(q => ({
-      sql: "INSERT INTO quotations (id, customer_name, amount, status, date, valid_until) VALUES (?, ?, ?, ?, ?, ?)",
-      args: q
-    })),
-    "write"
-  );
-
-  // ----- Settings -----
-  const settingsData = [
-    ["profile", JSON.stringify({ name: "สมชาย ใจดี", username: "somchai", email: "somchai@roengvaree.com", phone: "081-234-5678", company: "RoengVaree Co., Ltd.", position: "ผู้จัดการฝ่ายขาย" })],
-    ["companySettings", JSON.stringify({ name: "RoengVaree Co., Ltd.", taxId: "0105-564-123456", address: "เลขที่ 99 ถ.สุขุมวิท กรุงเทพฯ", phone: "02-123-4567", email: "info@roengvaree.com", website: "www.roengvaree.com", logo: "" })],
-    ["quotationSettings", JSON.stringify({ prefix: "Q", validDays: 30, defaultVat: true, vatRate: 7, currency: "THB", defaultNotes: "ขอบคุณที่ใช้บริการ", defaultTerms: ["50% Deposit: Payable upon signing the contract.", "30% Second Installment: Payable upon 50% work completion.", "20% Final Payment: Payable upon 100% work completion."] })],
-    ["notifications", JSON.stringify({ emailNewQuotation: true, emailApproved: true, emailRejected: true, emailExpiring: true, browserNotify: true })],
-    ["categories", JSON.stringify(["เรือ", "ซ่อมเรือ", "เครื่องยนต์", "มาตรฐาน", "อุปกรณ์เสริม"])],
-    ["boatModels", JSON.stringify(["R52", "R33"])],
-  ];
-
-  await db.batch(
-    settingsData.map(s => ({
-      sql: "INSERT INTO settings (key, value) VALUES (?, ?)",
-      args: s
-    })),
-    "write"
-  );
-
-  // ----- Boat Specifications -----
-  await db.execute({
-    sql: "INSERT INTO boat_specs (model, loa, beam, draft, fresh_water_capacity, gas_tank, height, rec_engine, speed_design, passenger, images_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-    args: ["R52", "15.6 m", "4 m", "0.6 m", "150 L", "400 L", "3.5 m", "250Hpx3", "30 Knt", "60+3 Person", "[]"]
-  });
-  
-  await db.execute({
-    sql: "INSERT INTO boat_specs (model, loa, beam, draft, fresh_water_capacity, gas_tank, height, rec_engine, speed_design, passenger, images_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-    args: ["R33", "-", "-", "-", "-", "-", "-", "-", "-", "-", "[]"]
-  });
-
-  // ----- Production Costs (Master Data) -----
-  // We mirror the products data here as the system uses production_costs for master data in v3
-  await db.batch(
-    productsData.map(p => ({
+    });
+    
+    // Also sync to production_costs as it's the main source for v3
+    await db.execute({
       sql: `INSERT INTO production_costs (name, category, unit_price, unit, description, sku, in_stock, boat_model)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      args: p
-    })),
-    "write"
-  );
+            SELECT ?, ?, ?, ?, ?, ?, ?, ?
+            WHERE NOT EXISTS (SELECT 1 FROM production_costs WHERE sku = ? AND quotation_id = '')`,
+      args: [...p, p[5]]
+    });
+  }
 
-  console.log("✅ Database seeded successfully!");
+  console.log("✅ Database sync/seed completed!");
 }
