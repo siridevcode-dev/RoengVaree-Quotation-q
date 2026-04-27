@@ -241,11 +241,13 @@ export default function AccountingDashboard() {
 }
 
 function ChartCard({ title, color, icon, actionText }: { title: string, color: string, icon: React.ReactNode, actionText: string }) {
-  const colorClasses = {
+  const colorMap: Record<string, string> = {
     emerald: "text-emerald-600 bg-emerald-50 border-emerald-100 ring-emerald-500/20",
     rose: "text-rose-600 bg-rose-50 border-rose-100 ring-rose-500/20",
     indigo: "text-indigo-600 bg-indigo-50 border-indigo-100 ring-indigo-500/20"
-  }[color];
+  };
+  
+  const colorClasses = colorMap[color] || colorMap.indigo;
 
   return (
     <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm p-8 flex flex-col group hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500">
