@@ -610,12 +610,11 @@ const QuotationDocument = forwardRef<HTMLDivElement, QuotationDocumentProps>(
               <>
                 {groups.map((group, groupIdx) => (
                   <div key={groupIdx} className="mt-4 pt-4 border-t border-slate-100" data-page-break-before="always">
-                    {groupIdx === 0 && (
-                      <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-2 text-center">{galleryTitle}</h4>
-                    )}
-
-                    {/* Hero image (first in each group) */}
                     <div className="mb-2 page-break-avoid">
+                      {groupIdx === 0 && (
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-2 text-center">{galleryTitle}</h4>
+                      )}
+                      {/* Hero image (first in each group) */}
                       <div className="rounded-[12px] overflow-hidden border border-slate-200 shadow-sm bg-white aspect-[16/10]">
                         <img src={group[0]} alt={`gallery hero ${groupIdx + 1}`} className="w-full h-full object-cover" />
                       </div>
