@@ -12,6 +12,7 @@ interface HeaderProps {
 const pageLabels: Record<string, string> = {
   "Dashboard": "แดชบอร์ด",
   "แดชบอร์ด": "แดชบอร์ด",
+  "แดชบอร์ดฝ่ายขาย": "แดชบอร์ดฝ่ายขาย",
   "Select Products": "สร้างใบเสนอราคา",
   "สร้างใบเสนอราคา": "สร้างใบเสนอราคา",
   "Quotation Form": "ใบเสนอราคา",
@@ -41,24 +42,41 @@ const pageLabels: Record<string, string> = {
   "รูปแบบใบเสนอราคา รูปแบบเก่า": "รูปแบบใบเสนอราคา (เก่า)",
 
   // HR Section
+  "แดชบอร์ดฝ่ายบุคคล": "แดชบอร์ดฝ่ายบุคคล",
   "Employee Management": "จัดการพนักงาน",
   "จัดการพนักงาน": "จัดการพนักงาน",
+  "พนักงาน": "จัดการพนักงาน",
+  "อนุมัติ": "อนุมัติคำขอ",
+  "ค่าใช้จ่าย & เบิกเงิน": "ค่าใช้จ่าย & เบิกเงิน",
+  "เงินเดือน": "บริหารจัดการเงินเดือน",
+  "มอบหมายงาน": "มอบหมายงาน",
+  "ประกาศ": "ประกาศประชาสัมพันธ์",
+  "กิจกรรม": "กิจกรรมพนักงาน",
   "Payroll": "สรุปเงินเดือน",
   "สรุปเงินเดือน": "สรุปเงินเดือน",
   "Attendance": "บันทึกเวลา",
   "บันทึกเวลา": "บันทึกเวลา",
   "รายชื่อพนักงาน": "รายชื่อพนักงาน",
   "บันทึกเวลาเข้างาน": "บันทึกเวลาเข้างาน",
+  "เข้างาน": "เข้างาน",
+  "คำขอ": "คำขอ",
+  "งานของฉัน": "งานของฉัน",
+  "รายงานฝ่ายบุคคล": "รายงาน",
+  "ตั้งค่าฝ่ายบุคคล": "ตั้งค่า",
 
   "Reports": "รายงาน",
   "รายงาน": "รายงาน",
   "Quotation Templates": "รูปแบบเอกสาร",
   "รูปแบบเอกสาร": "รูปแบบเอกสาร",
-  "Settings": "ตั้งค่า",
-  "ตั้งค่า": "ตั้งค่า",
+  "Settings": "ตั้งค่าโปรไฟล์",
+  "ตั้งค่า": "ตั้งค่าโปรไฟล์",
+  "ตั้งค่าโปรไฟล์": "ตั้งค่าโปรไฟล์",
+  "ตั้งค่าการขาย": "ตั้งค่าการขาย",
   "ตั้งค่า (บัญชี)": "ตั้งค่า (บัญชี)",
   "Members": "สมาชิก",
   "สมาชิก": "สมาชิก",
+  "ประวัติการใช้งาน": "ประวัติการใช้งาน",
+  "ประวัติใช้งาน": "ประวัติการใช้งาน",
 };
 
 export default function Header({ activePage, onNavigate, onMobileMenuToggle }: HeaderProps) {
@@ -111,15 +129,17 @@ export default function Header({ activePage, onNavigate, onMobileMenuToggle }: H
         {/* Right actions */}
         <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
           {/* History button */}
-          <button 
-            onClick={() => setActivityDrawerOpen(true)}
-            title="ประวัติการใช้งาน"
-            className="w-9 h-9 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-indigo-600 transition-all active:scale-95"
-          >
-            <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </button>
+          {!["รายชื่อพนักงาน", "โครงสร้างองค์กร", "สัญญาจ้าง", "สรุปเงินเดือน", "รายการจ่ายเงิน", "ประกันสังคม/ภาษี", "บันทึกเวลาเข้างาน", "จัดการวันลา", "ตารางเวร/กะ", "จัดการพนักงาน", "บันทึกเวลา"].includes(activePage) && (
+            <button 
+              onClick={() => setActivityDrawerOpen(true)}
+              title="ประวัติการใช้งาน"
+              className="w-9 h-9 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-indigo-600 transition-all active:scale-95"
+            >
+              <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
+          )}
 
           {/* Notification bell */}
           <button 
@@ -175,7 +195,7 @@ export default function Header({ activePage, onNavigate, onMobileMenuToggle }: H
                     </p>
                   </div>
                   <button
-                    onClick={() => handleNavigate("Settings")}
+                    onClick={() => handleNavigate("ตั้งค่าโปรไฟล์")}
                     className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2.5"
                   >
                     <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

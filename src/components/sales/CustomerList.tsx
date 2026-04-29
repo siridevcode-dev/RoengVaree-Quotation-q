@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useAppContext, Customer } from "@/context/AppContext";
-import PasswordModal from "./PasswordModal";
+import PasswordModal from "../system/PasswordModal";
+import { exportCustomers } from "@/lib/excel-export";
 
 const formatCurrency = (val: number) =>
   val.toLocaleString("th-TH", { style: "currency", currency: "THB", minimumFractionDigits: 0 });
@@ -80,14 +81,24 @@ export default function CustomerList() {
             <h1 className="page-title">ลูกค้า</h1>
             <p className="page-subtitle mt-1">จัดการข้อมูลลูกค้า ({customers.length} ราย)</p>
           </div>
-          {canEditOrDelete && (
-            <button onClick={openAddForm} className="btn-primary w-full sm:w-auto">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              เพิ่มลูกค้าใหม่
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap w-full sm:w-auto">
+            <button
+              onClick={() => exportCustomers(customers)}
+              className="inline-flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm font-semibold text-emerald-700 bg-white border border-emerald-200 rounded-lg hover:bg-emerald-50 transition-all active:scale-[0.98] shadow-sm"
+              title="ส่งออกข้อมูลลูกค้าเป็นไฟล์ Excel (.xlsx)"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              Excel
             </button>
-          )}
+            {canEditOrDelete && (
+              <button onClick={openAddForm} className="btn-primary flex-1 sm:flex-none">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                เพิ่มลูกค้าใหม่
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Search */}

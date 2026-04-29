@@ -5,7 +5,8 @@ import html2canvas from "html2canvas-pro";
 import { jsPDF } from "jspdf";
 import { useAppContext, Quotation } from "@/context/AppContext";
 import QuotationDocument from "./QuotationDocument";
-import PasswordModal from "./PasswordModal";
+import PasswordModal from "../system/PasswordModal";
+import { exportQuotations } from "@/lib/excel-export";
 
 const statusOptions = ["ทั้งหมด", "ฉบับร่าง", "ส่งแล้ว", "รอดำเนินการ", "อนุมัติแล้ว", "ปฏิเสธ"];
 
@@ -170,15 +171,25 @@ export default function QuotationList({ onNavigate }: QuotationListProps) {
             <h1 className="page-title">ใบเสนอราคา</h1>
             <p className="page-subtitle mt-1">จัดการใบเสนอราคาทั้งหมด ({quotations.length} รายการ)</p>
           </div>
-          <button
-            onClick={() => onNavigate("Select Products")}
-            className="btn-primary w-full sm:w-auto"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            สร้างใบเสนอราคาใหม่
-          </button>
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+            <button
+              onClick={() => exportQuotations(quotations)}
+              className="inline-flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm font-semibold text-emerald-700 bg-white border border-emerald-200 rounded-lg hover:bg-emerald-50 transition-all active:scale-[0.98] shadow-sm"
+              title="ส่งออกข้อมูลเป็นไฟล์ Excel (.xlsx)"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              Excel
+            </button>
+            <button
+              onClick={() => onNavigate("Select Products")}
+              className="btn-primary w-full sm:w-auto"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              สร้างใบเสนอราคาใหม่
+            </button>
+          </div>
         </div>
 
         {/* Filter Bar */}

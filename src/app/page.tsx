@@ -1,37 +1,43 @@
 "use client";
 
 import { useState } from "react";
-import Sidebar from "@/components/Sidebar";
-import Header from "@/components/Header";
-import Dashboard from "@/components/Dashboard";
-import QuotationList from "@/components/QuotationList";
-import CustomerList from "@/components/CustomerList";
-import QuotationForm from "@/components/QuotationForm";
-import ProductList from "@/components/ProductList";
-import Reports from "@/components/Reports";
-import RepeatQueries from "@/components/RepeatQueries";
-import Settings from "@/components/Settings";
-import MemberManagement from "@/components/MemberManagement";
-import ProductSelector from "@/components/ProductSelector";
-import QuotationView from "@/components/QuotationView";
-import ProductionCosts from "@/components/ProductionCosts";
-import PurchaseOrders from "@/components/PurchaseOrders";
-import ActivityLogView from "@/components/ActivityLogView";
-import ActivityDrawer from "@/components/ActivityDrawer";
-import AccountingPlaceholder from "@/components/AccountingPlaceholder";
-import AccountingDashboard from "@/components/AccountingDashboard";
-import RevenueOverview from "@/components/RevenueOverview";
-import ExpenseOverview from "@/components/ExpenseOverview";
-import ContactManagement from "@/components/ContactManagement";
-import ProductManagement from "@/components/ProductManagement";
-import FinanceManagement from "@/components/FinanceManagement";
-import ChartOfAccounts from "@/components/ChartOfAccounts";
-import DocumentArchive from "@/components/DocumentArchive";
-import AccountingSettings from "@/components/AccountingSettings";
+import Sidebar from "@/components/layout/Sidebar";
+import Header from "@/components/layout/Header";
+import Dashboard from "@/components/layout/Dashboard";
+import QuotationList from "@/components/sales/QuotationList";
+import CustomerList from "@/components/sales/CustomerList";
+import QuotationForm from "@/components/sales/QuotationForm";
+import ProductList from "@/components/sales/ProductList";
+import Reports from "@/components/shared/Reports";
+import RepeatQueries from "@/components/shared/RepeatQueries";
+import Settings from "@/components/system/Settings";
+import MemberManagement from "@/components/system/MemberManagement";
+import ProductSelector from "@/components/sales/ProductSelector";
+import QuotationView from "@/components/sales/QuotationView";
+import ProductionCosts from "@/components/sales/ProductionCosts";
+import PurchaseOrders from "@/components/accounting/PurchaseOrders";
+import ActivityLogView from "@/components/system/ActivityLogView";
+import ActivityDrawer from "@/components/system/ActivityDrawer";
+import AccountingPlaceholder from "@/components/accounting/AccountingPlaceholder";
+import AccountingDashboard from "@/components/accounting/AccountingDashboard";
+import RevenueOverview from "@/components/accounting/RevenueOverview";
+import ExpenseOverview from "@/components/accounting/ExpenseOverview";
+import ContactManagement from "@/components/system/ContactManagement";
+import ProductManagement from "@/components/sales/ProductManagement";
+import FinanceManagement from "@/components/accounting/FinanceManagement";
+import ChartOfAccounts from "@/components/accounting/ChartOfAccounts";
+import DocumentArchive from "@/components/system/DocumentArchive";
+import AccountingSettings from "@/components/accounting/AccountingSettings";
+import SalesSettings from "@/components/sales/SalesSettings";
+import HRManagement from "@/components/hr/HRManagement";
+import HRDashboard from "@/components/hr/HRDashboard";
+import HRAttendance from "@/components/hr/HRAttendance";
+import HRApproval from "@/components/hr/HRApproval";
+import HRExpenses from "@/components/hr/HRExpenses";
 import { Product } from "@/context/AppContext";
 
 import { useAppContext } from "@/context/AppContext";
-import Login from "@/components/Login";
+import Login from "@/components/layout/Login";
 
 export default function Home() {
   const { currentUser, isReady } = useAppContext();
@@ -60,6 +66,7 @@ export default function Home() {
     switch (activePage) {
       case "Dashboard":
       case "แดชบอร์ด":
+      case "แดชบอร์ดฝ่ายขาย":
         return <Dashboard />;
       case "Quotations":
       case "รายการใบเสนอราคา":
@@ -118,6 +125,7 @@ export default function Home() {
         return <RepeatQueries onNavigate={handleNavigate} />;
       case "Settings (System)":
         return <Settings />;
+      case "ประวัติการใช้งาน":
       case "ประวัติใช้งาน":
         return <ActivityLogView />;
       case "Members":
@@ -135,6 +143,37 @@ export default function Home() {
         return <PurchaseOrders onNavigate={handleNavigate} initialType="PO" />;
       case "ใบขอซื้อ":
         return <PurchaseOrders onNavigate={handleNavigate} initialType="PR" />;
+      case "แดชบอร์ดฝ่ายบุคคล":
+        return <HRDashboard />;
+      case "อนุมัติ":
+        return <HRApproval />;
+      case "ค่าใช้จ่าย & เบิกเงิน":
+        return <HRExpenses />;
+      case "พนักงาน":
+      case "เงินเดือน":
+      case "มอบหมายงาน":
+      case "รายงานฝ่ายบุคคล":
+      case "ประกาศ":
+      case "กิจกรรม":
+      case "ขอเข้าร่วมบริษัท":
+        return <HRManagement activeTab={activePage} />;
+      case "เข้างาน":
+        return <HRAttendance />;
+      case "คำขอ":
+      case "งานของฉัน":
+      case "รายชื่อพนักงาน":
+      case "โครงสร้างองค์กร":
+      case "สัญญาจ้าง":
+      case "สรุปเงินเดือน":
+      case "รายการจ่ายเงิน":
+      case "ประกันสังคม/ภาษี":
+      case "บันทึกเวลาเข้างาน":
+      case "จัดการวันลา":
+      case "ตารางเวร/กะ":
+      case "จัดการพนักงาน":
+      case "บันทึกเวลา":
+      case "ตั้งค่าฝ่ายบุคคล":
+        return <HRManagement activeTab={activePage} />;
       case "รายรับ":
       case "รายจ่าย":
       case "ดูภาพรวม":
@@ -165,7 +204,11 @@ export default function Home() {
       case "คลังเอกสาร":
         return <DocumentArchive />;
       case "ตั้งค่า":
+      case "โปรไฟล์":
+      case "ตั้งค่าโปรไฟล์":
         return <Settings />;
+      case "ตั้งค่าการขาย":
+        return <SalesSettings />;
       case "ตั้งค่า (บัญชี)":
         return <AccountingSettings />;
       default:
@@ -203,7 +246,9 @@ export default function Home() {
       </div>
 
       {/* Activity Drawer */}
-      <ActivityDrawer />
+      {!["แดชบอร์ดฝ่ายบุคคล", "พนักงาน", "อนุมัติ", "ค่าใช้จ่าย & เบิกเงิน", "เงินเดือน", "มอบหมายงาน", "รายงาน", "รายงานฝ่ายบุคคล", "ตั้งค่าฝ่ายบุคคล", "ประกาศ", "กิจกรรม", "รายชื่อพนักงาน", "โครงสร้างองค์กร", "สัญญาจ้าง", "สรุปเงินเดือน", "รายการจ่ายเงิน", "ประกันสังคม/ภาษี", "บันทึกเวลาเข้างาน", "จัดการวันลา", "ตารางเวร/กะ", "จัดการพนักงาน", "บันทึกเวลา", "เข้างาน", "คำขอ", "งานของฉัน"].includes(activePage) && (
+        <ActivityDrawer />
+      )}
     </div>
   );
 }

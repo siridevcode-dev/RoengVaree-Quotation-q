@@ -4,6 +4,7 @@ import React, { useState, useRef, useMemo } from "react";
 import * as XLSX from "xlsx";
 
 import { useAppContext, ProductionCost, Quotation } from "@/context/AppContext";
+import { exportProductionCosts } from "@/lib/excel-export";
 
 const formatCurrency = (val: number | undefined | null) => {
   if (val === undefined || val === null) return "฿0";
@@ -668,6 +669,14 @@ export default function ProductionCosts({ onNavigate, initialQuotationId }: Prod
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
               <span className="hidden sm:inline">นำเข้า</span> Excel
+            </button>
+            <button 
+              onClick={() => exportProductionCosts(productionCosts)} 
+              className="inline-flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm font-semibold text-emerald-700 bg-white border border-emerald-200 rounded-lg hover:bg-emerald-50 transition-all active:scale-[0.98] shadow-sm"
+              title="ส่งออกข้อมูลต้นทุนเป็นไฟล์ Excel (.xlsx)"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              <span className="hidden sm:inline">ส่งออก</span> Excel
             </button>
             
 

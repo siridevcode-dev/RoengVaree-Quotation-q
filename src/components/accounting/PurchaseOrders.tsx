@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useAppContext, PurchaseOrder, PurchaseOrderItem } from "@/context/AppContext";
 import PurchaseOrderDocument from "./PurchaseOrderDocument";
+import { exportPurchaseOrders } from "@/lib/excel-export";
 import html2canvas from "html2canvas-pro";
 import { jsPDF } from "jspdf";
 
@@ -311,12 +312,14 @@ export default function PurchaseOrders({ onNavigate, initialQuotationId, initial
               <div>
                 <label className="block text-sm font-semibold mb-1">ประเภทเอกสาร</label>
                 <select 
+                  title="ประเภทเอกสาร"
                   value={formData.type} 
                   onChange={(e) => setFormData({...formData, type: e.target.value as "PO" | "PR"})}
                   className="input-modern"
                   disabled={!!editingId}
                   aria-label="ประเภทเอกสาร"
                 >
+
                   <option value="PR">Purchase Requisition (ใบขอซื้อ)</option>
                   <option value="PO">Purchase Order (ใบสั่งซื้อ)</option>
                 </select>
@@ -324,11 +327,13 @@ export default function PurchaseOrders({ onNavigate, initialQuotationId, initial
               <div>
                 <label className="block text-sm font-semibold mb-1">สถานะ</label>
                 <select 
+                  title="สถานะ"
                   value={formData.status} 
                   onChange={(e) => setFormData({...formData, status: e.target.value})}
                   className="input-modern"
                   aria-label="สถานะ"
                 >
+
                   {statusOptions.filter(s => s !== "ทั้งหมด").map(s => (
                     <option key={s} value={s}>{s}</option>
                   ))}
@@ -438,9 +443,19 @@ export default function PurchaseOrders({ onNavigate, initialQuotationId, initial
             <h1 className="page-title">Purchase Requisition / Order</h1>
             <p className="page-subtitle mt-1">จัดการใบขอซื้อและใบสั่งซื้อ</p>
           </div>
-          <button onClick={() => handleOpenForm()} className="btn-primary w-full sm:w-auto">
-            + สร้างเอกสารใหม่
-          </button>
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap w-full sm:w-auto">
+            <button
+              onClick={() => exportPurchaseOrders(purchaseOrders)}
+              className="inline-flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm font-semibold text-emerald-700 bg-white border border-emerald-200 rounded-lg hover:bg-emerald-50 transition-all active:scale-[0.98] shadow-sm"
+              title="ส่งออกเป็นไฟล์ Excel (.xlsx)"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              Excel
+            </button>
+            <button onClick={() => handleOpenForm()} className="btn-primary flex-1 sm:flex-none">
+              + สร้างเอกสารใหม่
+            </button>
+          </div>
         </div>
 
         {/* Filters */}

@@ -121,9 +121,21 @@ html {
   line-break: strict;
 }
 
+/* Force No-Wrap for UI components to prevent messy breaking in Thai */
+[lang="th"] th,
+[lang="th"] td,
+[lang="th"] button,
+[lang="th"] label,
+[lang="th"] h1, [lang="th"] h2, [lang="th"] h3, [lang="th"] h4, [lang="th"] h5, [lang="th"] h6,
+[lang="th"] .badge,
+[lang="th"] .nowrap {
+  white-space: nowrap;
+}
+
 [lang="th"] .break-words {
   word-break: normal !important;
   overflow-wrap: break-word !important;
+  white-space: normal !important;
 }
 
 [lang="th"] .text-justify-thai {
