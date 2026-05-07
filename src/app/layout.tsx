@@ -10,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "RoengVaree — Enterprise Resource Planning (ERP)",
-  description: "Enterprise Resource Planning system for RoengVaree Marine Engineering.",
+  title: "RoengVaree — HR RoengVaree",
+  description: "HR RoengVaree system for RoengVaree Marine Engineering.",
 };
 
 export default function RootLayout({

@@ -12,7 +12,7 @@ export async function GET() {
     const result = await db.execute("SELECT * FROM users WHERE username = 'admin'");
     const adminUser = result.rows[0];
     
-    const hashedPassword = hashPassword("Admin1230");
+    const hashedPassword = hashPassword("admin");
     
     if (adminUser) {
       await db.execute({

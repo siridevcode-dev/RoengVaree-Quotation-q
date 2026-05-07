@@ -34,6 +34,8 @@ import HRDashboard from "@/components/hr/HRDashboard";
 import HRAttendance from "@/components/hr/HRAttendance";
 import HRApproval from "@/components/hr/HRApproval";
 import HRExpenses from "@/components/hr/HRExpenses";
+import HRMyRequests from "@/components/hr/HRMyRequests";
+import HRProfile from "@/components/hr/HRProfile";
 import { Product } from "@/context/AppContext";
 
 import { useAppContext } from "@/context/AppContext";
@@ -67,7 +69,7 @@ export default function Home() {
       case "Dashboard":
       case "แดชบอร์ด":
       case "แดชบอร์ดฝ่ายขาย":
-        return <Dashboard />;
+        return <HRDashboard />;
       case "Quotations":
       case "รายการใบเสนอราคา":
         return <QuotationList onNavigate={handleNavigate} />;
@@ -160,6 +162,9 @@ export default function Home() {
       case "เข้างาน":
         return <HRAttendance />;
       case "คำขอ":
+        return <HRMyRequests />;
+      case "โปรไฟล์":
+        return <HRProfile />;
       case "งานของฉัน":
       case "รายชื่อพนักงาน":
       case "โครงสร้างองค์กร":
@@ -174,6 +179,7 @@ export default function Home() {
       case "บันทึกเวลา":
       case "ตั้งค่าฝ่ายบุคคล":
         return <HRManagement activeTab={activePage} />;
+
       case "รายรับ":
       case "รายจ่าย":
       case "ดูภาพรวม":
@@ -204,7 +210,6 @@ export default function Home() {
       case "คลังเอกสาร":
         return <DocumentArchive />;
       case "ตั้งค่า":
-      case "โปรไฟล์":
       case "ตั้งค่าโปรไฟล์":
         return <Settings />;
       case "ตั้งค่าการขาย":
@@ -246,7 +251,7 @@ export default function Home() {
       </div>
 
       {/* Activity Drawer */}
-      {!["แดชบอร์ดฝ่ายบุคคล", "พนักงาน", "อนุมัติ", "ค่าใช้จ่าย & เบิกเงิน", "เงินเดือน", "มอบหมายงาน", "รายงาน", "รายงานฝ่ายบุคคล", "ตั้งค่าฝ่ายบุคคล", "ประกาศ", "กิจกรรม", "รายชื่อพนักงาน", "โครงสร้างองค์กร", "สัญญาจ้าง", "สรุปเงินเดือน", "รายการจ่ายเงิน", "ประกันสังคม/ภาษี", "บันทึกเวลาเข้างาน", "จัดการวันลา", "ตารางเวร/กะ", "จัดการพนักงาน", "บันทึกเวลา", "เข้างาน", "คำขอ", "งานของฉัน"].includes(activePage) && (
+      {!["แดชบอร์ดฝ่ายบุคคล", "พนักงาน", "อนุมัติ", "ค่าใช้จ่าย & เบิกเงิน", "เงินเดือน", "มอบหมายงาน", "รายงาน", "รายงานฝ่ายบุคคล", "ตั้งค่าฝ่ายบุคคล", "ประกาศ", "กิจกรรม", "รายชื่อพนักงาน", "โครงสร้างองค์กร", "สัญญาจ้าง", "สรุปเงินเดือน", "รายการจ่ายเงิน", "ประกันสังคม/ภาษี", "บันทึกเวลาเข้างาน", "จัดการวันลา", "ตารางเวร/กะ", "จัดการพนักงาน", "บันทึกเวลา", "เข้างาน", "คำขอ", "งานของฉัน", "โปรไฟล์"].includes(activePage) && (
         <ActivityDrawer />
       )}
     </div>

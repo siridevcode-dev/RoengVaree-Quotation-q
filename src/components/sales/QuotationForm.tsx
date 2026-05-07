@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import html2canvas from "html2canvas-pro";
 import { jsPDF } from "jspdf";
 import { useAppContext, LineItem, Quotation } from "@/context/AppContext";
+import ThaiAddressSelects from "../shared/ThaiAddressSelects";
 import QuotationDocument from "./QuotationDocument";
 import { compressImage, safeLocalStorageSet } from "@/lib/image-utils";
 import { api } from "@/lib/api-client";
@@ -58,6 +59,10 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
+  const [customerProvince, setCustomerProvince] = useState("");
+  const [customerDistrict, setCustomerDistrict] = useState("");
+  const [customerSubDistrict, setCustomerSubDistrict] = useState("");
+  const [customerZipCode, setCustomerZipCode] = useState("");
   const [customerTaxId, setCustomerTaxId] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -221,6 +226,10 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
     setCustomerEmail(c.email || "");
     setCustomerPhone(c.phone || "");
     setCustomerAddress(c.address || "");
+    setCustomerProvince(c.province || "");
+    setCustomerDistrict(c.district || "");
+    setCustomerSubDistrict(c.subDistrict || "");
+    setCustomerZipCode(c.zipCode || "");
     setCustomerTaxId(c.taxId || "");
     setShowSuggestions(false);
   };
@@ -237,6 +246,10 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
         setCustomerEmail(existing.customerEmail || "");
         setCustomerPhone(existing.customerPhone || "");
         setCustomerAddress(existing.customerAddress || "");
+        setCustomerProvince(existing.customerProvince || "");
+        setCustomerDistrict(existing.customerDistrict || "");
+        setCustomerSubDistrict(existing.customerSubDistrict || "");
+        setCustomerZipCode(existing.customerZipCode || "");
         setCustomerTaxId(existing.customerTaxId || "");
         if (existing.lineItems && existing.lineItems.length > 0) {
           setItems(existing.lineItems.map(item => ({
@@ -308,7 +321,7 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
       }
       hasHydrated.current = true;
     }
-  }, [quotationId, initialItems, initialImages, quotations, boatModels, setCustomerName, setCustomerEmail, setCustomerPhone, setCustomerAddress, setCustomerTaxId, setItems, setNotes, setTerms, setStatus, setGlobalVatEnabled, setSummaryDiscountAmount, setSummaryDiscountPercentage, setBoatModel, setIncludeOptionalEquipment, setFrequency, setCustomImages, users]);
+  }, [quotationId, initialItems, initialImages, quotations, boatModels, setCustomerName, setCustomerEmail, setCustomerPhone, setCustomerAddress, setCustomerProvince, setCustomerDistrict, setCustomerSubDistrict, setCustomerZipCode, setCustomerTaxId, setItems, setNotes, setTerms, setStatus, setGlobalVatEnabled, setSummaryDiscountAmount, setSummaryDiscountPercentage, setBoatModel, setIncludeOptionalEquipment, setFrequency, setCustomImages, users]);
 
   const updateItem = (id: number | string | undefined, field: keyof LineItem, value: string | number | boolean) => {
     if (id === undefined) return;
@@ -384,6 +397,10 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
           email: customerEmail,
           phone: customerPhone,
           address: customerAddress,
+          province: customerProvince,
+          district: customerDistrict,
+          subDistrict: customerSubDistrict,
+          zipCode: customerZipCode,
           taxId: customerTaxId,
           totalQuotations: 1,
           totalRevenue: calculations.grandTotal,
@@ -420,6 +437,10 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
         customerEmail,
         customerPhone,
         customerAddress,
+        customerProvince,
+        customerDistrict,
+        customerSubDistrict,
+        customerZipCode,
         customerTaxId,
         lineItems: filteredItems,
         notes,
@@ -513,6 +534,10 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
     customerEmail,
     customerPhone,
     customerAddress,
+    customerProvince,
+    customerDistrict,
+    customerSubDistrict,
+    customerZipCode,
     customerTaxId,
     date: new Date().toLocaleDateString("th-TH"),
     validUntil: new Date(Date.now() + (settings?.quotationSettings?.validDays || 30) * 86400000).toLocaleDateString("th-TH"),
@@ -1011,8 +1036,21 @@ export default function QuotationForm({ onNavigate, quotationId, initialItems, i
                       type="text"
                       value={customerAddress || ""}
                       onChange={(e) => setCustomerAddress(e.target.value)}
-                      placeholder="ที่อยู่"
-                      className="w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all placeholder:text-gray-400"
+                      placeholder="บ้านเลขที่, ซอย, ถนน..."
+                      className="w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all placeholder:text-gray-400 mb-4"
+                    />
+                    <ThaiAddressSelects 
+                      province={customerProvince}
+                      district={customerDistrict}
+                      subDistrict={customerSubDistrict}
+                      zipCode={customerZipCode}
+                      onProvinceChange={setCustomerProvince}
+                      onDistrictChange={setCustomerDistrict}
+                      onSubDistrictChange={setCustomerSubDistrict}
+                      onZipCodeChange={setCustomerZipCode}
+                      labelClassName="text-xs font-medium text-gray-500 mb-1.5 block"
+                      selectClassName="w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all cursor-pointer appearance-none"
+                      inputClassName="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg text-gray-400 outline-none cursor-not-allowed"
                     />
                   </div>
                   <div>

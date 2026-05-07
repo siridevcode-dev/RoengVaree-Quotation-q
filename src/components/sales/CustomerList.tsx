@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAppContext, Customer } from "@/context/AppContext";
+import ThaiAddressSelects from "../shared/ThaiAddressSelects";
 import PasswordModal from "../system/PasswordModal";
 import { exportCustomers } from "@/lib/excel-export";
 
@@ -24,7 +25,17 @@ export default function CustomerList() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
-  const [formData, setFormData] = useState({ name: "", email: "", phone: "", address: "", taxId: "" });
+  const [formData, setFormData] = useState({ 
+    name: "", 
+    email: "", 
+    phone: "", 
+    address: "", 
+    taxId: "",
+    province: "",
+    district: "",
+    subDistrict: "",
+    zipCode: ""
+  });
 
   const filtered = customers.filter(
     (c) =>
@@ -34,13 +45,26 @@ export default function CustomerList() {
   );
 
   const openAddForm = () => {
-    setFormData({ name: "", email: "", phone: "", address: "", taxId: "" });
+    setFormData({ 
+      name: "", email: "", phone: "", address: "", taxId: "",
+      province: "", district: "", subDistrict: "", zipCode: ""
+    });
     setEditingId(null);
     setShowForm(true);
   };
 
-  const openEditForm = (c: Customer) => {
-    setFormData({ name: c.name, email: c.email, phone: c.phone, address: c.address, taxId: c.taxId });
+  const openEditForm = (c: any) => {
+    setFormData({ 
+      name: c.name, 
+      email: c.email || "", 
+      phone: c.phone || "", 
+      address: c.address || "", 
+      taxId: c.taxId || "",
+      province: c.province || "",
+      district: c.district || "",
+      subDistrict: c.subDistrict || "",
+      zipCode: c.zipCode || ""
+    });
     setEditingId(c.id);
     setShowForm(true);
   };
@@ -141,8 +165,22 @@ export default function CustomerList() {
                 </div>
                 <div>
                   <label className={labelClass}>ที่อยู่</label>
-                  <input type="text" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} placeholder="ที่อยู่" className={inputClass} />
+                  <input type="text" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} placeholder="บ้านเลขที่, ซอย, ถนน..." className={inputClass} />
                 </div>
+                
+                <ThaiAddressSelects 
+                  province={formData.province}
+                  district={formData.district}
+                  subDistrict={formData.subDistrict}
+                  zipCode={formData.zipCode}
+                  onProvinceChange={(v) => setFormData({ ...formData, province: v })}
+                  onDistrictChange={(v) => setFormData({ ...formData, district: v })}
+                  onSubDistrictChange={(v) => setFormData({ ...formData, subDistrict: v })}
+                  onZipCodeChange={(v) => setFormData({ ...formData, zipCode: v })}
+                  labelClassName={labelClass}
+                  selectClassName={inputClass}
+                  inputClassName={inputClass.replace("bg-white", "bg-gray-50")}
+                />
                 <div>
                   <label className={labelClass}>เลขประจำตัวผู้เสียภาษี</label>
                   <input type="text" value={formData.taxId} onChange={(e) => setFormData({ ...formData, taxId: e.target.value })} placeholder="0105-XXX-XXXX" className={inputClass} />

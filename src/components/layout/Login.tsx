@@ -41,7 +41,7 @@ export default function Login() {
           <h1 className="text-4xl font-black tracking-tighter mb-2 text-[#283583]">
             ROENGVAREE
           </h1>
-          <p className="text-slate-500 font-medium tracking-wide">Enterprise Resource Planning</p>
+          <p className="text-slate-500 font-medium tracking-wide">HR RoengVaree</p>
         </div>
 
         {/* Login Card */}

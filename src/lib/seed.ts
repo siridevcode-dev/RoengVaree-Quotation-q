@@ -13,7 +13,7 @@ export async function seedDatabase(db: Client) {
       ["U002", "วิภาดา สายลม", "wiphada", "082-345-6789", "", "", "Manager", "Active", hashPassword("password123"), "30/03/2026 06:12"],
       ["U003", "กิตติพงษ์ มั่นคง", "kittipong", "083-456-7890", "", "", "Editor", "Active", hashPassword("password123"), "29/03/2026 18:45"],
       ["U004", "นารี รัตนา", "naree", "084-567-8901", "", "", "Viewer", "Inactive", hashPassword("password123"), "25/03/2026 10:20"],
-      ["U005", "Admin", "admin", "", "", "Admin", "Admin", "Active", hashPassword("Admin1230"), ""],
+      ["U005", "Admin", "admin", "", "", "Admin", "Admin", "Active", hashPassword("admin"), ""],
     ];
 
     await db.batch(

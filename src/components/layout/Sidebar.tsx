@@ -12,240 +12,6 @@ interface SidebarProps {
 
 const navGroups = [
   {
-    title: "ฝ่ายขาย",
-    items: [
-      {
-        label: "แดชบอร์ดฝ่ายขาย",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z" />
-          </svg>
-        ),
-      },
-      {
-        label: "สร้างใบเสนอราคา",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-          </svg>
-        ),
-      },
-      {
-        label: "รายการใบเสนอราคา",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-        ),
-      },
-      {
-        label: "ลูกค้า",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        ),
-      },
-      {
-        label: "สินค้า & บริการ",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-          </svg>
-        ),
-      },
-      {
-        label: "ต้นทุนการผลิต",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        ),
-      },
-      {
-        label: "รายงาน",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
-        ),
-        subItems: [
-          { label: "รายงาน" },
-          { label: "รายงาน ผู้ติดต่อ" },
-        ]
-      },
-      {
-        label: "รูปแบบเอกสาร",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-        ),
-        subItems: [
-          { label: "รูปแบบใบเสนอราคา" },
-          { label: "รูปแบบใบเสนอราคา รูปแบบเก่า" },
-        ]
-      },
-      {
-        label: "ตั้งค่าการขาย",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        ),
-      },
-    ]
-  },
-  {
-    title: "ต้นทุนการผลิต",
-    items: [
-      {
-        label: "แผนการผลิต",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-          </svg>
-        ),
-      },
-      {
-        label: "บันทึกการผลิต",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
-        ),
-      },
-      {
-        label: "รายงานการผลิต",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 2v-4m3 2v-6m0 10H4.6a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v11a2 2 0 01-2 2z" />
-          </svg>
-        ),
-      }
-    ]
-  },
-  {
-    title: "บัญชี",
-    items: [
-      {
-        label: "แดชบอร์ดบัญชี",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z" />
-          </svg>
-        ),
-      },
-      {
-        label: "รายรับ",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-        ),
-        subItems: [
-          { label: "ดูภาพรวม" },
-          { label: "ใบเสนอราคา" },
-          { label: "ใบแจ้งหนี้ (ใบส่งของ, บันทึกลูกหนี้)" },
-          { label: "ใบเสร็จรับเงิน" },
-          { label: "ใบกำกับภาษีขาย" },
-          { label: "ขยายดูเมนูเพิ่มเติม", isToggle: true },
-          { label: "ใบรับเงินมัดจำ", isExtra: true },
-          { label: "ใบลดหนี้", isExtra: true },
-          { label: "ใบเพิ่มหนี้", isExtra: true },
-          { label: "ใบวางบิล", isExtra: true },
-          { label: "นำเข้าเอกสาร", isExtra: true },
-        ]
-      },
-      {
-        label: "รายจ่าย",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-          </svg>
-        ),
-        subItems: [
-          { label: "ดูภาพรวม" },
-          { label: "บันทึกซื้อสินค้า" },
-          { label: "บันทึกค่าใช้จ่าย" },
-          { label: "ใบสั่งซื้อ" },
-          { label: "ใบขอซื้อ" },
-          { label: "ใบสั่งซื้อสินทรัพย์", isExtra: true },
-          { label: "ซื้อสินทรัพย์", isExtra: true },
-          { label: "ใบกำกับภาษีซื้อ", isExtra: true },
-          { label: "ขยายดูเมนูเพิ่มเติม", isToggle: true },
-          { label: "ใบจ่ายเงินมัดจำ", isExtra: true },
-          { label: "รับใบลดหนี้", isExtra: true },
-          { label: "รับใบเพิ่มหนี้", isExtra: true },
-          { label: "ใบรวมจ่าย", isExtra: true },
-          { label: "นำเข้าเอกสาร", isExtra: true },
-        ]
-      },
-      {
-        label: "ผู้ติดต่อ",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        ),
-      },
-      {
-        label: "สินค้า",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-          </svg>
-        ),
-      },
-      {
-        label: "การเงิน",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-          </svg>
-        ),
-      },
-      {
-        label: "บัญชี",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5S19.832 5.477 21 6.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
-        ),
-        subItems: [
-          { label: "บัญชีรายวัน" },
-          { label: "บัญชีแยกประเภท" },
-          { label: "งบทดลอง" },
-          { label: "งบฐานะการเงิน" },
-          { label: "งบกำไรขาดทุน" },
-          { label: "ขยายดูเมนูเพิ่มเติม", isToggle: true },
-          { label: "ผังบัญชี", isExtra: true },
-          { label: "งบกระแสเงินสด", isExtra: true },
-          { label: "DBD e-Filing", isExtra: true },
-          { label: "สินทรัพย์", isExtra: true },
-        ]
-      },
-      {
-        label: "คลังเอกสาร",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
-          </svg>
-        ),
-      },
-      {
-        label: "ตั้งค่า (บัญชี)",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        ),
-      }
-    ]
-  },
-  {
     title: "ฝ่ายบุคคล",
     items: [
       {
@@ -332,36 +98,6 @@ const navGroups = [
         ),
       }
     ]
-  },
-  {
-    title: "ระบบ",
-    items: [
-      {
-        label: "สมาชิก",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-          </svg>
-        ),
-      },
-      {
-        label: "ประวัติการใช้งาน",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        ),
-      },
-      {
-        label: "ตั้งค่าโปรไฟล์",
-        icon: (
-          <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        ),
-      }
-    ]
   }
 ];
 
@@ -369,11 +105,7 @@ export default function Sidebar({ activePage, onPageChange, mobileOpen, onMobile
   const [collapsed, setCollapsed] = useState(false);
   const [viewMode, setViewMode] = useState<"me" | "team">("team");
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    "ฝ่ายขาย": true,
-    "ต้นทุนการผลิต": false,
-    "บัญชี": false,
-    "ฝ่ายบุคคล": false,
-    "ระบบ": false
+    "ฝ่ายบุคคล": true
   });
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [showExtraRevenue, setShowExtraRevenue] = useState(false);
@@ -542,37 +274,13 @@ export default function Sidebar({ activePage, onPageChange, mobileOpen, onMobile
       {/* Navigation */}
       <nav className="flex-1 py-3 px-2.5 space-y-0.5 overflow-y-auto custom-scrollbar">
         {navGroups.map((group, gIdx) => {
-          const isExpanded = group.title ? expandedSections[group.title] : true;
+          const isExpanded = true;
           
           return (
             <div key={group.title || `general-${gIdx}`} className="space-y-0.5">
-              {group.title && (!collapsed || mobileOpen) && (
-                <button
-                  onClick={() => toggleSection(group.title!)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 group/head rounded-xl transition-all duration-200 ${
-                    isExpanded ? "bg-[#eef2ff] mb-1 mt-1 shadow-sm" : "hover:bg-gray-50 pt-4 pb-2"
-                  }`}
-                >
-                    <span className={`text-[15px] font-black transition-colors flex items-center gap-1.5 ${
-                    isExpanded ? "text-[#283583]" : "text-[#6A789A] group-hover/head:text-[#283583]"
-                  }`}>
-                    {group.title}
-                  </span>
-                  <svg 
-                    className={`w-3 h-3 transition-all duration-300 ${
-                      isExpanded ? "text-[#283583] rotate-180" : "text-[#283583]/30 group-hover/head:text-[#283583]/60"
-                    }`} 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-              )}
               
-              <div className={`grid transition-all duration-300 ease-in-out ${isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0 pointer-events-none"}`}>
-                <div className={`overflow-hidden space-y-0.5 ${group.title ? "bg-[#f4f7fa] rounded-xl p-1.5 mb-1" : ""}`}>
+              <div className="block">
+                <div className="overflow-hidden space-y-0.5">
                   {group.title === "ฝ่ายบุคคล" && (!collapsed || mobileOpen) && (
                     <div className="px-1.5 py-2 mb-2">
                       <div className="bg-gray-200/50 p-1 rounded-[16px] flex items-center gap-0.5 shadow-inner border border-gray-200/20">

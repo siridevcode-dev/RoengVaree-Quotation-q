@@ -447,5 +447,34 @@ input[type="number"] {
 .dynamic-width  { width: var(--w); }
 .dynamic-top    { top: var(--top); }
 .dynamic-left   { left: var(--left); }
-.dynamic-bg     { background-color: var(--bg); }
+.dynamic-bg     { background: var(--bg); }
 .dynamic-color  { color: var(--color); }
+.dynamic-delay  { animation-delay: var(--delay); }
+
+/* Gradient & Animation delay utilities for HR Module */
+.grad-1 { background: linear-gradient(135deg, #283583 0%, #7c3aed 100%); }
+.grad-2 { background: linear-gradient(135deg, #0d9488 0%, #2dd4bf 100%); }
+.grad-3 { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
+.grad-4 { background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%); }
+.grad-5 { background: linear-gradient(135deg, #7c3aed 0%, #c084fc 100%); }
+.grad-6 { background: linear-gradient(135deg, #dc2626 0%, #f87171 100%); }
+.grad-7 { background: linear-gradient(135deg, #d97706 0%, #fbbf24 100%); }
+
+.shadow-grad-1 { --shadow-color: rgba(40, 53, 131, 0.25); }
+.shadow-grad-2 { --shadow-color: rgba(13, 148, 136, 0.25); }
+.shadow-grad-3 { --shadow-color: rgba(99, 102, 241, 0.25); }
+.shadow-grad-4 { --shadow-color: rgba(2, 132, 199, 0.25); }
+.shadow-grad-5 { --shadow-color: rgba(124, 58, 237, 0.25); }
+.shadow-grad-6 { --shadow-color: rgba(220, 38, 38, 0.25); }
+.shadow-grad-7 { --shadow-color: rgba(217, 119, 6, 0.25); }
+
+.delay-0 { animation-delay: 0ms; }
+.delay-70 { animation-delay: 70ms; }
+.delay-140 { animation-delay: 140ms; }
+.delay-210 { animation-delay: 210ms; }
+.delay-280 { animation-delay: 280ms; }
+.delay-350 { animation-delay: 350ms; }
+.delay-420 { animation-delay: 420ms; }
+.delay-490 { animation-delay: 490ms; }
+.delay-560 { animation-delay: 560ms; }
+.delay-630 { animation-delay: 630ms; }

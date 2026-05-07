@@ -134,7 +134,7 @@ export default function HRPayroll() {
  )}
  {/* Breadcrumbs */}
  <div className="flex items-center gap-2 text-[13px] font-bold text-slate-400">
- <button onClick={() => setSelectedPeriodDetails(null)} className="hover:text-indigo-600 transition-colors">เงินเดือน</button>
+ <button title="button" onClick={() => setSelectedPeriodDetails(null)} className="hover:text-indigo-600 transition-colors">เงินเดือน</button>
  <span>&gt;</span>
  <span className="text-slate-600">งวดเงินเดือน</span>
  </div>
@@ -260,14 +260,14 @@ export default function HRPayroll() {
  </div>
 
  <div className="flex items-center gap-3">
- <button className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-2xl text-[13.5px] font-bold transition-all active:scale-95">
+ <button title="button" className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-2xl text-[13.5px] font-bold transition-all active:scale-95">
  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
  </svg>
  <span>ดาวน์โหลดเอกสาร</span>
  </button>
 
- <button className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-2xl text-[13.5px] font-bold transition-all active:scale-95">
+ <button title="button" className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-2xl text-[13.5px] font-bold transition-all active:scale-95">
  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
  </svg>
@@ -280,7 +280,7 @@ export default function HRPayroll() {
  {workflowStep === 1 ? (
  <>
  <div>
- <button className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/80 rounded-xl text-[13px] font-bold transition-all shadow-sm active:scale-95">
+ <button title="button" className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/80 rounded-xl text-[13px] font-bold transition-all shadow-sm active:scale-95">
  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.356-2m15.356 2H15" />
  </svg>
@@ -292,7 +292,7 @@ export default function HRPayroll() {
  </div>
 
  <div className="flex items-center gap-3">
- <button onClick={handleCalculate} className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/80 rounded-xl text-[13px] font-bold transition-all shadow-sm active:scale-95">
+ <button title="button" onClick={handleCalculate} className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/80 rounded-xl text-[13px] font-bold transition-all shadow-sm active:scale-95">
  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
  </svg>
@@ -318,20 +318,20 @@ export default function HRPayroll() {
  ) : workflowStep === 2 ? (
  <>
  <div>
- <button onClick={() => setWorkflowStep(1)} className="flex items-center gap-2 px-5 py-2 bg-white hover:bg-slate-50 text-sky-500 border border-sky-400/60 rounded-xl text-[13px] font-bold transition-all shadow-sm active:scale-95">
+ <button title="button" onClick={() => setWorkflowStep(1)} className="flex items-center gap-2 px-5 py-2 bg-white hover:bg-slate-50 text-sky-500 border border-sky-400/60 rounded-xl text-[13px] font-bold transition-all shadow-sm active:scale-95">
  <span>ย้อนกลับ</span>
  </button>
  </div>
 
  <div className="flex items-center gap-3">
- <button className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/80 rounded-xl text-[13px] font-bold transition-all shadow-sm active:scale-95">
+ <button title="button" className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/80 rounded-xl text-[13px] font-bold transition-all shadow-sm active:scale-95">
  <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
  </svg>
  <span>อัปโหลดเอกสารอนุมัติ (ถ้ามี)</span>
  </button>
 
- <button onClick={() => setWorkflowStep(3)} className="flex items-center gap-2 px-5 py-2 bg-[#0EA5E9] hover:bg-[#0EA5E9]/90 text-white rounded-xl text-[13px] font-bold transition-all shadow-md shadow-sky-500/10 active:scale-95">
+ <button title="button" onClick={() => setWorkflowStep(3)} className="flex items-center gap-2 px-5 py-2 bg-[#0EA5E9] hover:bg-[#0EA5E9]/90 text-white rounded-xl text-[13px] font-bold transition-all shadow-md shadow-sky-500/10 active:scale-95">
  <span>อนุมัติ</span>
  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -342,7 +342,7 @@ export default function HRPayroll() {
  ) : (
  <>
  <div>
- <button onClick={() => setWorkflowStep(2)} className="flex items-center gap-2 px-6 py-2 bg-white hover:bg-sky-50/50 text-[#0EA5E9] border border-[#0EA5E9] rounded-xl text-[13px] font-black transition-all shadow-sm active:scale-95">
+ <button title="button" onClick={() => setWorkflowStep(2)} className="flex items-center gap-2 px-6 py-2 bg-white hover:bg-sky-50/50 text-[#0EA5E9] border border-[#0EA5E9] rounded-xl text-[13px] font-black transition-all shadow-sm active:scale-95">
  <span>ย้อนกลับ</span>
  </button>
  </div>
@@ -371,7 +371,7 @@ export default function HRPayroll() {
  )}
 
  {!isPeriodClosed && (
- <button onClick={() => {
+ <button title="button" onClick={() => {
  setIsPeriodClosed(true);
  setToast("ปิดงวดแล้ว");
  }}
@@ -664,7 +664,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -673,7 +673,7 @@ export default function HRPayroll() {
  <span className="text-slate-600 font-black">เพิ่มข้อมูลเงินได้</span>
  </div>
  
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -723,12 +723,12 @@ export default function HRPayroll() {
 
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-4xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -749,7 +749,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -759,7 +759,7 @@ export default function HRPayroll() {
  </div>
  
  {/* Close button */}
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -988,12 +988,12 @@ export default function HRPayroll() {
  </div>
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-4xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -1014,7 +1014,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1023,7 +1023,7 @@ export default function HRPayroll() {
  <span className="text-slate-600 font-black">แก้ไขข้อมูลเงินได้</span>
  </div>
  
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1047,7 +1047,7 @@ export default function HRPayroll() {
  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
  </label>
  </div>
- <button className="flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/60 text-slate-600 rounded-2xl text-[13px] font-bold transition-all">
+ <button title="button" className="flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/60 text-slate-600 rounded-2xl text-[13px] font-bold transition-all">
  ⚙️ ตั้งค่าเงื่อนไขการทำโอที
  </button>
  </div>
@@ -1206,12 +1206,12 @@ export default function HRPayroll() {
  </div>
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-4xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -1232,7 +1232,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1241,7 +1241,7 @@ export default function HRPayroll() {
  <span className="text-slate-600 font-black">แก้ไขข้อมูลเงินได้</span>
  </div>
  
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1320,14 +1320,14 @@ export default function HRPayroll() {
  <span className="text-[13px] font-black text-slate-800">พนักงานที่ได้รับสิทธิ์</span>
  <div className="flex items-center gap-3 max-w-md">
  <div className="flex bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/30 flex-1">
- <button className="flex-1 text-center py-2 bg-white shadow-sm rounded-[10px] text-[12.5px] font-black text-[#0EA5E9]">
+ <button title="button" className="flex-1 text-center py-2 bg-white shadow-sm rounded-[10px] text-[12.5px] font-black text-[#0EA5E9]">
  พนักงานทุกคน
  </button>
- <button className="flex-1 text-center py-2 text-[12.5px] font-bold text-slate-500 hover:text-slate-700">
+ <button title="button" className="flex-1 text-center py-2 text-[12.5px] font-bold text-slate-500 hover:text-slate-700">
  กำหนดเอง
  </button>
  </div>
- <button className="p-2 bg-white hover:bg-slate-50 border border-slate-200/60 rounded-xl text-slate-400 hover:text-slate-600 transition-all shadow-sm">
+ <button title="button" className="p-2 bg-white hover:bg-slate-50 border border-slate-200/60 rounded-xl text-slate-400 hover:text-slate-600 transition-all shadow-sm">
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
  </svg>
@@ -1405,10 +1405,10 @@ export default function HRPayroll() {
  </div>
 
  <div className="flex bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/30 max-w-xs">
- <button className="flex-1 text-center py-2 text-[12.5px] font-bold text-slate-500 hover:text-slate-700">
+ <button title="button" className="flex-1 text-center py-2 text-[12.5px] font-bold text-slate-500 hover:text-slate-700">
  อัตราคงที่
  </button>
- <button className="flex-1 text-center py-2 bg-white shadow-sm rounded-[10px] text-[12.5px] font-black text-[#0EA5E9]">
+ <button title="button" className="flex-1 text-center py-2 bg-white shadow-sm rounded-[10px] text-[12.5px] font-black text-[#0EA5E9]">
  ขั้นบันได
  </button>
  </div>
@@ -1421,10 +1421,10 @@ export default function HRPayroll() {
  </label>
 
  <div className="flex bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/30 max-w-sm">
- <button className="flex-1 text-center py-2 bg-white shadow-sm rounded-[10px] text-[12.5px] font-black text-[#0EA5E9]">
+ <button title="button" className="flex-1 text-center py-2 bg-white shadow-sm rounded-[10px] text-[12.5px] font-black text-[#0EA5E9]">
  นับใหม่เมื่อไม่ผ่านเงื่อนไข
  </button>
- <button className="flex-1 text-center py-2 text-[12.5px] font-bold text-slate-500 hover:text-slate-700">
+ <button title="button" className="flex-1 text-center py-2 text-[12.5px] font-bold text-slate-500 hover:text-slate-700">
  นับสะสมไปเรื่อย ๆ
  </button>
  </div>
@@ -1455,19 +1455,19 @@ export default function HRPayroll() {
  ))}
  </div>
 
- <button className="text-[#0EA5E9] hover:underline text-[13px] font-bold flex items-center gap-1 mt-2 self-start">
+ <button title="button" className="text-[#0EA5E9] hover:underline text-[13px] font-bold flex items-center gap-1 mt-2 self-start">
  ⓘ ดูสูตรคำนวณ
  </button>
  </div>
  </div>
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-4xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -1488,7 +1488,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1497,7 +1497,7 @@ export default function HRPayroll() {
  <span className="text-slate-600 font-black">แก้ไขข้อมูลเงินได้</span>
  </div>
  
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1555,12 +1555,12 @@ export default function HRPayroll() {
 
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-4xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -1581,7 +1581,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1590,7 +1590,7 @@ export default function HRPayroll() {
  <span className="text-slate-600 font-black">แก้ไขข้อมูลเงินได้</span>
  </div>
  
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1655,12 +1655,12 @@ export default function HRPayroll() {
 
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-4xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -1681,7 +1681,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1690,7 +1690,7 @@ export default function HRPayroll() {
  <span className="text-slate-600 font-black">แก้ไขข้อมูลเงินได้</span>
  </div>
  
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1781,12 +1781,12 @@ export default function HRPayroll() {
  <span className="text-[12.5px] font-bold text-slate-500">พนักงานที่ได้รับสิทธิ์</span>
  <div className="flex items-center gap-3">
  <div className="flex bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/30 flex-1 max-w-[220px]">
- <button onClick={() => setWelfareMonthlyEligible("พนักงานทุกคน")}
+ <button title="button" onClick={() => setWelfareMonthlyEligible("พนักงานทุกคน")}
  className={`flex-1 text-center py-1.5 rounded-[10px] text-[12px] font-black transition-all ${welfareMonthlyEligible === "พนักงานทุกคน" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-500 hover:text-slate-700"}`}
  >
  พนักงานทุกคน
  </button>
- <button onClick={() => setWelfareMonthlyEligible("กำหนดเอง")}
+ <button title="button" onClick={() => setWelfareMonthlyEligible("กำหนดเอง")}
  className={`flex-1 text-center py-1.5 rounded-[10px] text-[12px] font-black transition-all ${welfareMonthlyEligible === "กำหนดเอง" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-500 hover:text-slate-700"}`}
  >
  กำหนดเอง
@@ -1808,12 +1808,12 @@ export default function HRPayroll() {
  <div className="flex flex-col gap-2">
  <span className="text-[12.5px] font-bold text-slate-500">วิธีคำนวณ</span>
  <div className="flex bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/30 w-fit">
- <button onClick={() => setWelfareMonthlyCalcType("รายเดือน")}
+ <button title="button" onClick={() => setWelfareMonthlyCalcType("รายเดือน")}
  className={`px-4 py-1.5 rounded-[10px] text-[12px] font-black transition-all ${welfareMonthlyCalcType === "รายเดือน" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-500 hover:text-slate-700"}`}
  >
  รายเดือน
  </button>
- <button onClick={() => setWelfareMonthlyCalcType("คิดตามวันทำงาน")}
+ <button title="button" onClick={() => setWelfareMonthlyCalcType("คิดตามวันทำงาน")}
  className={`px-4 py-1.5 rounded-[10px] text-[12px] font-black transition-all ${welfareMonthlyCalcType === "คิดตามวันทำงาน" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-500 hover:text-slate-700"}`}
  >
  คิดตามวันทำงาน
@@ -1840,7 +1840,7 @@ export default function HRPayroll() {
  <span>รวมพนักงานที่ไม่ลงเวลา</span>
  </label>
 
- <button className="text-[#0EA5E9] hover:underline text-[12px] font-bold flex items-center gap-1 self-start">
+ <button title="button" className="text-[#0EA5E9] hover:underline text-[12px] font-bold flex items-center gap-1 self-start">
  ⓘ ดูสูตรคำนวณ
  </button>
  </div>
@@ -1876,12 +1876,12 @@ export default function HRPayroll() {
 
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-4xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -1902,7 +1902,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1911,7 +1911,7 @@ export default function HRPayroll() {
  <span className="text-slate-600 font-black">แก้ไขข้อมูลเงินได้</span>
  </div>
  
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1969,12 +1969,12 @@ export default function HRPayroll() {
 
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-4xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -1995,7 +1995,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2004,7 +2004,7 @@ export default function HRPayroll() {
  <span className="text-slate-600 font-black">แก้ไขข้อมูลเงินหัก</span>
  </div>
  
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2114,12 +2114,12 @@ export default function HRPayroll() {
 
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-4xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -2140,7 +2140,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2149,7 +2149,7 @@ export default function HRPayroll() {
  <span className="text-slate-600 font-black">แก้ไขข้อมูลเงินหัก</span>
  </div>
  
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2206,12 +2206,12 @@ export default function HRPayroll() {
 
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-4xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -2232,7 +2232,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2241,7 +2241,7 @@ export default function HRPayroll() {
  <span className="text-slate-600 font-black">แก้ไขข้อมูลเงินหัก</span>
  </div>
  
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2350,7 +2350,7 @@ export default function HRPayroll() {
  </div>
  </div>
  
- <button className="flex items-center gap-2 text-[#0EA5E9] hover:text-[#0284C7] text-[13px] font-bold mt-1 self-start">
+ <button title="button" className="flex items-center gap-2 text-[#0EA5E9] hover:text-[#0284C7] text-[13px] font-bold mt-1 self-start">
  <span className="w-6 h-6 border-2 border-dashed border-[#0EA5E9] rounded-xl flex items-center justify-center">+</span>
  <span>เพิ่ม</span>
  </button>
@@ -2394,7 +2394,7 @@ export default function HRPayroll() {
  </div>
  </div>
  
- <button className="flex items-center gap-2 text-[#0EA5E9] hover:text-[#0284C7] text-[13px] font-bold mt-1 self-start">
+ <button title="button" className="flex items-center gap-2 text-[#0EA5E9] hover:text-[#0284C7] text-[13px] font-bold mt-1 self-start">
  <span className="w-6 h-6 border-2 border-dashed border-[#0EA5E9] rounded-xl flex items-center justify-center">+</span>
  <span>เพิ่ม</span>
  </button>
@@ -2404,12 +2404,12 @@ export default function HRPayroll() {
 
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-6xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -2430,7 +2430,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2439,7 +2439,7 @@ export default function HRPayroll() {
  <span className="text-slate-600 font-black">แก้ไขข้อมูลเงินหัก</span>
  </div>
  
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2510,7 +2510,7 @@ export default function HRPayroll() {
  <span className="text-[12px] font-bold text-slate-400">พนักงานที่ได้รับสิทธิ์</span>
  <div className="flex bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/30 max-w-xs">
  {["พนักงานทุกคน", "กำหนดเอง"].map((tab, idx) => (
- <button key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "พนักงานทุกคน" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
+ <button title="button" key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "พนักงานทุกคน" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
  {tab}
  </button>
  ))}
@@ -2527,7 +2527,7 @@ export default function HRPayroll() {
 
  <div className="flex bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/30 max-w-xs">
  {["กำหนดวงเงิน", "คิดตามวันทำงาน"].map((tab, idx) => (
- <button key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "กำหนดวงเงิน" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
+ <button title="button" key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "กำหนดวงเงิน" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
  {tab}
  </button>
  ))}
@@ -2562,7 +2562,7 @@ export default function HRPayroll() {
  <span className="text-[12px] font-bold text-slate-400">พนักงานที่ได้รับสิทธิ์</span>
  <div className="flex bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/30 max-w-xs">
  {["พนักงานทุกคน", "กำหนดเอง"].map((tab, idx) => (
- <button key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "พนักงานทุกคน" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
+ <button title="button" key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "พนักงานทุกคน" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
  {tab}
  </button>
  ))}
@@ -2579,7 +2579,7 @@ export default function HRPayroll() {
 
  <div className="flex bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/30 max-w-xs">
  {["กำหนดวงเงิน", "คิดตามวันทำงาน"].map((tab, idx) => (
- <button key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "คิดตามวันทำงาน" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
+ <button title="button" key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "คิดตามวันทำงาน" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
  {tab}
  </button>
  ))}
@@ -2603,12 +2603,12 @@ export default function HRPayroll() {
 
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-6xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -2629,7 +2629,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2639,14 +2639,14 @@ export default function HRPayroll() {
  </div>
  
  <div className="flex items-center gap-3">
- <button className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded-xl text-[12.5px] font-bold shadow-sm transition-all">
+ <button title="button" className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded-xl text-[12.5px] font-bold shadow-sm transition-all">
  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
  </svg>
  <span>ตั้งค่าเงื่อนไขการทำงาน</span>
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2738,7 +2738,7 @@ export default function HRPayroll() {
 
  <div className="flex bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/30 mt-2 max-w-lg">
  {["ตามค่าจ้าง", "รายครั้ง", "เป็นรอบๆ", "ขั้นบันได (ต่อครั้ง)"].map((tab, idx) => (
- <button key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "ตามค่าจ้าง" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
+ <button title="button" key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "ตามค่าจ้าง" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
  {tab}
  </button>
  ))}
@@ -2752,7 +2752,7 @@ export default function HRPayroll() {
  </div>
  </div>
 
- <button className="text-[#0EA5E9] hover:underline text-[13px] font-bold flex items-center gap-1 mt-4 self-start">
+ <button title="button" className="text-[#0EA5E9] hover:underline text-[13px] font-bold flex items-center gap-1 mt-4 self-start">
  ⓘ ดูสูตรคำนวณ
  </button>
  </div>
@@ -2776,7 +2776,7 @@ export default function HRPayroll() {
 
  <div className="flex bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/30 mt-2 max-w-lg">
  {["ตามค่าจ้าง", "รายครั้ง", "เป็นรอบๆ", "ขั้นบันได (ต่อครั้ง)"].map((tab, idx) => (
- <button key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "ตามค่าจ้าง" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
+ <button title="button" key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "ตามค่าจ้าง" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
  {tab}
  </button>
  ))}
@@ -2790,7 +2790,7 @@ export default function HRPayroll() {
  </div>
  </div>
 
- <button className="text-[#0EA5E9] hover:underline text-[13px] font-bold flex items-center gap-1 mt-4 self-start">
+ <button title="button" className="text-[#0EA5E9] hover:underline text-[13px] font-bold flex items-center gap-1 mt-4 self-start">
  ⓘ ดูสูตรคำนวณ
  </button>
  </div>
@@ -2798,12 +2798,12 @@ export default function HRPayroll() {
 
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-6xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -2824,7 +2824,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2834,14 +2834,14 @@ export default function HRPayroll() {
  </div>
  
  <div className="flex items-center gap-3">
- <button className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded-xl text-[12.5px] font-bold shadow-sm transition-all">
+ <button title="button" className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded-xl text-[12.5px] font-bold shadow-sm transition-all">
  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
  </svg>
  <span>ตั้งค่าเงื่อนไขการทำงาน</span>
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2933,13 +2933,13 @@ export default function HRPayroll() {
 
  <div className="flex bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/30 mt-2 max-w-xs">
  {["ตามค่าจ้าง", "รายครั้ง"].map((tab, idx) => (
- <button key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "ตามค่าจ้าง" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
+ <button title="button" key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "ตามค่าจ้าง" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
  {tab}
  </button>
  ))}
  </div>
 
- <button className="text-[#0EA5E9] hover:underline text-[13px] font-bold flex items-center gap-1 mt-4 self-start">
+ <button title="button" className="text-[#0EA5E9] hover:underline text-[13px] font-bold flex items-center gap-1 mt-4 self-start">
  ⓘ ดูสูตรคำนวณ
  </button>
  </div>
@@ -2963,13 +2963,13 @@ export default function HRPayroll() {
 
  <div className="flex bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/30 mt-2 max-w-xs">
  {["ตามค่าจ้าง", "รายครั้ง"].map((tab, idx) => (
- <button key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "ตามค่าจ้าง" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
+ <button title="button" key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "ตามค่าจ้าง" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
  {tab}
  </button>
  ))}
  </div>
 
- <button className="text-[#0EA5E9] hover:underline text-[13px] font-bold flex items-center gap-1 mt-4 self-start">
+ <button title="button" className="text-[#0EA5E9] hover:underline text-[13px] font-bold flex items-center gap-1 mt-4 self-start">
  ⓘ ดูสูตรคำนวณ
  </button>
  </div>
@@ -2977,12 +2977,12 @@ export default function HRPayroll() {
 
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-6xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -3003,7 +3003,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3013,14 +3013,14 @@ export default function HRPayroll() {
  </div>
  
  <div className="flex items-center gap-3">
- <button className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded-xl text-[12.5px] font-bold shadow-sm transition-all">
+ <button title="button" className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded-xl text-[12.5px] font-bold shadow-sm transition-all">
  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
  </svg>
  <span>ตั้งค่าเงื่อนไขการทำงาน</span>
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3112,7 +3112,7 @@ export default function HRPayroll() {
 
  <div className="flex bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/30 mt-2 max-w-lg">
  {["ตามค่าจ้าง", "รายครั้ง", "เป็นรอบๆ", "ขั้นบันได (ต่อครั้ง)"].map((tab, idx) => (
- <button key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "ขั้นบันได (ต่อครั้ง)" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
+ <button title="button" key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "ขั้นบันได (ต่อครั้ง)" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
  {tab}
  </button>
  ))}
@@ -3136,7 +3136,7 @@ export default function HRPayroll() {
  <span className="text-slate-400 font-bold text-[11.5px] ml-2">฿</span>
  </div>
  {i > 0 && (
- <button className="p-2 text-slate-300 hover:text-rose-500 transition-colors">
+ <button title="button" className="p-2 text-slate-300 hover:text-rose-500 transition-colors">
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
  </svg>
@@ -3146,7 +3146,7 @@ export default function HRPayroll() {
  ))}
  </div>
 
- <button className="flex items-center gap-2 text-[#0EA5E9] hover:text-[#0284C7] text-[13px] font-bold mt-2 self-start">
+ <button title="button" className="flex items-center gap-2 text-[#0EA5E9] hover:text-[#0284C7] text-[13px] font-bold mt-2 self-start">
  <span className="w-6 h-6 border-2 border-dashed border-[#0EA5E9] rounded-xl flex items-center justify-center">+</span>
  <span>เพิ่ม</span>
  </button>
@@ -3176,7 +3176,7 @@ export default function HRPayroll() {
 
  <div className="flex bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/30 mt-2 max-w-lg">
  {["ตามค่าจ้าง", "รายครั้ง", "เป็นรอบๆ", "ขั้นบันได (ต่อครั้ง)"].map((tab, idx) => (
- <button key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "ตามค่าจ้าง" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
+ <button title="button" key={idx} className={`flex-1 text-center py-2 rounded-[10px] text-[12.5px] font-black ${tab === "ตามค่าจ้าง" ? "bg-white shadow-sm text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"}`}>
  {tab}
  </button>
  ))}
@@ -3195,7 +3195,7 @@ export default function HRPayroll() {
  <span>นำเวลาพักเกินไปคำนวณด้วย</span>
  </label>
 
- <button className="text-[#0EA5E9] hover:underline text-[13px] font-bold flex items-center gap-1 mt-4 self-start">
+ <button title="button" className="text-[#0EA5E9] hover:underline text-[13px] font-bold flex items-center gap-1 mt-4 self-start">
  ⓘ ดูสูตรคำนวณ
  </button>
  </div>
@@ -3203,12 +3203,12 @@ export default function HRPayroll() {
 
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-6xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -3229,7 +3229,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3238,7 +3238,7 @@ export default function HRPayroll() {
  <span className="text-slate-600 font-black">แก้ไขข้อมูลเงินหัก</span>
  </div>
  
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3304,12 +3304,12 @@ export default function HRPayroll() {
 
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-4xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -3330,7 +3330,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3339,7 +3339,7 @@ export default function HRPayroll() {
  <span className="text-slate-600 font-black">แก้ไขข้อมูลเงินหัก</span>
  </div>
  
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3408,12 +3408,12 @@ export default function HRPayroll() {
 
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-4xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -3434,7 +3434,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3443,7 +3443,7 @@ export default function HRPayroll() {
  <span className="text-slate-600 font-black">แก้ไขข้อมูลเงินหัก</span>
  </div>
  
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3521,12 +3521,12 @@ export default function HRPayroll() {
 
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-4xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -3547,7 +3547,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3556,7 +3556,7 @@ export default function HRPayroll() {
  <span className="text-slate-600 font-black">แก้ไขข้อมูลเงินได้</span>
  </div>
  
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3638,12 +3638,12 @@ export default function HRPayroll() {
 
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6 max-w-4xl">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -3664,7 +3664,7 @@ export default function HRPayroll() {
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
  </svg>
- <button onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
+ <button title="button" onClick={() => setActiveEditingEarning(null)} className="hover:text-indigo-600 transition-colors font-bold">
  เงินได้/เงินหัก
  </button>
  <svg className="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3673,7 +3673,7 @@ export default function HRPayroll() {
  <span className="text-slate-600 font-black">แก้ไขข้อมูล</span>
  </div>
  
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3724,12 +3724,12 @@ export default function HRPayroll() {
  </div>
  {/* Action Buttons Row */}
  <div className="flex items-center justify-end gap-3 mt-10 mb-6">
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-6 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[13.5px] font-bold transition-all bg-white shadow-sm"
  >
  ยกเลิก
  </button>
- <button onClick={() => setActiveEditingEarning(null)}
+ <button title="button" onClick={() => setActiveEditingEarning(null)}
  className="px-8 py-2.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-[13.5px] font-black shadow-sm shadow-sky-100 transition-all"
  >
  บันทึกข้อมูล
@@ -3745,7 +3745,7 @@ export default function HRPayroll() {
  {/* Header & Breadcrumbs */}
  <div className="bg-white border-b border-slate-200/60 px-10 py-4 flex-shrink-0 flex items-center justify-between">
  <div className="flex items-center gap-2">
- <button onClick={() => setEarningsTab("เงินได้")}
+ <button title="button" onClick={() => setEarningsTab("เงินได้")}
  className={`relative px-6 py-3 text-[14px] font-black transition-all flex items-center gap-2 ${
  earningsTab === "เงินได้" ? "text-[#0EA5E9] border-b-2 border-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"
  }`}
@@ -3753,7 +3753,7 @@ export default function HRPayroll() {
  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#0EA5E9] text-white text-[12px]">+</span>
  <span>เงินได้</span>
  </button>
- <button onClick={() => setEarningsTab("เงินหัก")}
+ <button title="button" onClick={() => setEarningsTab("เงินหัก")}
  className={`relative px-6 py-3 text-[14px] font-black transition-all flex items-center gap-2 ${
  earningsTab === "เงินหัก" ? "text-[#0EA5E9] border-b-2 border-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"
  }`}
@@ -3764,7 +3764,7 @@ export default function HRPayroll() {
  </div>
  
  {/* Close button */}
- <button onClick={() => setIsEarningsSettingsOpen(false)}
+ <button title="button" onClick={() => setIsEarningsSettingsOpen(false)}
  className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-100 bg-white"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3798,7 +3798,7 @@ export default function HRPayroll() {
  </select>
  </div>
 
- <button onClick={() => setActiveEditingEarning("create_new")}
+ <button title="button" onClick={() => setActiveEditingEarning("create_new")}
  className="flex items-center gap-2 px-5 py-2.5 bg-[#0EA5E9] hover:bg-sky-600 text-white rounded-2xl text-[13px] font-black transition-all shadow-lg shadow-[#0EA5E9]/20 active:scale-95"
  >
  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3845,7 +3845,7 @@ export default function HRPayroll() {
  <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
  <td className="px-6 py-4 text-slate-500">{item.id}</td>
  <td className="px-6 py-4 text-slate-800">
- <button onClick={() => setActiveEditingEarning(item.name)} 
+ <button title="button" onClick={() => setActiveEditingEarning(item.name)} 
  className="hover:text-[#0EA5E9] transition-colors text-left"
  >
  {item.name}
@@ -3884,7 +3884,7 @@ export default function HRPayroll() {
  <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
  <td className="px-6 py-4 text-slate-500">{item.id}</td>
  <td className="px-6 py-4 text-slate-800">
- <button onClick={() => setActiveEditingEarning(item.name)} 
+ <button title="button" onClick={() => setActiveEditingEarning(item.name)} 
  className="hover:text-[#0EA5E9] transition-colors text-left"
  >
  {item.name}
@@ -3985,7 +3985,7 @@ export default function HRPayroll() {
  <div className="flex flex-col gap-2">
  <label className="text-[13px] font-black text-slate-800">จำนวนงวดการจ่าย</label>
  <div className={`flex bg-slate-100/80 rounded-2xl p-1 border border-slate-200/40 transition-all duration-300 ${payType === "รายวัน" ? "max-w-md" : "max-w-sm"}`}>
- <button onClick={() => setPaymentFrequency("เดือนละ 1 ครั้ง")}
+ <button title="button" onClick={() => setPaymentFrequency("เดือนละ 1 ครั้ง")}
  className={`flex-1 text-center py-2.5 rounded-xl text-[13px] flex items-center justify-center gap-1 transition-all duration-200 ${
  paymentFrequency === "เดือนละ 1 ครั้ง" 
  ? "bg-white shadow-sm font-black text-[#0EA5E9] border border-slate-100" 
@@ -3999,7 +3999,7 @@ export default function HRPayroll() {
  </svg>
  )}
  </button>
- <button onClick={() => setPaymentFrequency("เดือนละ 2 ครั้ง")}
+ <button title="button" onClick={() => setPaymentFrequency("เดือนละ 2 ครั้ง")}
  className={`flex-1 text-center py-2.5 rounded-xl text-[13px] flex items-center justify-center gap-1 transition-all duration-200 ${
  paymentFrequency === "เดือนละ 2 ครั้ง" 
  ? "bg-white shadow-sm font-black text-[#0EA5E9] border border-slate-100" 
@@ -4014,7 +4014,7 @@ export default function HRPayroll() {
  )}
  </button>
  {payType === "รายวัน" && (
- <button onClick={() => setPaymentFrequency("ทุกสัปดาห์")}
+ <button title="button" onClick={() => setPaymentFrequency("ทุกสัปดาห์")}
  className={`flex-1 text-center py-2.5 rounded-xl text-[13px] flex items-center justify-center gap-1 transition-all duration-200 ${
  paymentFrequency === "ทุกสัปดาห์" 
  ? "bg-white shadow-sm font-black text-[#0EA5E9] border border-slate-100" 
@@ -4073,10 +4073,10 @@ export default function HRPayroll() {
  <label className="text-[13px] font-black text-slate-800">พนักงาน</label>
  <div className="flex items-center gap-3">
  <div className="flex max-w-xs bg-slate-100/80 rounded-2xl p-1 border border-slate-200/40 flex-1">
- <button className="flex-1 text-center py-2 bg-white shadow-sm rounded-xl text-[13px] font-black text-[#0EA5E9] border border-slate-100">
+ <button title="button" className="flex-1 text-center py-2 bg-white shadow-sm rounded-xl text-[13px] font-black text-[#0EA5E9] border border-slate-100">
  ทุกคน
  </button>
- <button className="flex-1 text-center py-2 text-slate-500 text-[13px] font-bold hover:text-slate-700 transition-colors">
+ <button title="button" className="flex-1 text-center py-2 text-slate-500 text-[13px] font-bold hover:text-slate-700 transition-colors">
  กำหนดเอง
  </button>
  </div>
@@ -4399,12 +4399,12 @@ export default function HRPayroll() {
 
  {/* Action Buttons moved inside */}
  <div className="flex items-center gap-3 mt-6 max-w-sm">
- <button onClick={() => setIsCreatingPeriod(false)}
+ <button title="button" onClick={() => setIsCreatingPeriod(false)}
  className="px-6 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl text-[13.5px] font-bold text-slate-600 transition-colors active:scale-95 shadow-sm flex-1 text-center"
  >
  ยกเลิก
  </button>
- <button onClick={() => {
+ <button title="button" onClick={() => {
  setIsCreatingPeriod(false);
  setToast("สร้างงวดเงินเดือนสำเร็จ");
  }}
@@ -4426,7 +4426,7 @@ export default function HRPayroll() {
  <div className="bg-white border-b border-slate-200/60 px-8 flex-shrink-0 z-20 flex items-center justify-between">
  <div className="flex items-center gap-2">
  {tabs.map((tab) => (
- <button key={tab.id}
+ <button title="button" key={tab.id}
  onClick={() => setActiveTab(tab.id)}
  className={`relative px-6 py-5 text-[14px] font-black transition-all group flex items-center gap-2 ${
  activeTab === tab.id ? "text-[#0EA5E9]" : "text-slate-400 hover:text-slate-600"
@@ -4487,7 +4487,7 @@ export default function HRPayroll() {
  {/* Year Selector */}
  <div className="relative">
  <div className="absolute -top-2.5 left-3 bg-white px-1 text-[10px] font-black text-slate-400 tracking-wider">ปี</div>
- <button onClick={() => setIsYearDropdownOpen(!isYearDropdownOpen)}
+ <button title="button" onClick={() => setIsYearDropdownOpen(!isYearDropdownOpen)}
  className="flex items-center gap-3 px-4 py-2.5 bg-white border border-slate-200/60 rounded-2xl text-[13.5px] font-bold text-slate-700 transition-all shadow-sm hover:border-slate-300"
  >
  <span>{selectedYear}</span>
@@ -4500,7 +4500,7 @@ export default function HRPayroll() {
  <div className="fixed inset-0 z-30" onClick={() => setIsYearDropdownOpen(false)} />
  <div className="absolute right-0 mt-2 w-32 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-40 animate-in fade-in duration-100 text-[13.5px] font-bold">
  {["2569", "2568", "2567"].map(year => (
- <button key={year}
+ <button title="button" key={year}
  onClick={() => {
  setSelectedYear(year);
  setIsYearDropdownOpen(false);
@@ -4536,7 +4536,7 @@ export default function HRPayroll() {
 
  {/* Earnings Settings button */}
  {activeTab !== "เงินสะสมประจำปี" && activeTab !== "ตั้งค่าสลิปเงินเดือน" && (
- <button onClick={() => setIsEarningsSettingsOpen(true)}
+ <button title="button" onClick={() => setIsEarningsSettingsOpen(true)}
  className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 border border-slate-200/60 text-slate-600 rounded-2xl text-[13.5px] font-bold transition-all shadow-sm"
  >
  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -4549,7 +4549,7 @@ export default function HRPayroll() {
  {/* Create Period Dropdown */}
  {activeTab !== "เงินสะสมประจำปี" && activeTab !== "ตั้งค่าสลิปเงินเดือน" && (
  <div className="relative">
- <button onClick={() => setIsCreatePeriodDropdownOpen(!isCreatePeriodDropdownOpen)}
+ <button title="button" onClick={() => setIsCreatePeriodDropdownOpen(!isCreatePeriodDropdownOpen)}
  className="flex items-center gap-2 px-5 py-2.5 bg-[#0EA5E9] hover:bg-sky-600 text-white rounded-[16px] text-[13.5px] font-black transition-all shadow-lg shadow-sky-100 active:scale-95"
  >
  <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -4563,7 +4563,7 @@ export default function HRPayroll() {
  
  {isCreatePeriodDropdownOpen && (
  <div className="absolute right-0 mt-2 w-44 bg-white rounded-2xl shadow-xl border border-slate-100/80 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
- <button onClick={() => {
+ <button title="button" onClick={() => {
  setIsCreatePeriodDropdownOpen(false);
  setIsCreatingPeriod(true);
  }}
@@ -4571,7 +4571,7 @@ export default function HRPayroll() {
  >
  สร้างงวด
  </button>
- <button onClick={() => {
+ <button title="button" onClick={() => {
  setIsCreatePeriodDropdownOpen(false);
  setIsCreatingSupplementaryPeriod(true);
  }}
@@ -4586,7 +4586,7 @@ export default function HRPayroll() {
 
  {/* Import Annual Accumulations Button */}
  {activeTab === "เงินสะสมประจำปี" && (
- <button onClick={() => setToast("นำเข้าเงินสะสมประจำปีสำเร็จ")}
+ <button title="button" onClick={() => setToast("นำเข้าเงินสะสมประจำปีสำเร็จ")}
  className="flex items-center gap-2 px-5 py-2.5 bg-[#0EA5E9] hover:bg-sky-600 text-white rounded-[16px] text-[13.5px] font-black transition-all shadow-lg shadow-sky-100 active:scale-95"
  >
  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -4734,7 +4734,7 @@ export default function HRPayroll() {
  {/* Toggle 1 */}
  <div className="flex items-center justify-between max-w-md">
  <span className="text-[14px] font-bold text-slate-700">อนุญาตให้พนักงานดูสลิป</span>
- <button onClick={() => setAllowEmployeeViewSlip(!allowEmployeeViewSlip)}
+ <button title="button" onClick={() => setAllowEmployeeViewSlip(!allowEmployeeViewSlip)}
  className={`w-12 h-6 flex items-center rounded-full p-1 transition-all duration-300 ${
  allowEmployeeViewSlip ? "bg-[#22C55E]" : "bg-slate-200"
  }`}
@@ -4748,7 +4748,7 @@ export default function HRPayroll() {
  {/* Dropdown Selection */}
  <div className="relative max-w-md mt-2">
  <div className="absolute -top-2.5 left-3 bg-white px-1.5 text-[10.5px] font-black text-sky-500 tracking-wider z-10">อนุญาตให้ดูสลิปเงินเดือนตั้งแต่สถานะ</div>
- <button onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+ <button title="button" onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
  className={`w-full flex items-center justify-between px-4 py-3.5 bg-white border rounded-2xl text-[13.5px] font-bold text-slate-700 transition-all shadow-sm ${
  isStatusDropdownOpen ? "border-sky-400 ring-2 ring-sky-400/10" : "border-slate-200"
  }`}
@@ -4764,7 +4764,7 @@ export default function HRPayroll() {
  <div className="fixed inset-0 z-30" onClick={() => setIsStatusDropdownOpen(false)} />
  <div className="absolute left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-40 animate-in fade-in duration-100 text-[13.5px] font-bold">
  {["คำนวณแล้ว", "รออนุมัติ", "อนุมัติแล้ว", "ชำระแล้ว", "ปิดงวด"].map((status) => (
- <button key={status}
+ <button title="button" key={status}
  onClick={() => {
  setViewSlipFromStatus(status);
  setIsStatusDropdownOpen(false);
@@ -4784,7 +4784,7 @@ export default function HRPayroll() {
  {/* Toggle 2 */}
  <div className="flex items-center justify-between max-w-md mt-2">
  <span className="text-[14px] font-bold text-slate-700">อนุญาตให้รับผ่าน Email</span>
- <button onClick={() => setAllowEmailDelivery(!allowEmailDelivery)}
+ <button title="button" onClick={() => setAllowEmailDelivery(!allowEmailDelivery)}
  className={`w-12 h-6 flex items-center rounded-full p-1 transition-all duration-300 ${
  allowEmailDelivery ? "bg-[#22C55E]" : "bg-slate-200"
  }`}
@@ -4840,7 +4840,7 @@ export default function HRPayroll() {
  {/* Header */}
  <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
  <h3 className="text-[16px] font-black text-slate-800">สร้างงวดเสริม</h3>
- <button onClick={() => setIsCreatingSupplementaryPeriod(false)}
+ <button title="button" onClick={() => setIsCreatingSupplementaryPeriod(false)}
  className="p-1.5 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-all"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -4933,14 +4933,14 @@ export default function HRPayroll() {
  <span className="text-[13px] font-black text-slate-800">พนักงาน</span>
  <div className="flex items-center gap-3">
  <div className="flex bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/30 flex-1">
- <button className="flex-1 text-center py-2 bg-white shadow-sm rounded-[10px] text-[12.5px] font-black text-[#0EA5E9]">
+ <button title="button" className="flex-1 text-center py-2 bg-white shadow-sm rounded-[10px] text-[12.5px] font-black text-[#0EA5E9]">
  พนักงานทุกคน
  </button>
- <button className="flex-1 text-center py-2 text-[12.5px] font-bold text-slate-500 hover:text-slate-700">
+ <button title="button" className="flex-1 text-center py-2 text-[12.5px] font-bold text-slate-500 hover:text-slate-700">
  กำหนดเอง
  </button>
  </div>
- <button className="p-2 bg-white hover:bg-slate-50 border border-slate-200/60 rounded-xl text-slate-400 hover:text-slate-600 transition-all shadow-sm">
+ <button title="button" className="p-2 bg-white hover:bg-slate-50 border border-slate-200/60 rounded-xl text-slate-400 hover:text-slate-600 transition-all shadow-sm">
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
  </svg>
@@ -4985,12 +4985,12 @@ export default function HRPayroll() {
 
  {/* Footer */}
  <div className="p-4 border-t border-slate-100 flex items-center justify-end gap-3 bg-slate-50/30">
- <button onClick={() => setIsCreatingSupplementaryPeriod(false)}
+ <button title="button" onClick={() => setIsCreatingSupplementaryPeriod(false)}
  className="px-5 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-[13px] font-bold text-slate-600 rounded-xl shadow-sm transition-colors active:scale-95"
  >
  ยกเลิก
  </button>
- <button onClick={() => {
+ <button title="button" onClick={() => {
  setIsCreatingSupplementaryPeriod(false);
  setToast("สร้างงวดเสริมสำเร็จ");
  }}

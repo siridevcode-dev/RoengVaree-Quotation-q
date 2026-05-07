@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useAppContext, BoatSpecification } from "@/context/AppContext";
+import ThaiAddressSelects from "../shared/ThaiAddressSelects";
 import { api } from "@/lib/api-client";
 
 export default function SalesSettings() {
@@ -104,7 +105,21 @@ export default function SalesSettings() {
                 </div>
                 <div className="md:col-span-2">
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">ที่อยู่</label>
-                  <textarea title="ที่อยู่บริษัท" placeholder="ระบุที่อยู่บริษัท" value={companyData.address || ""} onChange={(e) => setCompanyData({ ...companyData, address: e.target.value })} rows={2} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 resize-none" />
+                  <textarea title="ที่อยู่บริษัท" placeholder="ระบุที่อยู่บริษัท" value={companyData.address || ""} onChange={(e) => setCompanyData({ ...companyData, address: e.target.value })} rows={2} className="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 resize-none mb-4" />
+                  
+                  <ThaiAddressSelects 
+                    province={companyData.province || ""}
+                    district={companyData.district || ""}
+                    subDistrict={companyData.subDistrict || ""}
+                    zipCode={companyData.zipCode || ""}
+                    onProvinceChange={(v) => setCompanyData({ ...companyData, province: v })}
+                    onDistrictChange={(v) => setCompanyData({ ...companyData, district: v })}
+                    onSubDistrictChange={(v) => setCompanyData({ ...companyData, subDistrict: v })}
+                    onZipCodeChange={(v) => setCompanyData({ ...companyData, zipCode: v })}
+                    labelClassName="text-xs font-medium text-gray-500 mb-1.5 block"
+                    selectClassName="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all cursor-pointer appearance-none"
+                    inputClassName="w-full px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg text-gray-400 outline-none cursor-not-allowed"
+                  />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">อีเมล</label>

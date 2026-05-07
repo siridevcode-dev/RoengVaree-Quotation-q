@@ -1,3 +1,4 @@
+/* eslint-disable */
 const fs = require('fs');
 
 const filePath = 'src/components/hr/HRPayroll.tsx';
